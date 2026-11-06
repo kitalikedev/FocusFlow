@@ -48,81 +48,65 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 
 ## 4. Trạng thái Kho Lưu Trữ (Git & GitHub)
 
-* **Remote Repository URL:** `https://github.com/kitalikedev/FocusFlow.git`
-* **Nhánh hiện có:**
-  - Nhánh cục bộ (Local): `main`
-  - Nhánh từ xa (Remote): `origin/main`
-* **Nhánh đã merge vào `main`:** Chưa có (dự án vừa khởi tạo, chưa có Pull Request nào).
-* **Lịch sử Commit gần nhất (`git log --oneline -n 10`):**
-  - `895ea84` (`HEAD -> main, origin/main`): `add database migration and tighten agent safety rules` (Đã commit cập nhật an toàn `AGENTS.md` và migration database `20261105000000_init_schema.sql`).
-  - `e953f96`: `docs: initialize project specifications, agents instructions, and readme` (Commit khởi tạo đẩy các tệp tài liệu markdown và `.gitignore`).
-* **Bảo vệ nhánh `main` (Branch Protection):** Đang chờ người dùng bật trên GitHub Repository Settings (đây là lần push trực tiếp cuối cùng vào `main`).
-* **Tình trạng Working Tree hiện tại:**
-  - `AGENTS.md` và migration file đã được commit lên remote `origin/main`.
-  - Thư mục chưa được theo dõi (Untracked): `docs/plans/` (chứa `phase-0.md`, sẽ commit trên nhánh phase sau khi plan được duyệt).
+* **Remote:** `https://github.com/kitalikedev/FocusFlow.git`
+* **`main`:** commit gần nhất `8b723b5 chore: scaffold phase 0 foundation (#1)` (squash merge PR #1, CI `ci` xanh).
+* **Bảo vệ `main`:** Ruleset "Main Protection" đang hoạt động (PR bắt buộc, linear history, chặn force push và xóa). Chưa bật Require status checks (`ci`).
+* **Dependabot:** nhánh `dependabot/npm_and_yarn/multi-*` đề xuất nâng `vitest` và `@vitest/coverage-v8` lên 5.x trong khi `vite` giữ 5.x. Chưa merge; xử lý trong PR chore nâng cấp toolchain riêng.
 
 ---
 
 ## 5. Trạng thái Mã Nguồn (Codebase Status)
 
-Đối chiếu với cấu trúc thư mục kiến trúc tại Mục 3 `docs/ARCHITECTURE.md`:
+Phase 0 đã có trên `main`:
 
-| Phân vùng Kiến trúc | Trạng thái Thực tế trong Workspace | Đánh giá |
-| :--- | :--- | :--- |
-| **Cấu hình & Scripts** (`package.json`, `tsconfig.json`, `vite.config.ts`, Tailwind, ESLint) | **Chưa tồn tại** | Chưa khởi tạo dự án npm. |
-| **Tài nguyên Tĩnh** (`public/fonts/`, `public/wallpapers/`) | **Chưa tồn tại** | Chưa nạp tệp font hay ảnh tĩnh. |
-| **Composition Root & Layout** (`src/app/`) | **Chưa tồn tại** | Chưa có `App.tsx`, `layout.tsx`, `slots.tsx`. |
-| **Core Modules** (`src/core/`) | **Chưa tồn tại** | Chưa có `theme/`, `ui/`, `hud/`, `timer/`, `auth/`, `data/`, `shortcuts/`. |
-| **Feature Modules** (`src/features/`) | **Chưa tồn tại** | Chưa có `clock-modes/`, `theme-wallpaper/`, `audio/`, `productivity/`. |
-| **Tầng Dùng chung** (`src/shared/`) | **Chưa tồn tại** | Chưa có `contracts.ts` hay `lib/supabase.ts`. |
+| Phân vùng | Trạng thái |
+| :--- | :--- |
+| Cấu hình (`package.json`, tsconfig, Vite, Vitest, Tailwind, ESLint, Prettier, `vercel.json`, `.env.example`, `.nvmrc` Node 22, CI) | Hoàn tất |
+| `src/app/` (App, layout, providers, 11 slot trong `slots.tsx`) | Hoàn tất (stub) |
+| `src/core/theme`, `src/core/ui`, `src/core/hud` (stub) | Hoàn tất |
+| `src/features/*` (4 stub) | Hoàn tất (stub) |
+| `src/shared/types/contracts.ts`, `src/shared/lib/supabase.ts` (lazy) | Hoàn tất |
+| `src/core/timer`, `auth`, `data`, `shortcuts` | Chưa có |
 
-* **Đánh giá chung:** Mã nguồn ứng dụng (application code) ở trạng thái **0% (chưa bắt đầu viết code)**. Toàn bộ tài nguyên hiện có là hệ thống tài liệu đặc tả, kế hoạch triển khai và tệp định nghĩa database migration.
-
----
-
-## 6. Trạng thái Từng Phase Triển khai
-
-Theo lộ trình 4 Phase xác lập tại Mục 15 `docs/ARCHITECTURE.md`:
-
-* **Phase 0 — Khởi tạo Kiến trúc Nền tảng (Scaffold & Foundation):**  
-  * **Trạng thái:** **Đang Plan (Chờ người dùng duyệt kế hoạch)**.  
-  * **Chi tiết:** Đã lập xong kế hoạch kỹ thuật chi tiết tại [`docs/plans/phase-0.md`](plans/phase-0.md) gồm 8 mục (danh sách tệp, danh mục dependency Vite/React/Tailwind/Vitest/ESLint, 9 bước thực hiện tuần tự kèm lệnh kiểm chứng, 5 ca kiểm thử và 7 tiêu chí DoD). Chưa tạo nhánh `chore/phase-0-init` và chưa cài package.
-* **Phase 1 — Tầng Dữ liệu, Auth & Guest Migration:**  
-  * **Trạng thái:** **Sẵn sàng triển khai khi hoàn tất Phase 0** (DB Cloud và Storage đã chuẩn bị xong, migration đã chạy đạt).  
-  * **Chi tiết:** Đã có sẵn tệp migration SQL `supabase/migrations/20261105000000_init_schema.sql` và đặc tả API trong `docs/API_DOCS.md`.
-* **Phase 2 — Động cơ Đếm Giờ, Phím Tắt, Âm Báo & HUD:**  
-  * **Trạng thái:** **Chưa bắt đầu**.
-* **Phase 3 — Hiện thực hóa 4 Feature Modules Độc lập:**  
-  * **Gói 3A (`clock-modes`):** Chưa bắt đầu.  
-  * **Gói 3B (`theme-wallpaper`):** Chưa bắt đầu.  
-  * **Gói 3C (`audio`):** Chưa bắt đầu.  
-  * **Gói 3D (`productivity`):** Chưa bắt đầu.
-* **Tính năng Nâng cao (P2):** Chưa bắt đầu.
+Chỉ số: lint 0/0, typecheck sạch, 5 file test / 14 test xanh, coverage `src/core` 100%, initial JS gzip khoảng 51 KB (ngưỡng 200 KB).
 
 ---
 
-## 7. Việc Đang Dang Dở Ngay Lúc Này
+## 6. Trạng thái Từng Phase
 
-1. **Kế hoạch Phase 0 đang chờ phê duyệt:**  
-   * Tệp [`docs/plans/phase-0.md`](plans/phase-0.md) đã được soạn thảo hoàn chỉnh, đang ở trạng thái chờ người dùng xác nhận thông qua trước khi chuyển sang nhánh `chore/phase-0-init`.
-
----
-
-## 8. Việc Cần Làm Tiếp Theo (Thứ tự Ưu tiên)
-
-1. **Ưu tiên 1:** Bật branch protection cho nhánh `main` và mời 4 thành viên (người dùng thực hiện trên giao diện GitHub Repository Settings).
-2. **Ưu tiên 2:** Người dùng xem xét và phê duyệt kế hoạch triển khai Phase 0 tại [`docs/plans/phase-0.md`](plans/phase-0.md).
-3. **Ưu tiên 3:** Tạo và checkout sang nhánh làm việc `chore/phase-0-init` từ `main`.
-4. **Ưu tiên 4:** Thực thi Phase 0 theo 9 bước: khởi tạo `package.json`, cài đặt dependencies, cấu hình TypeScript strict, Tailwind CSS mapped CSS variables, ESLint directory overrides, Vitest + RTL, hiện thực `core/theme`, `core/ui`, `core/hud`, `slots.tsx` và stub components cho 4 features.
-5. **Ưu tiên 5:** Chạy chuỗi kiểm thử xác thực DoD (`npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`), bảo đảm bundle ban đầu <= 200 KB, và mở Pull Request vào `main`.
+* **Phase 0:** **Hoàn tất**, đã merge (PR #1).
+* **Phase 1 (Data, Auth, Guest migration):** Chưa bắt đầu; cần `.env.local` với `VITE_SUPABASE_URL` và `VITE_SUPABASE_PUBLISHABLE_KEY`. Bước tiếp theo là lập plan.
+* **Phase 2 (Timer, phím tắt, âm báo, HUD):** Chưa bắt đầu.
+* **Phase 3 (3A `clock-modes`, 3B `theme-wallpaper`, 3C `audio`, 3D `productivity`):** Chưa bắt đầu; bắt đầu sau Phase 2.
+* **P2 và E2E Playwright:** Chưa bắt đầu.
 
 ---
 
-## 9. Rủi ro & Quyết định Đang Chờ Người Dùng Duyệt
+## 7. Việc Đang Dang Dở
 
-1. **Phê duyệt Kế hoạch Phase 0:** Xác nhận nội dung trong [`docs/plans/phase-0.md`](plans/phase-0.md) (danh mục dependencies, thứ tự các bước và tiêu chí DoD).
-2. **Quyết định Font Chữ Phase 0:** Xác nhận phương án tạm thời sử dụng font hệ thống (`Inter, -apple-system, sans-serif`) ở Phase 0 và chỉ tích hợp nạp font WOFF2 self-hosted tại Phase 3B.
+1. Bật Require status checks (`ci`) trong ruleset.
+2. Import repo vào Vercel (Node 22.x, 2 biến `VITE_*`), kiểm tra lỗi CSP trên preview.
+3. Mời 4 thành viên, rà soát cài đặt GitHub (Squash only, auto delete head branches, secret scanning), thêm LICENSE, điền About/topics.
 
 ---
 
-*Cập nhật lần cuối: 2026-11-06T11:25:00+07:00*
+## 8. Việc Cần Làm Tiếp Theo
+
+1. Lập plan Phase 1 (Planning only) tại `docs/plans/phase-1.md`, người dùng duyệt rồi mới code.
+2. Thực thi Phase 1, rồi Phase 2.
+3. Chuẩn bị 4 nhánh `feature/<module>` có code sẵn cho thành viên (Phase 3).
+4. PR chore riêng: nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8).
+
+---
+
+## 9. Rủi ro & Lưu ý
+
+1. ARCHITECTURE ghi 10 slot nhưng `slots.tsx` có 11; cần chỉnh docs.
+2. Docs còn LaTeX (ARCHITECTURE, README), mang tính thẩm mỹ.
+3. CSP trong `vercel.json` chỉ kiểm chứng được trên Vercel preview.
+4. Thêm supabase-js ở Phase 1 làm bundle tăng khoảng 40–50 KB gzip, vẫn trong ngưỡng.
+5. devDependencies còn 12 lỗ hổng audit (production = 0), xử lý bằng PR nâng toolchain.
+
+---
+
+*Cập nhật lần cuối: 2026-11-06*
