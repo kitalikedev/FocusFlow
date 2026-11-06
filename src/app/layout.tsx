@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
+import { useAuthStore } from '@/core/auth/useAuthStore';
+import { ToastViewport } from '@/core/ui/ToastViewport';
 import {
   WallpaperLayerSlot,
   EffectsLayerSlot,
@@ -12,6 +14,22 @@ import {
   SidePanelsSlot,
   DrawerTabsSlot,
 } from './slots';
+
+// Auth dialogs are loaded on demand so they never weigh on the initial bundle.
+const AuthModal = lazy(() => import('@/core/auth/AuthModal'));
+const GuestMergeDialog = lazy(() => import('@/core/auth/GuestMergeDialog'));
+
+const AuthOverlays: React.FC = () => {
+  const isAuthModalOpen = useAuthStore((state) => state.isAuthModalOpen);
+  const mergePrompt = useAuthStore((state) => state.mergePrompt);
+
+  return (
+    <Suspense fallback={null}>
+      {isAuthModalOpen && <AuthModal />}
+      {mergePrompt !== 'hidden' && <GuestMergeDialog />}
+    </Suspense>
+  );
+};
 
 export const Layout: React.FC = () => {
   return (
@@ -47,6 +65,8 @@ export const Layout: React.FC = () => {
       {/* Global Modals */}
       <WallpaperPickerSlot />
       <ThemeCustomizerSlot />
+      <AuthOverlays />
+      <ToastViewport />
     </WallpaperLayerSlot>
   );
 };

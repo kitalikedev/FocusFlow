@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { HudSlot } from '../HudSlot';
 import { useUiStore } from '../../ui/useUiStore';
+import { useAuthStore } from '../../auth/useAuthStore';
 
 describe('HudSlot', () => {
   beforeEach(() => {
@@ -9,6 +10,7 @@ describe('HudSlot', () => {
       isZen: false,
       isFullscreen: false,
     });
+    useAuthStore.setState({ user: null, isGuest: true, isConfigured: true });
   });
 
   it('renders brand, 4 cycle dots, streak badge, and fullscreen button', () => {
@@ -28,6 +30,17 @@ describe('HudSlot', () => {
     expect(useUiStore.getState().isFullscreen).toBe(false);
     fireEvent.click(btn);
     expect(useUiStore.getState().isFullscreen).toBe(true);
+  });
+
+  it('shows the Login button for guests (FR-01 entry point)', () => {
+    render(<HudSlot />);
+    expect(screen.getByTestId('login-btn')).toBeInTheDocument();
+  });
+
+  it('shows the account menu for signed-in users', () => {
+    useAuthStore.setState({ user: { id: 'u1', email: 'a@b.co' }, isGuest: false });
+    render(<HudSlot />);
+    expect(screen.getByTestId('account-btn')).toBeInTheDocument();
   });
 
   it('renders nothing when isZen is true', () => {

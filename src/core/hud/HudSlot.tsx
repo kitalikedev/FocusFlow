@@ -1,6 +1,7 @@
 import React from 'react';
 import { Maximize2, Minimize2, Flame } from 'lucide-react';
 import { useHud } from './useHud';
+import { AccountMenu } from './AccountMenu';
 
 export const HudSlot: React.FC = () => {
   const {
@@ -57,6 +58,7 @@ export const HudSlot: React.FC = () => {
 
       {/* Actions */}
       <div className="flex items-center gap-3">
+        <AccountMenu />
         <button
           data-testid="fullscreen-btn"
           onClick={toggleFullscreen}
