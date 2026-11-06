@@ -102,7 +102,7 @@ export interface TimerState {
   mode: TimerMode;
   status: TimerStatus;
   sessionType: SessionType;
-  remainingSeconds: number;
+  remainingSeconds: number;     // Stopwatch mode: giây ĐÃ TRÔI (đếm xuôi), không phải giây còn lại
   targetEndTime: number | null; // Timestamp mili-giây Date.now()
   durations: TimerDurations;
   cyclesCompleted: number;      // Chỉ tăng khi hoàn thành phiên focus

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useUiStore } from '../useUiStore';
+import { isFullscreenSupported, useUiStore, watchFullscreen } from '../useUiStore';
 
 describe('useUiStore', () => {
   beforeEach(() => {
@@ -24,29 +24,59 @@ describe('useUiStore', () => {
     expect(useUiStore.getState().isZen).toBe(false);
   });
 
-  it('toggles isFullscreen state and calls requestFullscreen/exitFullscreen safely', () => {
+  it('toggleFullscreen asks the browser to enter and leave fullscreen without touching the state', () => {
     document.documentElement.requestFullscreen = vi.fn().mockResolvedValue(undefined);
     document.exitFullscreen = vi.fn().mockResolvedValue(undefined);
 
+    useUiStore.getState().toggleFullscreen();
+    expect(document.documentElement.requestFullscreen).toHaveBeenCalledTimes(1);
     expect(useUiStore.getState().isFullscreen).toBe(false);
 
+    Object.defineProperty(document, 'fullscreenElement', { value: document.documentElement, configurable: true });
     useUiStore.getState().toggleFullscreen();
+    expect(document.exitFullscreen).toHaveBeenCalledTimes(1);
+
+    Object.defineProperty(document, 'fullscreenElement', { value: null, configurable: true });
+  });
+
+  it('a rejected or missing fullscreen request never throws or flips the state', async () => {
+    document.documentElement.requestFullscreen = vi.fn().mockRejectedValue(new Error('denied'));
+    expect(() => useUiStore.getState().toggleFullscreen()).not.toThrow();
+    await Promise.resolve();
+    expect(useUiStore.getState().isFullscreen).toBe(false);
+
+    (document.documentElement as { requestFullscreen?: unknown }).requestFullscreen = undefined;
+    expect(() => useUiStore.getState().toggleFullscreen()).not.toThrow();
+  });
+
+  it('watchFullscreen keeps isFullscreen in sync with the browser, including Esc', () => {
+    const stop = watchFullscreen();
+    expect(useUiStore.getState().isFullscreen).toBe(false);
+
+    Object.defineProperty(document, 'fullscreenElement', { value: document.documentElement, configurable: true });
+    document.dispatchEvent(new Event('fullscreenchange'));
     expect(useUiStore.getState().isFullscreen).toBe(true);
 
-    // Mock document.fullscreenElement to be present for exit
-    Object.defineProperty(document, 'fullscreenElement', {
-      value: document.documentElement,
-      configurable: true,
-    });
-
-    useUiStore.getState().toggleFullscreen();
+    Object.defineProperty(document, 'fullscreenElement', { value: null, configurable: true });
+    document.dispatchEvent(new Event('fullscreenchange'));
     expect(useUiStore.getState().isFullscreen).toBe(false);
-    expect(document.exitFullscreen).toHaveBeenCalled();
 
-    Object.defineProperty(document, 'fullscreenElement', {
-      value: null,
-      configurable: true,
-    });
+    stop();
+    Object.defineProperty(document, 'fullscreenElement', { value: document.documentElement, configurable: true });
+    document.dispatchEvent(new Event('fullscreenchange'));
+    expect(useUiStore.getState().isFullscreen).toBe(false);
+    Object.defineProperty(document, 'fullscreenElement', { value: null, configurable: true });
+  });
+
+  it('isFullscreenSupported depends on the browser capability', () => {
+    document.documentElement.requestFullscreen = vi.fn();
+    Object.defineProperty(document, 'fullscreenEnabled', { value: true, configurable: true });
+    expect(isFullscreenSupported()).toBe(true);
+    Object.defineProperty(document, 'fullscreenEnabled', { value: false, configurable: true });
+    expect(isFullscreenSupported()).toBe(false);
+    Object.defineProperty(document, 'fullscreenEnabled', { value: undefined, configurable: true });
+    (document.documentElement as { requestFullscreen?: unknown }).requestFullscreen = undefined;
+    expect(isFullscreenSupported()).toBe(false);
   });
 
   it('manages modal open states and closes all with closeAllModals', () => {

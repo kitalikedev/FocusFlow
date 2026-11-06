@@ -5,6 +5,7 @@ import { useThemeStore } from '@/core/theme/useThemeStore';
 import { useToastStore } from '@/core/ui/useToastStore';
 import { createDefaultSettings } from './defaults';
 import { getDataRepository } from './useDataRepository';
+import { trackWrite } from './useSyncStatusStore';
 
 export type SettingsStatus = 'idle' | 'loading' | 'ready' | 'error';
 
@@ -43,7 +44,7 @@ export const useSettingsStore = create<SettingsStoreState>((set) => ({
 
   update: async (partial) => {
     try {
-      const settings = await getDataRepository().saveSettings(partial);
+      const settings = await trackWrite(() => getDataRepository().saveSettings(partial));
       set({ settings, status: 'ready' });
       if (partial.activeTheme) applyThemeFrom(settings);
     } catch (error) {
