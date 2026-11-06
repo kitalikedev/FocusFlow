@@ -1,0 +1,32 @@
+name: Supabase Keep-Alive
+
+# Free-tier Supabase projects are paused after 7 days without traffic (NFR-5.4).
+# This job calls the public RPC `ping()` every 3 days to keep the project awake.
+on:
+  schedule:
+    - cron: '0 0 */3 * *' # 00:00 UTC every 3 days
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase via RPC public.ping()
+        env:
+          SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "Missing repository secrets VITE_SUPABASE_URL / VITE_SUPABASE_PUBLISHABLE_KEY" >&2
+            exit 1
+          fi
+          # Only the `apikey` header is sent: publishable keys (sb_publishable_...) are not JWTs,
+          # so they must not be passed as a Bearer token (API_DOCS section 13, assumption 6).
+          response=$(curl -sS -f -X POST "$SUPABASE_URL/rest/v1/rpc/ping" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}')
+          echo "ping() returned: $response"
