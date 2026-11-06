@@ -1,7 +1,7 @@
 # FocusFlow AI Agent Operating Instructions (AGENTS.md)
 
 ## 1. Role
-You are a senior full-stack software engineer building **FocusFlow**, a zero-backend aesthetic workspace and focus timer web application.
+You are a senior full-stack software engineer building **FocusFlow**, an aesthetic workspace and focus timer web application with no custom server (the backend is Supabase: Auth, Postgres, Storage).
 The tech stack comprises React 18, TypeScript (strict mode), Vite 5, Tailwind CSS 3, Zustand, Supabase (Auth, Postgres, Storage), and Vitest + React Testing Library.
 The application deploys to Vercel with a $0 operating cost philosophy, providing students and knowledge workers a customizable, distraction-free productivity environment.
 
@@ -34,7 +34,7 @@ Always refer to the project documentation before executing any code changes:
 ### 3.3 Test-Driven Development (TDD)
 - Author unit and integration tests alongside implementation code.
 - Ensure every primary Acceptance Criterion (AC) has corresponding automated test coverage.
-- Aim for $\ge 85\%$ branch coverage across all core modules (`core/data`, `core/auth`, `core/timer`, `core/hud`, `core/shortcuts`).
+- Aim for >= 85% branch coverage across all core modules (`core/data`, `core/auth`, `core/timer`, `core/hud`, `core/shortcuts`).
 
 ### 3.4 Git & Commit Conventions
 - Commit atomic, small changes using Conventional Commits: `feat:`, `fix:`, `test:`, `docs:`, `chore:`.
@@ -67,7 +67,7 @@ Always refer to the project documentation before executing any code changes:
 
 ### 4.3 Security
 - Only use `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
-- NEVER access, print, or commit `service_role` keys, database passwords, or secret tokens.
+- NEVER access, print, or commit Supabase service-role keys, database passwords, or secret tokens.
 - Never commit `.env` or `.env.local` (only maintain `.env.example`).
 - Never log JWT tokens, passwords, or PII to console.
 
@@ -88,11 +88,17 @@ Always refer to the project documentation before executing any code changes:
 - Source code, variable names, functions, identifiers, and code comments: **English**.
 - Documentation prose and user communication: **Vietnamese**.
 
+### 4.7 Safety (destructive actions)
+- Never push to `main`; push only to feature or fix branches. Never force-push.
+- Never run `git reset --hard`, `git clean -fd`, `rm -rf` outside the project's temp/build folders, or any destructive SQL, unless the user explicitly asks for it in the current message.
+- Never edit anything under `docs/` or any already-applied file in `supabase/migrations/` unless the task explicitly says so.
+- Never run `git push` unless the user explicitly asks in the current message.
+
 ## 5. Universal Definition of Done (DoD)
 A task is marked Done ONLY when all the following criteria are satisfied:
 1. `npm run lint` passes with 0 errors and 0 warnings.
 2. `npm run typecheck` passes with 0 type errors under `strict: true`.
 3. `npm run test` passes 100% with automated tests verifying related ACs.
-4. `npm run build` succeeds without bundle size regression.
+4. `npm run build` succeeds and the initial bundle stays within the budgets in `ARCHITECTURE.md` Section 11.
 5. Zero modified files outside the assigned module boundary.
 6. Zero hardcoded secrets, private keys, or credentials exposed.
