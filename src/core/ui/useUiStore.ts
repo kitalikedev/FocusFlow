@@ -20,22 +20,14 @@ export const useUiStore = create<UiStore>((set) => ({
 
   toggleZen: () => set((state) => ({ isZen: !state.isZen })),
 
+  // The state follows the browser's `fullscreenchange` event (see watchFullscreen), so pressing Esc or
+  // a rejected request can never leave `isFullscreen` out of sync.
   toggleFullscreen: () => {
-    set((state) => {
-      const nextFullscreen = !state.isFullscreen;
-      if (typeof document !== 'undefined') {
-        if (nextFullscreen) {
-          if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen?.().catch(() => {});
-          }
-        } else {
-          if (document.fullscreenElement) {
-            document.exitFullscreen?.().catch(() => {});
-          }
-        }
-      }
-      return { isFullscreen: nextFullscreen };
-    });
+    if (document.fullscreenElement) {
+      void Promise.resolve(document.exitFullscreen?.()).catch(() => {});
+    } else {
+      void Promise.resolve(document.documentElement.requestFullscreen?.()).catch(() => {});
+    }
   },
 
   setMixerOpen: (isOpen: boolean) => set({ isMixerOpen: isOpen }),
@@ -55,3 +47,16 @@ export const useUiStore = create<UiStore>((set) => ({
       isAnalyticsOpen: false,
     }),
 }));
+
+/** Whether the browser can enter fullscreen at all (not the case on iPhone Safari). */
+export function isFullscreenSupported(): boolean {
+  return document.fullscreenEnabled !== false && typeof document.documentElement.requestFullscreen === 'function';
+}
+
+/** Mirrors the browser fullscreen state into the store; returns the cleanup function. */
+export function watchFullscreen(): () => void {
+  const sync = () => useUiStore.setState({ isFullscreen: Boolean(document.fullscreenElement) });
+  document.addEventListener('fullscreenchange', sync);
+  sync();
+  return () => document.removeEventListener('fullscreenchange', sync);
+}
