@@ -252,31 +252,33 @@ PostgREST cung cấp giao diện RESTful trực tiếp trên các bảng Postgre
     "auto_start_focus": false,
     "clock_visual_mode": "minimal",
     "clock_position": "center",
-    "active_wallpaper_id": "preset-obsidian",
+    "active_wallpaper_id": "preset-lofi-cafe",
     "volume_rain": 0.50,
     "volume_brown_noise": 0.00,
     "volume_campfire": 0.00,
     "volume_master": 0.80,
     "is_migrated": true,
     "active_theme": {
-      "name": "Obsidian Minimal",
+      "presetId": "obsidian-minimal",
       "tokens": {
-        "colorAccent": "#6366f1",
-        "colorAccentContrast": "#ffffff",
-        "colorBg": "#09090b",
-        "capsuleBg": "#18181b",
-        "capsuleOpacity": 0.85,
-        "capsuleBorder": "rgba(255,255,255,0.1)",
-        "capsuleBlur": 16,
+        "colorAccent": "#ffffff",
+        "colorAccentContrast": "#000000",
+        "capsuleBg": "rgba(0, 0, 0, 0.35)",
+        "capsuleOpacity": 0.35,
+        "capsuleBlur": 24,
         "capsuleRadius": 24,
-        "fontFamily": "Inter, sans-serif",
-        "fontSizeTimer": "5rem",
-        "bgDim": 0.3,
-        "bgBrightness": 1.0,
-        "bgEffect": "none",
-        "bgEffectIntensity": 0.5,
-        "showSeconds": false
-      }
+        "capsuleBorderWidth": 1,
+        "capsuleBorderColor": "rgba(255, 255, 255, 0.1)",
+        "fontClock": "'Inter', -apple-system, sans-serif",
+        "clockScale": 1.0,
+        "clockWeight": 600,
+        "bgDim": 20,
+        "bgBlur": 0,
+        "bgBrightness": 100,
+        "bgSolidColor": "#09090b"
+      },
+      "effects": { "rain": 0, "snow": 0, "fireflies": 0, "grain": 0, "vignette": 0 },
+      "wallpaperRef": { "type": "solid", "idOrColor": "#09090b" }
     },
     "created_at": "2026-11-05T10:00:00Z",
     "updated_at": "2026-11-05T10:00:00Z"
@@ -876,20 +878,20 @@ Bảng đối chiếu toàn diện giữa hợp đồng giao diện `DataReposit
 
 | Tên Phương thức | Tham số | Kiểu Trả về | Hành vi `LocalRepository` (Guest) | Hành vi `SupabaseRepository` (Cloud) | Lỗi có kiểu (Typed Error) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| `getTasks` | `filter?: TaskFilterParams` | `Promise<TaskItem[]>` | Đọc từ `localStorage('ff_tasks')`, lọc và sắp xếp bằng mảng JS. | Gọi `GET /rest/v1/tasks` kèm các query params lọc/sắp xếp tương ứng. | `NetworkError` |
-| `createTask` | `title: string, options?: Partial<TaskItem>` | `Promise<TaskItem>` | Kiểm tra quota $\le 500$, sinh UUID v4, lưu vào `localStorage`. | Gọi `POST /rest/v1/tasks` kèm UUID v4 do client sinh. | `QuotaExceededError`, `ValidationError` |
+| `getTasks` | `filter?: TaskFilterParams` | `Promise<TaskItem[]>` | Đọc từ `localStorage('focusflow_tasks')`, lọc và sắp xếp bằng mảng JS. | Gọi `GET /rest/v1/tasks` kèm các query params lọc/sắp xếp tương ứng. | `NetworkError` |
+| `createTask` | `title: string, options?: Partial<TaskItem>` | `Promise<TaskItem>` | Kiểm tra quota $\le 100$, sinh UUID v4, lưu vào `localStorage`. | Gọi `POST /rest/v1/tasks` kèm UUID v4 do client sinh. | `QuotaExceededError`, `ValidationError` |
 | `updateTask` | `id: string, updates: Partial<TaskItem>` | `Promise<TaskItem>` | Cập nhật phần tử trong mảng local, đổi `updatedAt`. | Gọi `PATCH /rest/v1/tasks?id=eq.<id>`. So khớp LWW. | `NotFoundError`, `NetworkError` |
 | `deleteTask` | `id: string` | `Promise<void>` | Lọc bỏ phần tử khỏi mảng local. | Gọi `DELETE /rest/v1/tasks?id=eq.<id>`. FK cascade set null. | `NetworkError` |
-| `getNote` | Không | `Promise<NoteItem>` | Đọc `localStorage('ff_note')` hoặc trả về note rỗng mặc định. | Gọi `GET /rest/v1/notes` với `user_id`. | `NetworkError` |
-| `saveNote` | `content: string` | `Promise<NoteItem>` | Kiểm tra $\le 100\text{KB}$, ghi đè `localStorage('ff_note')`. | Gọi `POST /rest/v1/notes?on_conflict=user_id`. | `ContentTooLargeError` |
-| `getSettings` | Không | `Promise<UserSettings>` | Đọc `localStorage('ff_settings')` hoặc trả về bộ preset Obsidian. | Gọi `GET /rest/v1/user_settings`. | `NetworkError` |
-| `saveSettings`| `settings: Partial<UserSettings>` | `Promise<UserSettings>` | Gộp thuộc tính và ghi `localStorage('ff_settings')`. | Gọi `POST /rest/v1/user_settings?on_conflict=user_id`. | `NetworkError` |
-| `recordFocusSession`| `durationMinutes: number, intentTitle?: string, taskId?: string` | `Promise<FocusSessionRecord>`| Sinh UUID v4, thêm vào mảng `localStorage('ff_sessions')`. | Gọi `POST /rest/v1/focus_sessions`. Fallback `taskId=null` nếu lỗi 23503. | `NetworkError` |
-| `getFocusSessions`| Không | `Promise<FocusSessionRecord[]>` | Đọc mảng từ `localStorage('ff_sessions')`. | Gọi `GET /rest/v1/focus_sessions?order=completed_at.desc`. | `NetworkError` |
-| `getWallpapers`| Không | `Promise<WallpaperMetadata[]>` | Trả về 6 Presets tĩnh + tối đa 1 custom wallpaper từ IndexedDB. | Trả về 6 Presets tĩnh + gọi `GET /rest/v1/user_wallpapers`. | `NetworkError` |
+| `getNote` | Không | `Promise<NoteItem>` | Đọc `localStorage('focusflow_notes')` hoặc trả về note rỗng mặc định. | Gọi `GET /rest/v1/notes` với `user_id`. | `NetworkError` |
+| `saveNote` | `content: string` | `Promise<NoteItem>` | Kiểm tra $\le 50{,}000$ ký tự, ghi đè `localStorage('focusflow_notes')`. | Gọi `POST /rest/v1/notes?on_conflict=user_id`. | `ContentTooLargeError` |
+| `getSettings` | Không | `Promise<UserSettings>` | Đọc `localStorage('focusflow_settings')` hoặc trả về bộ preset Obsidian. | Gọi `GET /rest/v1/user_settings`. | `NetworkError` |
+| `saveSettings`| `settings: Partial<UserSettings>` | `Promise<UserSettings>` | Gộp thuộc tính và ghi `localStorage('focusflow_settings')`. | Gọi `POST /rest/v1/user_settings?on_conflict=user_id`. | `NetworkError` |
+| `recordFocusSession`| `durationMinutes: number, intentTitle?: string, taskId?: string` | `Promise<FocusSessionRecord>`| Sinh UUID v4, thêm vào mảng `localStorage('focusflow_sessions')`. | Gọi `POST /rest/v1/focus_sessions`. Fallback `taskId=null` nếu lỗi 23503. | `NetworkError` |
+| `getFocusSessions`| Không | `Promise<FocusSessionRecord[]>` | Đọc mảng từ `localStorage('focusflow_sessions')`. | Gọi `GET /rest/v1/focus_sessions?order=completed_at.desc`. | `NetworkError` |
+| `getWallpapers`| Không | `Promise<WallpaperMetadata[]>` | Chỉ trả tối đa 1 ảnh custom từ IndexedDB (danh sách preset do gói `theme-wallpaper` tự ghép). | Chỉ trả ảnh custom: gọi `GET /rest/v1/user_wallpapers` (danh sách preset do gói `theme-wallpaper` tự ghép). | `NetworkError` |
 | `uploadCustomWallpaper`| `file: File, luminance: number` | `Promise<WallpaperMetadata>` | Lưu Blob vào IndexedDB (tối đa 1 file với Guest). | Upload lên Storage `user-wallpapers` + Chèn DB metadata. Rollback khi lỗi. | `QuotaExceededError`, `FileTooLargeError` |
 | `deleteCustomWallpaper`| `id: string` | `Promise<void>` | Xóa khỏi IndexedDB. | Gọi `DELETE /rest/v1/user_wallpapers` rồi xóa file Storage. | `NotFoundError` |
-| `getSavedThemes`| Không | `Promise<SavedTheme[]>` | Đọc từ `localStorage('ff_themes')` (tối đa 3 themes). | Gọi `GET /rest/v1/saved_themes`. | `NetworkError` |
+| `getSavedThemes`| Không | `Promise<SavedTheme[]>` | Đọc từ `localStorage('focusflow_saved_themes')` (tối đa 3 themes). | Gọi `GET /rest/v1/saved_themes`. | `NetworkError` |
 | `saveTheme` | `theme: Omit<SavedTheme, 'id' \| 'createdAt' \| 'updatedAt'>` | `Promise<SavedTheme>` | Kiểm tra quota $\le 3$, sinh UUID v4, lưu local. | Kiểm tra quota $\le 10$, gọi `POST /rest/v1/saved_themes`. Bắt lỗi trigger. | `ThemeLimitError`, `ValidationError` |
 | `renameTheme` | `id: string, name: string` | `Promise<SavedTheme>` | Sửa tên trong `localStorage`. | Gọi `PATCH /rest/v1/saved_themes?id=eq.<id>`. | `NotFoundError` |
 | `deleteTheme` | `id: string` | `Promise<void>` | Xóa khỏi `localStorage`. | Gọi `DELETE /rest/v1/saved_themes?id=eq.<id>`. | `NetworkError` |
@@ -1135,10 +1137,12 @@ export const mockSupabase = {
   rpc: vi.fn().mockResolvedValue({ data: 1, error: null }),
 };
 
-vi.mock('@/shared/lib/supabase', () => ({
-  supabase: mockSupabase,
-}));
+// Code thật export getter lazy `getSupabaseClient()`; bản mock trả về `mockSupabase`.
+export const getSupabaseClient = () => mockSupabase;
+export const isSupabaseConfigured = () => true;
 ```
+
+Cách dùng trong test: gọi `vi.mock('@/shared/lib/supabase')` (tự nhận file `__mocks__` cạnh module) rồi lấy client bằng `getSupabaseClient()`.
 
 ### 11.2. Danh mục Ca Kiểm thử Hợp đồng Bắt buộc (Contract Test Matrix)
 

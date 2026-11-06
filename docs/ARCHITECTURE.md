@@ -150,9 +150,14 @@ FocusFlow/
 │   │   └── slots.tsx              # Registry các Plug-and-Play UI Slots (tự đọc useUiStore)
 │   ├── core/
 │   │   ├── timer/                 # FR-04, FR-05, FR-06
-│   │   │   ├── timer.worker.ts    # Web Worker phát nhịp tick định kỳ 1000ms
-│   │   │   ├── timer-engine.ts    # Tính toán chênh lệch Date.now() & chuyển trạng thái
+│   │   │   ├── timer.worker.ts    # Web Worker phát nhịp tick đúng ranh giới mỗi giây
+│   │   │   ├── boundaryLoop.ts    # Vòng lặp tick dùng chung cho Worker và bản dự phòng
+│   │   │   ├── ticker.ts          # createTicker(): Worker, tự chuyển sang main thread nếu bị chặn
+│   │   │   ├── timer-engine.ts    # Hàm thuần: tính Date.now(), preset, chuyển trạng thái phiên
 │   │   │   ├── useTimerStore.ts   # Zustand store quản lý state timer
+│   │   │   ├── completion.ts      # Chuông, notification và ghi focus_sessions khi hết phiên
+│   │   │   ├── useFocusIntentStore.ts # Intent/task hiện tại (productivity ghi, timer đọc)
+│   │   │   ├── initializeTimer.ts # Nối timer với settings, visibilitychange/focus
 │   │   │   └── __tests__/         # Unit test logic tính giờ, drift, worker
 │   │   ├── theme/                 # FR-24 (Nền tảng Theme Engine)
 │   │   │   ├── tokens.ts          # Định nghĩa 15 Design Tokens CSS variables
@@ -180,7 +185,10 @@ FocusFlow/
 │   │   │   ├── SupabaseRepository.ts   # Triển khai kết nối PostgreSQL qua SDK (RLS)
 │   │   │   ├── migrateGuestData.ts     # Routine batch migrate dữ liệu khi đăng ký/đăng nhập
 │   │   │   ├── syncQueue.ts            # Hàng đợi đồng bộ ngoại tuyến Last-Write-Wins (FR-23)
-│   │   │   └── useDataRepository.ts    # Factory hook tự động chọn Repo theo auth state
+│   │   │   ├── useDataRepository.ts    # Factory hook tự động chọn Repo theo auth state
+│   │   │   ├── useSettingsStore.ts     # Cài đặt người dùng (FR-09)
+│   │   │   ├── useFocusSessionsStore.ts # Danh sách phiên focus đã hoàn thành
+│   │   │   └── useSyncStatusStore.ts   # Trạng thái Synced / Syncing / Offline cho HUD
 │   │   └── shortcuts/             # FR-08 (Hệ thống phím tắt & chống xung đột)
 │   │       ├── useShortcuts.ts    # Bắt phím Space, R, F, Shift+F, M; bỏ qua khi nhập liệu
 │   │       └── __tests__/
@@ -389,7 +397,7 @@ Lệnh `npm run lint` bắt buộc phải báo lỗi:
 * `ClockDisplay` tự đọc dữ liệu đếm ngược từ `useTimerStore` và theme từ `useThemeStore` (nhận `props: {}`).
 * Khi một feature được phát triển thật, kỹ sư chỉ thao tác bên trong thư mục của feature đó mà không cần sửa đổi `App.tsx`, `layout.tsx` hay `slots.tsx`.
 
-#### Bảng ánh xạ Slots ↔ Features ↔ Components
+#### Bảng ánh xạ Slots ↔ Features ↔ Components (11 slot)
 
 | Tên Slot | Feature / Core đảm nhiệm | Component xuất xưởng (`index.ts`) | Props Contract | Trạng thái hiển thị điều khiển qua | Hành vi Stub ở Phase 0 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -789,7 +797,8 @@ Trình duyệt tự động tiết kiệm tài nguyên khi tab rơi vào trạng
    * Khi bắt đầu hoặc khôi phục phiên: Xác lập mốc thời gian đích:  
      $$\text{targetEndTime} = \text{Date.now()} + (\text{remainingSeconds} \times 1000)$$
    * Tại mỗi nhịp tick nhận từ Worker: Tính lại số giây còn lại:  
-     $$\text{remainingSeconds} = \max\left(0, \left\lfloor \frac{\text{targetEndTime} - \text{Date.now()}}{1000} \right\rfloor\right)$$
+     $$\text{remainingSeconds} = \max\left(0, \left\lceil \frac{\text{targetEndTime} - \text{Date.now()}}{1000} \right\rceil\right)$$
+     (làm tròn **lên** để `00:00` xuất hiện đúng lúc đạt `targetEndTime`; phiên hoàn thành khi `Date.now() >= targetEndTime`)
    * Đảm bảo giá trị hiển thị luôn chính xác với sai số $\le 100\text{ms}$ (AC-06.1, AC-06.2).
 3. **Bộ Bắt Sự Kiện Đánh Thức (`visibilitychange` & `window focus`):**
    * Khi người dùng mở lại nắp laptop hoặc chuyển tab về FocusFlow, sự kiện `document.visibilitychange` lập tức tính toán lại hiệu số timestamp ngay tại thời điểm mở tab, không chờ nhịp tick kế tiếp của Worker.
@@ -813,7 +822,7 @@ stateDiagram-v2
     StopwatchRunning --> Idle: Click Reset / 'R' key
     StopwatchPaused --> Idle: Click Reset / 'R' key
     
-    Running --> Completed: targetEndTime <= Date.now() (remainingSeconds == 0)
+    Running --> Completed: Date.now() >= targetEndTime
     
     state Completed {
         [*] --> TriggerChimeAndNotification: Synthesize Chime via Web Audio (AC-07.2)
@@ -845,6 +854,17 @@ stateDiagram-v2
     }
 ```
 
+### 6.3. Quy ước Triển khai (Phase 2)
+
+* **Preset:** chỉ đặt thời lượng focus và nghỉ ngắn (Pomodoro 25/5, 52/17, Deep Work 90/15); nghỉ dài giữ giá trị của người dùng. Chế độ không có cột riêng trong DB: khi tải cài đặt, `mode` được suy ra từ cặp focus / nghỉ ngắn (khớp preset thì là preset, ngược lại là `custom`).
+* **Stopwatch:** `remainingSeconds` mang số giây **đã trôi**, `targetEndTime = null`, không tự kết thúc và không ghi phiên.
+* **Skip:** chuyển focus sang nghỉ ngắn hoặc ngược lại về trạng thái idle, không ghi phiên, không tăng chu kỳ, không phát chuông.
+* **Ngủ máy qua nhiều phiên:** chỉ hoàn thành 1 phiên, phiên kế bắt đầu tính từ lúc thức dậy.
+* **Ghi phiên:** khi hết phiên focus, `core/timer` đọc `intentTitle`, `taskId` từ `useFocusIntentStore` (module `productivity` ghi vào store này) và gọi `recordFocusSession`.
+* **Trạng thái Fullscreen** lấy từ sự kiện `fullscreenchange`; nút Fullscreen ẩn khi trình duyệt không hỗ trợ.
+* **Chỉ báo sync:** ẩn với Guest; với người đã đăng nhập là Offline (`navigator.onLine`), Syncing (đang có lượt ghi) hoặc Synced.
+* **Phím tắt** bị bỏ qua khi đang gõ (kể cả bộ gõ IME), giữ Ctrl/Cmd/Alt, đang mở dialog, hoặc Space khi tiêu điểm đang ở nút bấm.
+
 ---
 
 ## 7. Kiến trúc Xác thực (Authentication)
@@ -854,7 +874,7 @@ stateDiagram-v2
 Theo ràng buộc mục 2.3 và FR-01:
 * Dự án Supabase được cấu hình tắt tùy chọn **"Confirm email"** trong mục *Authentication -> Email Templates / Providers*.
 * Khi gọi `supabase.auth.signUp({ email, password })`, Supabase trả về ngay lập tức cặp `access_token` và `refresh_token` cùng đối tượng `user` mà không cần đợi xác nhận hòm thư.
-* Phiên làm việc (Session) được lưu trữ tự động trong `localStorage` bởi SDK dưới key `sb-<project-ref>-auth-token`.
+* Phiên làm việc (Session) được lưu trữ tự động trong `localStorage` bởi SDK dưới key `sb-focusflow-auth-token` (cấu hình `storageKey` tại `shared/lib/supabase.ts`).
 
 ### 7.2. Quản lý Trạng thái Auth trong Zustand (`core/auth/useAuthStore.ts`)
 
@@ -1124,7 +1144,7 @@ Hệ thống thiết lập ma trận kiểm thử tự động đa tầng bằng
 Mỗi khi có Pull Request hoặc push vào nhánh `main`, hệ thống tự động kích hoạt pipeline kiểm tra chất lượng code:
 
 ```yaml
-name: CI Pipeline
+name: CI
 
 on:
   push:
@@ -1132,24 +1152,35 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  validate:
+  ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
+
       - name: Install dependencies
         run: npm ci
-      - name: ESLint & Boundary Check
+
+      - name: Run ESLint & Boundary Checks
         run: npm run lint
-      - name: TypeScript Check
+
+      - name: Run TypeScript Strict Check
         run: npm run typecheck
-      - name: Unit & Integration Tests
-        run: npm run test:run
-      - name: Production Build Check
+
+      - name: Run Unit & Integration Tests with Coverage
+        run: npm run test -- --coverage
+
+      - name: Build Production Artifacts
         run: npm run build
 ```
 

@@ -126,6 +126,7 @@ Sản phẩm tham chiếu chức năng tiện ích từ hai web focus timer đi�
     * **When:** Quá trình đăng nhập thành công.  
     * **Then:** Hệ thống hiển thị modal xác nhận: *"Bạn có muốn nhập dữ liệu từ phiên khách vào tài khoản này không?"*:  
       * Nếu chọn **"Đồng ý" (Merge)**: Hệ thống thêm nối tiếp (append) toàn bộ task và note từ `localStorage` vào tài khoản trên Supabase, giữ nguyên `user_settings` hiện có trên Cloud (không ghi đè settings), dọn dẹp `localStorage` của guest, và lưu cờ `is_migrated = true` vào cột `is_migrated` trong bảng `user_settings`.  
+      * *Quy ước nối note:* vì mỗi người dùng chỉ có 1 dòng `notes`, nội dung mới là `note cloud + "\n\n" + note guest` (bỏ phần nào đang rỗng); nếu tổng vượt 50.000 ký tự thì hủy toàn bộ việc gộp trước khi ghi và báo lỗi, dữ liệu guest được giữ nguyên.
       * Nếu chọn **"Từ chối" (Discard)**: Hệ thống giữ nguyên toàn bộ dữ liệu hiện có trên Cloud, xóa sạch dữ liệu guest trong `localStorage`, và đóng modal xác nhận.
 
 #### FR-03: Đăng nhập bằng Google OAuth
@@ -174,11 +175,11 @@ Sản phẩm tham chiếu chức năng tiện ích từ hai web focus timer đi�
   * **AC-06.1 (Kiểm soát Background Drift):**  
     * **Given:** Timer còn lại `20:00` trên tổng số `25:00` (xác lập `targetEndTime = Date.now() + 1200000`).  
     * **When:** Người dùng chuyển sang tab khác trong 10 phút (chính xác 600,000ms) rồi quay lại tab FocusFlow.  
-    * **Then:** Đồng hồ hiển thị `10:00` với sai số $\le 100\text{ms}$ (giá trị hiển thị làm tròn xuống giây theo `Math.floor(remainingSeconds)`), không bị hiện tượng thời gian còn lại lớn hơn do trình duyệt throttle.
+    * **Then:** Đồng hồ hiển thị `10:00` với sai số $\le 100\text{ms}$ (giá trị hiển thị làm tròn lên giây theo `Math.ceil`), không bị hiện tượng thời gian còn lại lớn hơn do trình duyệt throttle.
   * **AC-06.2 (Xử lý khi máy tính Sleep/Wake):**  
     * **Given:** Timer đang chạy còn `15:00`, người dùng gập màn hình laptop trong 20 phút rồi mở lại.  
     * **When:** Trình duyệt nhận sự kiện `visibilitychange` hoặc `focus`.  
-    * **Then:** Hệ thống tính toán $Date.now() \ge targetEndTime$, chuyển ngay timer về trạng thái Hoàn thành (`00:00`) với sai số thời gian $\le 100\text{ms}$ (giá trị hiển thị làm tròn xuống giây), phát âm thanh kết thúc và kích hoạt notification.
+    * **Then:** Hệ thống tính toán $Date.now() \ge targetEndTime$, chuyển ngay timer về trạng thái Hoàn thành (`00:00`) với sai số thời gian $\le 100\text{ms}$, phát âm thanh kết thúc và kích hoạt notification.
 
 #### FR-07: Âm Báo & Thông Báo Trình Duyệt Khi Hết Giờ
 * **Mô tả:** Phát âm thanh thông báo được tổng hợp bằng Web Audio API và gửi Web Notification đến hệ điều hành khi phiên làm việc hoặc phiên nghỉ kết thúc.
@@ -610,6 +611,8 @@ Sản phẩm tham chiếu chức năng tiện ích từ hai web focus timer đi�
 
 ## 4. UI Spec
 
+> **Quy ước ngôn ngữ giao diện:** chữ hiển thị trên UI lấy nguyên văn theo các AC (tiếng Anh cho AC-01.x, tiếng Việt cho AC-02.3); thông điệp lỗi theo bảng API_DOCS Mục 9 (tiếng Việt); nhãn nút và tiêu đề theo wireframe (tiếng Anh). Toàn bộ chuỗi tập trung ở `src/shared/lib/messages.ts`.
+
 ### 4.1. Sơ Đồ Bố Cục ASCII (Layout Wireframes)
 
 #### Desktop Main Workspace Layout with HUD & Focus Intent
@@ -785,7 +788,7 @@ Hệ thống tuân thủ triết lý thiết kế tối giản cao cấp (kiểu
   * Các hiệu ứng kính mờ `backdrop-filter` được tăng tốc bằng GPU (`transform: translateZ(0)`).
 
 ### 5.2. Độ Chính Xác Bộ Đếm (Timer Precision)
-* Sai số thời gian tích lũy tuyệt đối không vượt quá $\pm 100\text{ms}$ sau 60 phút hoạt động liên tục (giá trị hiển thị làm tròn xuống giây theo `Math.floor(remainingSeconds)`), bất kể tab trình duyệt bị thu nhỏ, chuyển sang background, hoặc thiết bị rơi vào chế độ ngủ và được đánh thức lại.
+* Sai số thời gian tích lũy tuyệt đối không vượt quá $\pm 100\text{ms}$ sau 60 phút hoạt động liên tục (giá trị hiển thị làm tròn lên giây theo `Math.ceil`, phiên hoàn thành khi `Date.now() >= targetEndTime`), bất kể tab trình duyệt bị thu nhỏ, chuyển sang background, hoặc thiết bị rơi vào chế độ ngủ và được đánh thức lại.
 * Web Worker chuyên trách phát tick nhịp; mỗi tick và mỗi lần `visibilitychange`/`focus` tính lại `remaining = targetEndTime - Date.now()`.
 
 ### 5.3. Bảo Mật & Cô Lập Dữ Liệu (Security & Data Isolation)

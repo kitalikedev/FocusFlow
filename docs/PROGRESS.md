@@ -39,74 +39,77 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
   - Supabase Security Advisor: **0 cảnh báo (no warnings)**.
 * **Cấu hình Supabase Auth:**
   - Đã tắt tính năng **Confirm email** (cho phép người dùng trải nghiệm ngay không cần chờ xác thực email).
-  - Đã thêm `http://localhost:5173` vào danh sách **Redirect URLs**.
+  - Redirect URLs gồm `http://localhost:5173/**`, `http://localhost:5180/**` (cổng dev cố định của dự án) và domain Vercel.
+  - Độ dài mật khẩu tối thiểu đặt là **6** (theo PRD AC-01.1).
 * **Trạng thái biến môi trường workspace:**
-  - Workspace cục bộ hiện tại chưa có file `.env`.
-  - Tại Phase 1, file `.env.local` (đã được cấu hình trong `.gitignore`) sẽ được tạo chứa `VITE_SUPABASE_URL` và `VITE_SUPABASE_PUBLISHABLE_KEY`.
+  - `.env.local` (đã nằm trong `.gitignore`) chứa `VITE_SUPABASE_URL` và `VITE_SUPABASE_PUBLISHABLE_KEY`; thiếu hai biến này app vẫn chạy ở chế độ Guest.
 
 ---
 
 ## 4. Trạng thái Kho Lưu Trữ (Git & GitHub)
 
 * **Remote:** `https://github.com/kitalikedev/FocusFlow.git`
-* **`main`:** commit gần nhất `8b723b5 chore: scaffold phase 0 foundation (#1)` (squash merge PR #1, CI `ci` xanh).
-* **Bảo vệ `main`:** Ruleset "Main Protection" đang hoạt động (PR bắt buộc, linear history, chặn force push và xóa). Chưa bật Require status checks (`ci`).
-* **Dependabot:** nhánh `dependabot/npm_and_yarn/multi-*` đề xuất nâng `vitest` và `@vitest/coverage-v8` lên 5.x trong khi `vite` giữ 5.x. Chưa merge; xử lý trong PR chore nâng cấp toolchain riêng.
+* **`main`:** commit gần nhất `3d69b6b` (squash merge PR #6, Phase 2), trước đó `f718df3` (PR #5, Phase 1) và `8b723b5` (PR #1, Phase 0). Cổng dev cố định: `5180`.
+* **Bảo vệ `main`:** Ruleset "Main Protection" (PR bắt buộc, 1 approval, chỉ Squash, linear history, chặn force push và xóa; admin bypass khi merge PR). Cần xác nhận ruleset đang Active và đã thêm status check `ci`.
+* **Dependabot:** các PR đề xuất nâng `vitest` và `@vitest/coverage-v8` lên 5.x trong khi `vite` giữ 5.x chưa merge; xử lý trong PR chore nâng toolchain riêng.
+* **Keep-alive:** workflow `.github/workflows/keep-alive.yml` đã có trên `main`; cần tạo 2 secret `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` rồi chạy tay một lần (kết quả đúng là `ping() returned: 1`).
 
 ---
 
 ## 5. Trạng thái Mã Nguồn (Codebase Status)
 
-Phase 0 đã có trên `main`:
-
 | Phân vùng | Trạng thái |
 | :--- | :--- |
-| Cấu hình (`package.json`, tsconfig, Vite, Vitest, Tailwind, ESLint, Prettier, `vercel.json`, `.env.example`, `.nvmrc` Node 22, CI) | Hoàn tất |
-| `src/app/` (App, layout, providers, 11 slot trong `slots.tsx`) | Hoàn tất (stub) |
-| `src/core/theme`, `src/core/ui`, `src/core/hud` (stub) | Hoàn tất |
-| `src/features/*` (4 stub) | Hoàn tất (stub) |
-| `src/shared/types/contracts.ts`, `src/shared/lib/supabase.ts` (lazy) | Hoàn tất |
-| `src/core/timer`, `auth`, `data`, `shortcuts` | Chưa có |
+| Cấu hình (`package.json`, tsconfig, Vite, Vitest, Tailwind, ESLint, Prettier, `vercel.json`, CI, keep-alive) | Hoàn tất |
+| `src/app/` (App, layout, providers, 11 slot trong `slots.tsx`) | Hoàn tất |
+| `src/core/theme`, `src/core/ui` (Zustand stores, Toast) | Hoàn tất |
+| `src/core/data` (LocalRepository, SupabaseRepository, migrateGuestData, settings / sessions / sync status stores) | Hoàn tất (Phase 1, 2) |
+| `src/core/auth` (đăng ký, đăng nhập, đăng xuất, Gộp/Hủy dữ liệu guest) | Hoàn tất (Phase 1) |
+| `src/core/timer` (Web Worker, drift-free `Date.now()`, 5 chế độ, nghỉ dài, chuông, ghi `focus_sessions`) | Hoàn tất (Phase 2) |
+| `src/core/shortcuts` (Space, R, F, Shift+F, M) | Hoàn tất (Phase 2) |
+| `src/core/hud` (cycle dots, phiên hôm nay, streak, sync, Fullscreen, menu tài khoản) | Hoàn tất (Phase 2) |
+| `src/shared/lib` (supabase, errors, messages, web-audio) | Hoàn tất |
+| `src/features/*` | **Stub** (chờ Phase 3); `clock-modes` có đồng hồ tối thiểu để dùng thử, gói 3A thay thế |
 
-Chỉ số: lint 0/0, typecheck sạch, 5 file test / 14 test xanh, coverage `src/core` 100%, initial JS gzip khoảng 51 KB (ngưỡng 200 KB).
+Chỉ số sau Phase 2: lint 0/0, typecheck sạch, 34 file / 355 test xanh, branch coverage `src/core` ≥ 85%, initial JS khoảng 127 KB gzip (ngưỡng 200 KB).
 
 ---
 
 ## 6. Trạng thái Từng Phase
 
-* **Phase 0:** **Hoàn tất**, đã merge (PR #1).
-* **Phase 1 (Data, Auth, Guest migration):** Chưa bắt đầu; cần `.env.local` với `VITE_SUPABASE_URL` và `VITE_SUPABASE_PUBLISHABLE_KEY`. Bước tiếp theo là lập plan.
-* **Phase 2 (Timer, phím tắt, âm báo, HUD):** Chưa bắt đầu.
-* **Phase 3 (3A `clock-modes`, 3B `theme-wallpaper`, 3C `audio`, 3D `productivity`):** Chưa bắt đầu; bắt đầu sau Phase 2.
-* **P2 và E2E Playwright:** Chưa bắt đầu.
+* **Phase 0:** Hoàn tất (PR #1).
+* **Phase 1 (Data, Auth, Guest migration):** Hoàn tất (PR #5). Đã kiểm tay với Supabase thật: đăng ký + migrate, đăng nhập sai mật khẩu, Gộp, Hủy, đăng xuất. Kịch bản mất mạng chưa kiểm tay (có unit test).
+* **Phase 2 (Timer, phím tắt, âm báo, HUD):** Hoàn tất (PR #6), đã kiểm tay (chuông, notification, HUD, `focus_sessions`).
+* **Phase 3 (3A `clock-modes`, 3B `theme-wallpaper`, 3C `audio`, 3D `productivity`):** Chưa bắt đầu. Kế hoạch: tạo sẵn 4 nhánh `feature/<module>` cho thành viên.
+* **P2 (syncQueue, Google OAuth, PiP...) và E2E Playwright:** Chưa bắt đầu.
 
 ---
 
 ## 7. Việc Đang Dang Dở
 
-1. Bật Require status checks (`ci`) trong ruleset.
-2. Import repo vào Vercel (Node 22.x, 2 biến `VITE_*`), kiểm tra lỗi CSP trên preview.
-3. Mời 4 thành viên, rà soát cài đặt GitHub (Squash only, auto delete head branches, secret scanning), thêm LICENSE, điền About/topics.
+1. Xác nhận ruleset Active và đã bật Require status checks `ci`.
+2. Tạo secret GitHub cho keep-alive và chạy thử workflow.
+3. Import repo vào Vercel (Node 22.x, 2 biến `VITE_*`), kiểm tra lỗi CSP trên preview (Worker cần `worker-src 'self' blob:`).
+4. Mời 4 thành viên, rà soát cài đặt GitHub (Squash only, auto delete head branches, secret scanning), thêm LICENSE, điền About/topics.
 
 ---
 
 ## 8. Việc Cần Làm Tiếp Theo
 
-1. Lập plan Phase 1 (Planning only) tại `docs/plans/phase-1.md`, người dùng duyệt rồi mới code.
-2. Thực thi Phase 1, rồi Phase 2.
-3. Chuẩn bị 4 nhánh `feature/<module>` có code sẵn cho thành viên (Phase 3).
-4. PR chore riêng: nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8).
+1. Lập plan Phase 3 và tạo 4 nhánh `feature/<module>` có code sẵn cho thành viên.
+2. PR chore riêng: nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8) và xử lý Dependabot.
+3. Về sau: `syncQueue` (FR-23), Google OAuth (FR-03), E2E Playwright.
 
 ---
 
 ## 9. Rủi ro & Lưu ý
 
-1. ARCHITECTURE ghi 10 slot nhưng `slots.tsx` có 11; cần chỉnh docs.
-2. Docs còn LaTeX (ARCHITECTURE, README), mang tính thẩm mỹ.
+1. Streak chỉ tính trên 90 ngày dữ liệu gần nhất (giới hạn của `getFocusSessions`).
+2. Chưa có `syncQueue`: người dùng đã đăng nhập mà mất mạng sẽ bị báo lỗi khi lưu, chưa có hàng đợi; tooltip Offline dùng đúng chuỗi của AC-30.2.
 3. CSP trong `vercel.json` chỉ kiểm chứng được trên Vercel preview.
-4. Thêm supabase-js ở Phase 1 làm bundle tăng khoảng 40–50 KB gzip, vẫn trong ngưỡng.
-5. devDependencies còn 12 lỗ hổng audit (production = 0), xử lý bằng PR nâng toolchain.
+4. devDependencies còn lỗ hổng audit (production = 0), xử lý bằng PR nâng toolchain.
+5. Docs còn LaTeX trong ARCHITECTURE và README (thẩm mỹ).
 
 ---
 
-*Cập nhật lần cuối: 2026-11-06*
+*Cập nhật lần cuối: 2026-11-07*
