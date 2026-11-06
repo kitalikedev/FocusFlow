@@ -80,7 +80,7 @@ Chỉ số sau Phase 2: lint 0/0, typecheck sạch, 34 file / 355 test xanh, bra
 * **Phase 0:** Hoàn tất (PR #1).
 * **Phase 1 (Data, Auth, Guest migration):** Hoàn tất (PR #5). Đã kiểm tay với Supabase thật: đăng ký + migrate, đăng nhập sai mật khẩu, Gộp, Hủy, đăng xuất. Kịch bản mất mạng chưa kiểm tay (có unit test).
 * **Phase 2 (Timer, phím tắt, âm báo, HUD):** Hoàn tất (PR #6), đã kiểm tay (chuông, notification, HUD, `focus_sessions`).
-* **Phase 3 (3A `clock-modes`, 3B `theme-wallpaper`, 3C `audio`, 3D `productivity`):** Chưa bắt đầu. Kế hoạch: tạo sẵn 4 nhánh `feature/<module>` cho thành viên.
+* **Phase 3 (3A `clock-modes`, 3B `theme-wallpaper`, 3C `audio`, 3D `productivity`):** Đã lập plan (`docs/plans/phase-3.md`); mỗi gói làm trên nhánh `feature/<module>` riêng.
 * **P2 (syncQueue, Google OAuth, PiP...) và E2E Playwright:** Chưa bắt đầu.
 
 ---
@@ -90,13 +90,13 @@ Chỉ số sau Phase 2: lint 0/0, typecheck sạch, 34 file / 355 test xanh, bra
 1. Xác nhận ruleset Active và đã bật Require status checks `ci`.
 2. Tạo secret GitHub cho keep-alive và chạy thử workflow.
 3. Import repo vào Vercel (Node 22.x, 2 biến `VITE_*`), kiểm tra lỗi CSP trên preview (Worker cần `worker-src 'self' blob:`).
-4. Mời 4 thành viên, rà soát cài đặt GitHub (Squash only, auto delete head branches, secret scanning), thêm LICENSE, điền About/topics.
+4. Rà soát cài đặt GitHub (Squash only, auto delete head branches, secret scanning), thêm LICENSE, điền About/topics.
 
 ---
 
 ## 8. Việc Cần Làm Tiếp Theo
 
-1. Lập plan Phase 3 và tạo 4 nhánh `feature/<module>` có code sẵn cho thành viên.
+1. Triển khai Phase 3 theo `docs/plans/phase-3.md` (3A trước), mỗi gói một PR.
 2. PR chore riêng: nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8) và xử lý Dependabot.
 3. Về sau: `syncQueue` (FR-23), Google OAuth (FR-03), E2E Playwright.
 
@@ -109,6 +109,7 @@ Chỉ số sau Phase 2: lint 0/0, typecheck sạch, 34 file / 355 test xanh, bra
 3. CSP trong `vercel.json` chỉ kiểm chứng được trên Vercel preview.
 4. devDependencies còn lỗ hổng audit (production = 0), xử lý bằng PR nâng toolchain.
 5. Docs còn LaTeX trong ARCHITECTURE và README (thẩm mỹ).
+6. Hai lần `useSettingsStore.update()` chạy song song có thể ghi đè nhau (`LocalRepository.saveSettings` đọc rồi ghi); cần sửa ở core trước gói 3B/3C.
 
 ---
 
