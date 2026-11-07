@@ -19,6 +19,10 @@ export interface SettingsStoreState {
 // Drops responses of outdated load() calls (e.g. the user logged out while a request was in flight).
 let loadSequence = 0;
 
+// Saves run one after another: the repository reads then writes the whole settings object,
+// so two overlapping saves would let the later write drop the earlier patch.
+let saveQueue: Promise<void> = Promise.resolve();
+
 function applyThemeFrom(settings: UserSettings): void {
   useThemeStore.getState().setTokens(settings.activeTheme.tokens);
 }
@@ -42,13 +46,18 @@ export const useSettingsStore = create<SettingsStoreState>((set) => ({
     }
   },
 
-  update: async (partial) => {
-    try {
-      const settings = await trackWrite(() => getDataRepository().saveSettings(partial));
-      set({ settings, status: 'ready' });
-      if (partial.activeTheme) applyThemeFrom(settings);
-    } catch (error) {
-      useToastStore.getState().showToast(toAppError(error).message, { variant: 'error' });
-    }
+  update: (partial) => {
+    const run = async (): Promise<void> => {
+      try {
+        const settings = await trackWrite(() => getDataRepository().saveSettings(partial));
+        set({ settings, status: 'ready' });
+        if (partial.activeTheme) applyThemeFrom(settings);
+      } catch (error) {
+        useToastStore.getState().showToast(toAppError(error).message, { variant: 'error' });
+      }
+    };
+    // run() never rejects, so a failed save does not block the next one.
+    saveQueue = saveQueue.then(run);
+    return saveQueue;
   },
 }));

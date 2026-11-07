@@ -101,6 +101,55 @@ describe('useSettingsStore (FR-09)', () => {
     expect(useSettingsStore.getState().settings).toBe(saved);
   });
 
+  it('runs overlapping updates one at a time so no patch is lost', async () => {
+    const events: string[] = [];
+    let stored = createDefaultSettings();
+    const saveSettings = vi.fn(async (patch: Partial<typeof stored>) => {
+      const name = Object.keys(patch)[0];
+      events.push(`start:${name}`);
+      const snapshot = stored; // read first, write later (like the real repository)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      stored = { ...snapshot, ...patch };
+      events.push(`end:${name}`);
+      return stored;
+    });
+    getRepo.mockReturnValue({ saveSettings } as never);
+
+    await Promise.all([
+      useSettingsStore.getState().update({ clockVisualMode: 'retro_flip' }),
+      useSettingsStore.getState().update({ clockPosition: 'mini_corner' }),
+    ]);
+
+    expect(events).toEqual([
+      'start:clockVisualMode',
+      'end:clockVisualMode',
+      'start:clockPosition',
+      'end:clockPosition',
+    ]);
+    expect(useSettingsStore.getState().settings).toMatchObject({
+      clockVisualMode: 'retro_flip',
+      clockPosition: 'mini_corner',
+    });
+  });
+
+  it('keeps saving after an earlier update failed', async () => {
+    const saved = { ...createDefaultSettings(), autoStartFocus: true };
+    const saveSettings = vi
+      .fn()
+      .mockRejectedValueOnce(new AppError('PERMISSION_DENIED'))
+      .mockResolvedValueOnce(saved);
+    getRepo.mockReturnValue({ saveSettings } as never);
+
+    await Promise.all([
+      useSettingsStore.getState().update({ autoStartBreaks: true }),
+      useSettingsStore.getState().update({ autoStartFocus: true }),
+    ]);
+
+    expect(saveSettings).toHaveBeenCalledTimes(2);
+    expect(useSettingsStore.getState().settings).toBe(saved);
+    expect(useToastStore.getState().toasts).toHaveLength(1);
+  });
+
   it('update keeps the previous value and shows a toast on failure', async () => {
     getRepo.mockReturnValue({ saveSettings: () => Promise.reject(new AppError('PERMISSION_DENIED')) } as never);
     const before = useSettingsStore.getState().settings;
