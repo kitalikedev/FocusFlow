@@ -94,7 +94,7 @@ export const EffectsLayer: React.FC = () => {
   const isNarrow = useMediaQuery(NARROW_SCREEN_QUERY);
   const hasParticles = !reducedMotion && (effects.rain > 0 || effects.snow > 0 || effects.fireflies > 0);
 
-  if (!hasParticles && effects.grain === 0 && effects.vignette === 0) return null;
+  if (!hasParticles && effects.grain === 0 && effects.vignette === 0 && effects.scanlines === 0) return null;
 
   return (
     <div data-testid="effects-layer" aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1]">
@@ -106,6 +106,17 @@ export const EffectsLayer: React.FC = () => {
           data-testid="grain-overlay"
           className="absolute inset-0 mix-blend-overlay"
           style={{ backgroundImage: GRAIN_TILE, opacity: (effects.grain / 100) * 0.5 }}
+        />
+      )}
+      {effects.scanlines > 0 && (
+        // Static CRT stripes: one dark line every 4 px (no animation, so nothing changes with reduced motion).
+        <div
+          data-testid="scanlines-overlay"
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.9) 0, rgba(0, 0, 0, 0.9) 1px, transparent 1px, transparent 4px)',
+            opacity: (effects.scanlines / 100) * 0.4,
+          }}
         />
       )}
       {effects.vignette > 0 && (

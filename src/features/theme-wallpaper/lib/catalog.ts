@@ -1,11 +1,14 @@
 import { parseColor, relativeLuminance } from '@/core/theme/color';
+import { PIXEL_CYBERPUNK_WALLPAPERS } from './pixelCyberpunk';
 
-export type WallpaperCategory = 'colors' | 'abstract' | 'animated' | 'scenic';
+export type WallpaperCategory = 'colors' | 'abstract' | 'animated' | 'pixel' | 'cyberpunk' | 'scenic';
 
 export const CATEGORY_LABELS: Record<WallpaperCategory, string> = {
   colors: 'Colors & Gradients',
   abstract: 'Abstract',
   animated: 'Animated',
+  pixel: 'Pixel',
+  cyberpunk: 'Cyberpunk',
   scenic: 'Scenic',
 };
 
@@ -17,6 +20,8 @@ export interface CatalogWallpaper {
   background: string | null;
   /** Image or GIF under /public/wallpapers (scenic group). */
   imageUrl?: string;
+  /** Pixel art: scale with hard edges instead of smoothing. */
+  pixelated?: boolean;
   /** Extra class for animated wallpapers (keyframes in wallpapers.css). */
   animationClass?: string;
   /** Precomputed average relative luminance 0..1 (FR-15: never measured at runtime). */
@@ -101,6 +106,7 @@ export const WALLPAPER_CATALOG: CatalogWallpaper[] = [
   animated('animated-lava', 'Lava', ['#450a0a', '#9a3412', '#7f1d1d', '#c2410c']),
   animated('animated-deep-sea', 'Deep Sea', ['#020617', '#0c4a6e', '#1e3a8a', '#0f766e']),
   animated('animated-candy', 'Candy', ['#f9a8d4', '#a5b4fc', '#fbcfe8', '#93c5fd']),
+  ...PIXEL_CYBERPUNK_WALLPAPERS,
 ];
 
 export function findWallpaper(id: string): CatalogWallpaper | undefined {

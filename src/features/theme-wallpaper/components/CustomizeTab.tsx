@@ -114,6 +114,8 @@ const EFFECTS: { key: keyof EffectsConfig; label: string }[] = [
   { key: 'fireflies', label: 'Fireflies' },
   { key: 'grain', label: 'Film grain' },
   { key: 'vignette', label: 'Vignette' },
+  { key: 'scanlines', label: 'Scanlines' },
+  { key: 'glow', label: 'Clock glow' },
 ];
 
 /** Theme Customizer (FR-25): every token with Live Preview, Apply / Revert and the readability floor. */

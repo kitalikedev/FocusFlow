@@ -31,7 +31,15 @@ export function backgroundFor(
       };
     }
     if (wallpaper?.imageUrl) {
-      return { style: { backgroundImage: `url("${wallpaper.imageUrl}")`, backgroundSize: 'cover', backgroundPosition: 'center' }, className: '' };
+      return {
+        style: {
+          backgroundImage: `url("${wallpaper.imageUrl}")`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          imageRendering: wallpaper.pixelated ? 'pixelated' : undefined,
+        },
+        className: '',
+      };
     }
   }
   if (ref.type === 'custom') {
