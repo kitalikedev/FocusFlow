@@ -1,109 +1,98 @@
-# Kế hoạch Triển khai: Phase 4 — Tối ưu, Âm thanh, Animation và 3 gói cho team
+# Kế hoạch Triển khai: Phase 4 — Tối ưu, Âm thanh, Animation
 
-**Phiên bản:** 1.0 (đã duyệt; phần A đã triển khai)
+**Phiên bản:** 1.0 (đã triển khai, PR #11)
 **Nền tảng:** `main` tại `6470de4` (đã có đủ Phase 3)
-**Cách làm:** phần của mình trong một nhánh `feature/phase-4-polish`, một PR, Squash and merge thành một commit. Chạy `lint`, `typecheck`, `test`, `build` sau mỗi bước. Ba gói cho team làm sau, khi PR này đã merge.
 
 ---
 
-## 1. Chia việc
-
-| Phần | Ai làm | Nội dung |
-| :--- | :--- | :--- |
-| **A. Lõi** | Mình, PR `feature/phase-4-polish` | Tối ưu, âm thanh mượt, âm lượng YouTube, animation, chuẩn bị chỗ cho 3 gói (Mục 2 đến 4) |
-| **B. Gói 3E `quotes`** | Thành viên | Quote ngẫu nhiên trên màn hình (Mục 5) |
-| **C. Gói 3F `themes-pixel`** | Thành viên | Nền pixel/cyberpunk, 5 theme mới, hiệu ứng Scanlines và Glow (Mục 5) |
-| **D. Gói 3G `lofi`** | Thành viên | Kênh nhạc lofi tự sinh và danh sách lofi radio (Mục 5) |
-
-Mình viết **bản nháp chạy được** cho B, C, D, kiểm tra trong một bản sao tạm của repo, rồi đóng zip kèm hướng dẫn Discord. Zip và hướng dẫn để **ngoài** thư mục dự án (`~/FocusFlow-handoff/`), không đụng repo. Thành viên nhận bản nháp, làm thử, hoàn thiện rồi commit như làm bình thường.
-
----
-
-## 2. Phần A — Tối ưu và dọn dẹp
+## 1. Kết quả quét dự án
 
 | # | Phát hiện | Xử lý |
 | :--- | :--- | :--- |
-| O1 | Nền "Animated" chạy bằng `background-position`, trình duyệt vẽ lại cả màn hình mỗi khung hình | Chuyển sang lớp lớn hơn màn hình, di chuyển bằng `transform` (GPU lo) |
-| O3 | State thừa từ thiết kế cũ: `isMobileDrawerOpen`, `activeDrawerTab`, `closeAllModals`, `cycleDots` trong `useHud` | Xóa, cập nhật contracts và test |
+| O1 | Nền "Animated" chạy bằng `background-position`, trình duyệt vẽ lại cả màn hình mỗi khung hình | Lớp lớn hơn màn hình, di chuyển bằng `transform` (GPU lo) |
+| O3 | State thừa từ thiết kế cũ: `isMobileDrawerOpen`, `activeDrawerTab`, `closeAllModals`, `cycleDots` trong `useHud` | Đã xóa, cập nhật contracts và test |
 | O4 | `useMediaQuery` và hằng `(max-width: 639px)` lặp ở 3 chỗ | Dùng chung bản trong `core/ui` |
-| O5 | `DEFAULT_WALLPAPER_ID = 'preset-lofi-cafe'` không có trong catalog | Giữ nguyên: đó là mặc định của cột database (ERD), còn nền hiển thị lấy từ `activeTheme.wallpaperRef`; chỉ thêm chú thích |
-| O6 | PRD 4.1, ARCHITECTURE, PROGRESS lệch code | Cập nhật ở bước cuối |
-| O7 | `npm audit` 12 lỗ hổng, **chỉ ở công cụ dev** (bản người dùng chạy có 0) | PR riêng, cần Node 22 trước vì Vite 8 / Vitest 5 đòi Node ≥ 20.19 (máy đang Node 20.11) |
+| O5 | `DEFAULT_WALLPAPER_ID = 'preset-lofi-cafe'` không có trong catalog | Giữ nguyên: đó là mặc định của cột database (ERD), còn nền hiển thị lấy từ `activeTheme.wallpaperRef` |
+| O6 | PRD 4.1, ARCHITECTURE, PROGRESS lệch code | Đồng bộ trong PR docs riêng |
+| O7 | `npm audit` 12 lỗ hổng, **chỉ ở công cụ dev** (bản người dùng chạy có 0) | PR riêng, cần Node 22 trước vì Vite 8 / Vitest 5 đòi Node ≥ 20.19 |
 
-## 3. Phần A — Âm thanh
+## 2. Âm thanh
 
 | # | Nội dung |
 | :--- | :--- |
-| S1 | Mọi kênh lên/xuống âm lượng mượt trong khoảng 1,5 giây (bật, tắt, Play/Pause, kéo thanh trượt): hết tiếng "bụp". |
-| S2 | Rain đổi từ noise trắng sang noise hồng, hạ tần số lọc, dao động chậm hơn: ấm và nhẹ nhàng hơn. |
-| S5 | **Âm lượng YouTube riêng:** thanh trượt "Music" trong thẻ Sounds, độc lập với Master (âm lượng thực = Music × Master). Lưu trên thiết bị (`localStorage`, khóa `focusflow_audio_levels`), không đổi database: âm lượng 3 kênh trong database là các cột riêng (`volume_rain`…), không phải JSONB. |
+| S1 | Mọi kênh lên/xuống âm lượng mượt trong khoảng 1,5 giây (bật, tắt, Play/Pause, kéo thanh trượt), hết tiếng "bụp"; mute cũng mượt |
+| S2 | Rain đổi từ noise trắng sang noise hồng, hạ tần số lọc, dao động chậm hơn, thang gain 0,55 |
+| S3 | Danh sách kênh `CHANNEL_DEFS` (`features/audio/lib/channelDefs.ts`): `ambientEngine` và thẻ Sounds đọc từ đó; âm lượng 3 kênh lưu cùng tài khoản (cột `volume_rain`, `volume_brown_noise`, `volume_campfire`) |
 
-(S3 kênh Lofi tự sinh và S4 lofi radio chuyển thành gói 3G.)
+## 3. Animation
 
-## 4. Phần A — Animation
-
-Một bộ keyframes dùng chung trong Tailwind và `core/ui`; tất cả tắt khi `prefers-reduced-motion`.
+Bộ keyframes dùng chung trong `tailwind.config.ts` và `core/ui`; tất cả tắt khi `prefers-reduced-motion`.
 
 | Thành phần | Hiệu ứng |
 | :--- | :--- |
-| Nút, tab, icon dock | Nhấn co nhẹ, hover sáng dần |
-| Thẻ Tasks / Note / Sounds | Trượt lên + mờ vào; đóng thì mờ ra |
+| Nút, tab, icon dock | Nhấn co nhẹ, chuyển màu mượt |
+| Thẻ Tasks / Note / Sounds | Trượt lên + mờ vào; đóng thì mờ ra (`usePresence` giữ thẻ thêm 180 ms) |
 | Panel Themes / Analytics | Trượt từ phải (desktop) hoặc từ dưới (điện thoại), nền tối mờ dần |
-| Thẻ theme, ô nền | Hover nâng nhẹ; chọn thì viền "nảy" |
+| Thẻ theme, ô nền | Hover nâng nhẹ; chọn thì dấu tích "pop" |
 | Task | Trượt vào khi thêm; dấu tích hoàn thành "pop" |
-| Đồng hồ | Đổi chế độ mờ chuyển; Start/Pause có hiệu ứng nhấn |
+| Đồng hồ | Đổi chế độ hoặc kiểu thì mờ chuyển |
 | Toast, danh sách chọn task | Mờ + trượt nhẹ |
 | Biểu đồ Analytics | Cột mọc lên từ đáy |
 
-Animation nằm ở `core/ui` và class Tailwind dùng chung, vì nó đi qua nhiều thư mục; không giao cho thành viên.
+## 4. Hiệu ứng theme
 
-## 5. Chuẩn bị chỗ cho 3 gói (làm trong PR của phần A)
+`EffectsConfig` có thêm `scanlines` và `glow` (0 đến 100). Biến `--clock-glow` do `applyTheme` đặt theo mức Glow và màu nhấn; chữ đồng hồ đọc `text-shadow: var(--clock-glow, none)`.
 
-Để mỗi gói chỉ sửa trong thư mục của mình, mình làm sẵn phần chung:
+## 5. Ghi chú triển khai
 
-* **3E `quotes`:** thư mục `src/features/quotes/`, `index.ts` xuất `QuoteDisplay` (trả về `null`), `QuoteSlot` trong `slots.tsx` đặt góc phải trên dưới HUD.
-* **3F `themes-pixel`:** thêm `scanlines` và `glow` vào `EffectsConfig` (contracts, `parseThemeConfig`, `useThemeStore`); đồng hồ đọc biến `--clock-glow`; `EffectsLayer` nhận hai hiệu ứng mới; catalog và presets của gói theme đọc thêm từ file riêng (`lib/pixelCyberpunk.ts`) để gói chỉ thêm file, ít sửa file có sẵn.
-* **3G `lofi`:** `ambientEngine` và thẻ Sounds đọc danh sách kênh `CHANNEL_DEFS` (`features/audio/lib/channelDefs.ts`); thêm kênh mới là thêm một mục `{ id, label, icon, scale, persist: 'device', build }`. Âm lượng của kênh `device` lưu trên thiết bị nên không cần sửa database hay contracts.
+* Nền động: `inset: -15%`, `will-change: transform`; bộ lọc độ sáng và mờ nằm ở lớp ngoài.
+* `rampGain()` trong `web-audio.ts`: hằng số thời gian 0,5 s cho kênh và 0,08 s cho master và mute; kênh tắt thì mờ dần rồi 2 giây sau mới giải phóng node.
+* `asyncUtilTimeout` 4 giây trong `src/test/setup.ts` để test không hỏng khi máy chậm.
+* Thư mục `src/features/quotes/` và `QuoteSlot` (góc phải trên, dưới HUD) là khung cho FR-31, hiện trả về `null`.
 
-Hai gói 3F, 3G chỉ **thêm** nội dung vào thư mục riêng; quy tắc chung vẫn như `docs/plans/phase-3.md` Phần A.
+## 6. Đặc tả việc còn lại
 
-## 6. Phần B, C, D — bản nháp và đóng gói
+Quy tắc chung: mỗi việc chỉ sửa trong thư mục được nêu; không import chéo giữa các feature (ESLint chặn); màu và font dùng token (`var(--...)`, class `accent`, `capsule`); tắt animation khi `prefers-reduced-motion`; mỗi việc có test và qua `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`.
 
-| Gói | Bản nháp mình viết |
-| :--- | :--- |
-| 3E quotes | ~40 câu danh ngôn ngắn (tiếng Anh), công tắc bật/tắt (mặc định TẮT, lưu `localStorage`), đổi câu ngẫu nhiên, ẩn trong Zen, animation mờ dần |
-| 3F themes-pixel | 4 nền Pixel + 4 nền Cyberpunk (SVG sinh từ code), 5 theme (Cyberpunk Neon, Synthwave, Pixel Night, Retro Terminal, Vaporwave), Scanlines và Glow chạy được |
-| 3G lofi | Kênh Lofi Web Audio (hợp âm piano điện mềm, trống nhẹ lệch nhịp, tiếng đĩa than rè, ~75 BPM), danh sách lofi radio thêm vào hàng chờ YouTube bằng một lần bấm |
+### Việc 1 — Danh ngôn ngẫu nhiên (FR-31)
 
-Mỗi gói kèm test và được chạy `lint`, `typecheck`, `test`, `build` trong bản sao tạm đã gồm PR này. Ngoài ra trong `~/FocusFlow-handoff/` mỗi gói có: zip code, hướng dẫn Discord (cách làm trên Codespaces hoặc web, như gói 3A), danh sách việc "còn thiếu để hoàn thiện" (ví dụ thêm câu quote, chỉnh màu, thêm nền) và mô tả PR.
+* **Thư mục:** `src/features/quotes/` (đã có `QuoteDisplay` trả về `null` và `QuoteSlot` ở góc phải trên, dưới HUD).
+* **Hành vi:**
+  1. Mặc định tắt: chưa bật thì không có câu chữ nào trên màn hình, chỉ có một icon nhỏ để bật (AC-31.1).
+  2. Bật lên thì hiện một câu ngẫu nhiên (khoảng 40 câu ngắn, mỗi câu dưới 90 ký tự, có thể kèm tác giả); nút đổi câu không bao giờ trả lại đúng câu đang hiện; nút tắt.
+  3. Chỉ nhớ lựa chọn bật/tắt (`localStorage`, khóa `focusflow_quotes`), câu thì mới mỗi lần mở trang.
+  4. Ẩn hoàn toàn trong Zen; câu mới mờ dần vào (`animate-fade-in`).
+* **Test:** danh sách (không trùng, độ dài), chọn câu (không lặp, trong khoảng), mặc định không có câu, bật/đổi/tắt, tác giả, Zen, lưu lựa chọn và dữ liệu hỏng.
 
-Mình không thêm plan chi tiết của 3E, 3F, 3G vào `phase-3.md` nữa; mỗi gói có một file `PLAN.md` nằm trong zip hướng dẫn (ngoài repo), nên repo không có dấu vết sắp xếp trước.
+### Việc 2 — Âm lượng riêng cho nhạc YouTube
 
-## 7. Thứ tự làm
+* **Thư mục:** `src/features/audio/`.
+* **Hành vi:**
+  1. Thanh trượt "Music" trong mục YouTube của thẻ Sounds, 0 đến 100 %, mặc định 70 %.
+  2. Âm lượng thực của player YouTube = Music × Master; kéo Music không làm đổi 3 kênh ambient và ngược lại.
+  3. Lưu trên thiết bị (`localStorage`, khóa `focusflow_audio_levels`, trường `youtube`), không đổi database; dữ liệu hỏng thì về mặc định.
+* **Test:** thanh trượt đổi đúng giá trị trong store, lưu và đọc lại, dữ liệu hỏng, âm lượng gửi cho player.
 
-1. Phần A: O1, O3, O4, O5, S1, S2, S5, animation, chuẩn bị chỗ cho 3 gói; test, build, kiểm trên trình duyệt.
-2. Bạn commit và merge PR.
-3. Mình tạo bản sao tạm từ `main` mới, viết bản nháp 3E, 3F, 3G, kiểm tra, đóng zip và hướng dẫn vào `~/FocusFlow-handoff/`.
-4. Đồng bộ tài liệu (O6) là PR docs riêng, chỉ ghi những gì đã merge.
+### Việc 3 — Kênh nhạc lofi tự sinh và lofi radio
 
-## 8. Ngoài phạm vi
+* **Thư mục:** `src/features/audio/`. Làm sau Việc 2 vì cùng sửa `useAudioStore.ts` và `SoundPanel.tsx`.
+* **Hành vi:**
+  1. Thêm kênh **Lofi** vào `CHANNEL_DEFS` (`lib/channelDefs.ts`), sinh hoàn toàn bằng Web Audio, không tải file: vòng hợp âm piano điện mềm khoảng 75 BPM, trống nhẹ lệch nhịp (kick, snare, hi-hat), tiếng đĩa than rè nhỏ; có thanh trượt âm lượng riêng như các kênh khác, đi qua cùng cơ chế mờ dần và Master.
+  2. Âm lượng kênh Lofi lưu trên thiết bị (`focusflow_audio_levels`), vì database không có cột cho kênh này.
+  3. Mục **Lofi radio** trong thẻ Sounds: danh sách vài đường dẫn YouTube dựng sẵn (nằm trong một file riêng, dễ đổi); bấm một mục thì thêm vào hàng chờ như dán link.
+  4. Kênh tắt hoặc Pause thì giải phóng hết node, không tốn CPU lúc im lặng.
+* **Test:** bộ lập lịch nốt (đúng nhịp, đúng hợp âm), kênh bật/tắt tạo và giải phóng đúng số node, lưu âm lượng, bấm mục radio thêm đúng vào hàng chờ.
 
-Nâng toolchain (O7), FR-23, FR-28, huy hiệu, Google OAuth, E2E.
+### Việc 4 — Theme Pixel và Cyberpunk
 
-## 9. Kiểm tay (phần A)
+* **Thư mục:** `src/features/theme-wallpaper/`.
+* **Hành vi:**
+  1. Hai nhóm nền mới trong thư viện: **Pixel** (4 nền) và **Cyberpunk** (4 nền), vẽ bằng SVG sinh từ code, nét pixel sắc (`shape-rendering: crispEdges`), mỗi nền có độ sáng tính sẵn trong catalog.
+  2. 5 theme dựng sẵn mới: Cyberpunk Neon, Synthwave, Pixel Night, Retro Terminal, Vaporwave (màu nhấn, font trong 6 font đã có, nền và hiệu ứng riêng); vẫn qua các luật dễ đọc của FR-15.
+  3. Hiệu ứng **Scanlines** (sọc ngang kiểu màn CRT, lớp tĩnh) trong `EffectsLayer` và thanh trượt trong tab Customize, cùng thanh trượt **Glow** (biến `--clock-glow` đã có sẵn trong core).
+  4. Hiệu ứng tắt hoặc tĩnh khi giảm chuyển động.
+* **Test:** catalog (id duy nhất, độ sáng hợp lệ, nhóm mới), 5 preset hợp lệ (nền và font tồn tại, capsule đủ tối), Scanlines hiện/ẩn theo mức, thanh trượt Scanlines và Glow cập nhật store.
 
-1. Bật Rain, Play/Pause: âm lượng lên xuống mượt, Rain dịu hơn trước.
-2. Kéo thanh "Music" khi đang phát YouTube: chỉ nhạc YouTube đổi to nhỏ.
-3. Mở/đóng thẻ và panel: có animation; bật "Giảm chuyển động" trong hệ điều hành thì không còn.
-4. Nền Animated chạy mượt, CPU thấp hơn.
-5. F5 giữ nguyên theme, âm lượng và hàng chờ.
+### Ngoài các việc trên
 
-## 10. Ghi chú triển khai phần A
-
-* Dọn dẹp: bỏ `isMobileDrawerOpen`, `activeDrawerTab`, `closeAllModals`, `DrawerTab`, `cycleDots` trong `useHud`; `useMediaQuery` dùng chung ở `core/ui` (clock-modes chỉ re-export). O5 giữ nguyên (xem bảng Mục 2).
-* Nền động: lớp lớn hơn màn hình (`inset: -15%`) di chuyển bằng `transform`; bộ lọc độ sáng và mờ nằm ở lớp ngoài.
-* Âm thanh: `rampGain()` trong `web-audio.ts` (τ = 0,5 s cho kênh, 0,08 s cho master và mute); kênh tắt thì mờ dần rồi 2 giây sau mới giải phóng node. Rain dùng noise hồng, thang gain 0,55.
-* Animation: keyframes trong `tailwind.config.ts`; `usePresence` giữ thẻ thêm 180 ms để chạy hiệu ứng đóng (tắt khi giảm chuyển động); nút nhấn co 0,95 và chuyển màu mượt (`index.css`, `@layer base`).
-* Hiệu ứng mới trong contracts: `scanlines`, `glow`. Biến `--clock-glow` do `applyTheme` đặt, chữ đồng hồ đọc nó.
-* Khung quote: `src/features/quotes/` (trả về `null`), `QuoteSlot`, vị trí góc phải trên dưới HUD.
-* Test: `asyncUtilTimeout` 4 giây trong `src/test/setup.ts` để test không hỏng khi máy chậm.
+Nâng toolchain (O7), FR-23 (offline sync), FR-28 (PiP), huy hiệu cục bộ (FR-31 phần achievement), Google OAuth, E2E.

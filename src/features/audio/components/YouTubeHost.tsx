@@ -19,7 +19,6 @@ export const YouTubeHost: React.FC = () => {
   const currentIndex = useAudioStore((state) => state.currentIndex);
   const wantsPlaying = useAudioStore((state) => state.wantsYouTubePlaying);
   const masterVolume = useSettingsStore((state) => state.settings.ambientVolumes.master);
-  const youtubeVolume = useAudioStore((state) => state.youtubeVolume);
   const videoId = currentIndex >= 0 ? parseYouTubeId(queue[currentIndex]?.url ?? '') : null;
 
   useEffect(() => subscribeMute(setMuted), []);
@@ -86,10 +85,9 @@ export const YouTubeHost: React.FC = () => {
     else player.pauseVideo();
   }, [ready, videoId, wantsPlaying, muted]);
 
-  // The player has no gain node: its own volume is the music level times the master volume.
   useEffect(() => {
-    if (ready) playerRef.current?.setVolume(Math.round(masterVolume * youtubeVolume * 100));
-  }, [ready, masterVolume, youtubeVolume]);
+    if (ready) playerRef.current?.setVolume(Math.round(masterVolume * 100));
+  }, [ready, masterVolume]);
 
   return (
     <div
