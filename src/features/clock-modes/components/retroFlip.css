@@ -1,0 +1,58 @@
+/* Retro Flip Clock (AC-10.3): each digit is split in two halves, the top flap folds down in 300ms. */
+.ff-flip-card {
+  position: relative;
+  display: inline-block;
+  width: 0.72em;
+  height: 1.1em;
+  perspective: 400px;
+}
+
+.ff-flip-half {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  background: var(--capsule-bg);
+  border-radius: 0.08em;
+}
+
+.ff-flip-half > span {
+  line-height: 1.1em;
+}
+
+.ff-flip-top {
+  top: 0;
+  align-items: flex-start;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+.ff-flip-bottom {
+  bottom: 0;
+  align-items: flex-end;
+}
+
+.ff-flip-flap {
+  transform-origin: bottom;
+  backface-visibility: hidden;
+  animation: ff-flip-down 300ms ease-in forwards;
+  z-index: 1;
+}
+
+@keyframes ff-flip-down {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(-90deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ff-flip-flap {
+    animation: none;
+    display: none;
+  }
+}
