@@ -64,14 +64,15 @@ export const WallpaperLayer: React.FC<WallpaperLayerProps> = ({ children }) => {
       <div
         data-testid="wallpaper-image"
         aria-hidden="true"
-        className={`absolute inset-0 transition-[filter] duration-200 ${background.className}`}
+        className="absolute inset-0 overflow-hidden transition-[filter] duration-200"
         style={{
-          ...background.style,
           // AC-25.5: a solid color ignores the image adjustments.
           filter: isSolid ? undefined : `brightness(${tokens.bgBrightness}%) blur(${tokens.bgBlur}px)`,
           transform: !isSolid && tokens.bgBlur > 0 ? 'scale(1.05)' : undefined,
         }}
-      />
+      >
+        <div data-testid="wallpaper-art" className={`ff-wallpaper-art ${background.className}`} style={background.style} />
+      </div>
       {!isSolid && (
         <div
           data-testid="wallpaper-dim"

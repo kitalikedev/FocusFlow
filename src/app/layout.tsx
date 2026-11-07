@@ -15,6 +15,7 @@ import {
   SoundPanelSlot,
   ToolPanelsSlot,
   AnalyticsSlot,
+  QuoteSlot,
 } from './slots';
 
 // Auth dialogs are loaded on demand so they never weigh on the initial bundle.
@@ -41,6 +42,11 @@ export const Layout: React.FC = () => {
       <div className="relative z-10 flex h-screen w-screen flex-col overflow-hidden">
         {/* Top: brand, today's sessions, streak, sync and account */}
         <HudSlot />
+
+        {/* Top right, under the HUD: random quote (hidden unless the user turns it on) */}
+        <div className="pointer-events-none absolute right-6 top-16 z-10 max-w-xs text-right max-sm:right-4 max-sm:top-14 max-sm:max-w-[60vw]">
+          <QuoteSlot />
+        </div>
 
         {/* Center: focus intent and the clock capsule */}
         <main className="relative flex flex-1 flex-col items-center justify-center px-4 pb-20">

@@ -10,6 +10,9 @@ const muteListeners = new Set<(value: boolean) => void>();
 vi.mock('@/shared/lib/web-audio', () => ({
   getAudioContext: () => ctx,
   getMasterGain: () => master,
+  rampGain: (node: { gain: { value: number } }, target: number) => {
+    node.gain.value = target;
+  },
   setMasterVolume: vi.fn(),
   isMuted: () => muted,
   subscribeMute: (listener: (value: boolean) => void) => {
@@ -24,7 +27,7 @@ vi.mock('@/shared/lib/web-audio', () => ({
 }));
 
 import { ControlBar, SoundPanel } from '../index';
-import { QUEUE_STORAGE_KEY, readStoredQueue, useAudioStore } from '../store/useAudioStore';
+import { LEVELS_STORAGE_KEY, QUEUE_STORAGE_KEY, readDeviceLevels, readStoredQueue, useAudioStore } from '../store/useAudioStore';
 import { resetAmbientEngine, setAmbientPaused } from '../lib/ambientEngine';
 import { useUiStore } from '@/core/ui/useUiStore';
 import { setMasterVolume, toggleMasterMute } from '@/shared/lib/web-audio';
@@ -45,6 +48,7 @@ beforeEach(() => {
   setAmbientPaused(true);
   useAudioStore.setState({
     volumes: { rain: 0, brownNoise: 0, campfire: 0 },
+    youtubeVolume: 0.7,
     isAmbientPaused: true,
     queue: [],
     currentIndex: -1,
@@ -72,8 +76,8 @@ describe('SoundPanel', () => {
     render(<SoundPanel />);
     fireEvent.change(screen.getByLabelText('Rain'), { target: { value: '50' } });
     expect(useAudioStore.getState().isAmbientPaused).toBe(false);
-    expect(channelGains()[0].gain.value).toBe(0.5);
-    expect(screen.getByText('50%')).toBeInTheDocument();
+    expect(channelGains()[0].gain.value).toBeCloseTo(0.5 * 0.55);
+    expect(screen.getAllByText('50%').length).toBeGreaterThan(0);
   });
 
   it('pauses and resumes the ambient channels from the header button', () => {
@@ -113,6 +117,22 @@ describe('SoundPanel', () => {
     fireEvent.change(screen.getByPlaceholderText('Paste a YouTube link'), { target: { value: 'https://vimeo.com/1' } });
     fireEvent.click(screen.getByTestId('add-track-btn'));
     expect(await screen.findByRole('alert')).toHaveTextContent('valid YouTube');
+  });
+
+  it('the Music slider sets the YouTube volume on its own and remembers it on this device', () => {
+    render(<SoundPanel />);
+    fireEvent.change(screen.getByLabelText('Music'), { target: { value: '30' } });
+    expect(useAudioStore.getState().youtubeVolume).toBe(0.3);
+    expect(useAudioStore.getState().volumes).toEqual({ rain: 0, brownNoise: 0, campfire: 0 });
+    expect(JSON.parse(localStorage.getItem(LEVELS_STORAGE_KEY) ?? '{}').youtube).toBe(0.3);
+    expect(readDeviceLevels().youtube).toBe(0.3);
+  });
+
+  it('ignores corrupted device levels', () => {
+    localStorage.setItem(LEVELS_STORAGE_KEY, '{"youtube":"loud"}');
+    expect(readDeviceLevels().youtube).toBe(0.7);
+    localStorage.setItem(LEVELS_STORAGE_KEY, 'nope');
+    expect(readDeviceLevels().youtube).toBe(0.7);
   });
 
   it('plays, skips and removes queue items', () => {

@@ -18,7 +18,7 @@ function countWords(text: string): number {
 }
 
 /** Scratchpad with debounced auto-save (FR-20). */
-export const NotePanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+export const NotePanel: React.FC<{ onClose: () => void; closing?: boolean }> = ({ onClose, closing }) => {
   const content = useNoteStore((state) => state.content);
   const status = useNoteStore((state) => state.status);
   const isLoaded = useNoteStore((state) => state.isLoaded);
@@ -28,7 +28,8 @@ export const NotePanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   useEffect(() => () => void useNoteStore.getState().flush(), []);
 
   return (
-    <FloatingPanel title="Notepad" testId="note-panel" icon={<NotebookPen className="h-4 w-4" />} onClose={onClose}>
+    <FloatingPanel title="Notepad" testId="note-panel"
+      closing={closing} icon={<NotebookPen className="h-4 w-4" />} onClose={onClose}>
       <div className="flex h-full flex-col gap-2 p-3">
         <label htmlFor="notepad" className="sr-only">
           Notes

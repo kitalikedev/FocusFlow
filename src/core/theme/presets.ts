@@ -27,6 +27,8 @@ export const OBSIDIAN_MINIMAL_CONFIG: ThemeConfig = {
     fireflies: 0,
     grain: 0,
     vignette: 0,
+    scanlines: 0,
+    glow: 0,
   },
   wallpaperRef: {
     type: 'solid',

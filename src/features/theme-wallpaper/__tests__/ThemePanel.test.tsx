@@ -192,7 +192,7 @@ describe('WallpaperLayer and EffectsLayer', () => {
     act(() => useThemeStore.getState().setWallpaper({ type: 'preset', idOrColor: 'animated-aurora' }));
     rerender(<WallpaperLayer />);
     const image = screen.getByTestId('wallpaper-image');
-    expect(image.className).toContain('ff-wallpaper-drift');
+    expect(screen.getByTestId('wallpaper-art').className).toContain('ff-wallpaper-drift');
     expect(image.style.filter).toBe('brightness(100%) blur(0px)');
     expect(screen.getByTestId('wallpaper-dim').style.opacity).toBe('0.2');
 
@@ -203,7 +203,7 @@ describe('WallpaperLayer and EffectsLayer', () => {
       useThemeStore.getState().setWallpaper({ type: 'custom', idOrColor: 'c1' });
     });
     rerender(<WallpaperLayer />);
-    expect(screen.getByTestId('wallpaper-image').style.backgroundImage).toContain('blob:c1');
+    expect(screen.getByTestId('wallpaper-art').style.backgroundImage).toContain('blob:c1');
   });
 
   it('AC-15.1: raises the capsule opacity to 50 % behind a bright wallpaper', async () => {

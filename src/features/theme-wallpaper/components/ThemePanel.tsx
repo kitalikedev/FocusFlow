@@ -19,7 +19,11 @@ const TABS: { id: ThemeTab; label: string }[] = [
  * Themes panel. Library and My Themes apply and save at once; Customize edits a draft shown live
  * (AC-25.1) that only Apply saves. Revert, or closing without Apply, restores the saved theme.
  */
-export const ThemePanel: React.FC<{ initialTab?: ThemeTab; onClose: () => void }> = ({ initialTab = 'library', onClose }) => {
+export const ThemePanel: React.FC<{ initialTab?: ThemeTab; closing?: boolean; onClose: () => void }> = ({
+  initialTab = 'library',
+  closing = false,
+  onClose,
+}) => {
   const [tab, setTab] = useState<ThemeTab>(initialTab);
   const [saved, setSaved] = useState<ThemeConfig>(() => useThemeStore.getState().config);
   const [draft, setDraft] = useState<ThemeConfig>(saved);
@@ -27,7 +31,13 @@ export const ThemePanel: React.FC<{ initialTab?: ThemeTab; onClose: () => void }
   const pending = useRef({ isDirty, saved });
   pending.current = { isDirty, saved };
 
-  // Closing with unapplied edits brings the saved theme back.
+  // Closing with unapplied edits brings the saved theme back, at once and not after the exit animation.
+  useEffect(() => {
+    if (closing && pending.current.isDirty) {
+      useThemeStore.getState().setConfig(pending.current.saved);
+      setDirty(false);
+    }
+  }, [closing]);
   useEffect(
     () => () => {
       if (pending.current.isDirty) useThemeStore.getState().setConfig(pending.current.saved);
@@ -59,6 +69,7 @@ export const ThemePanel: React.FC<{ initialTab?: ThemeTab; onClose: () => void }
     <SlideOver
       title="Themes"
       testId="theme-panel"
+      closing={closing}
       onClose={onClose}
       toolbar={
         <div role="tablist" aria-label="Theme sections" className="flex gap-1 rounded-xl bg-white/5 p-1">

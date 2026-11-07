@@ -2,9 +2,7 @@ import React from 'react';
 import { BarChart3, EyeOff, ListChecks, Music, NotebookPen, Palette } from 'lucide-react';
 import type { ToolPanel } from '@/shared/types/contracts';
 import { useUiStore } from '../ui/useUiStore';
-import { useMediaQuery } from '../ui/useMediaQuery';
-
-export const NARROW_SCREEN_QUERY = '(max-width: 639px)';
+import { NARROW_SCREEN_QUERY, useMediaQuery } from '../ui/useMediaQuery';
 
 const DOCK_STYLE: React.CSSProperties = {
   backgroundColor: 'var(--capsule-bg)',

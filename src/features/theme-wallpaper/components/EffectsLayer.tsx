@@ -1,12 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { useThemeStore } from '@/core/theme/useThemeStore';
-import { useMediaQuery } from '@/core/ui/useMediaQuery';
+import { NARROW_SCREEN_QUERY, REDUCED_MOTION_QUERY, useMediaQuery } from '@/core/ui/useMediaQuery';
 import { createFpsGuard, DESKTOP_MIN_FPS, MOBILE_MIN_FPS } from '../hooks/useFpsGuard';
 import { draw, particleCount, spawn, step, type Particle, type ParticleKind } from '../lib/particles';
 
 const KINDS: ParticleKind[] = ['rain', 'snow', 'fireflies'];
-const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
-const NARROW = '(max-width: 639px)';
 
 // Fine film grain as a tiny inline SVG noise tile (no request).
 const GRAIN_TILE =
@@ -92,8 +90,8 @@ const ParticleCanvas: React.FC<{ intensities: Record<ParticleKind, number>; isNa
 /** Ambient overlays (FR-26). Grain and vignette are static layers; motion is skipped with reduced motion. */
 export const EffectsLayer: React.FC = () => {
   const effects = useThemeStore((state) => state.config.effects);
-  const reducedMotion = useMediaQuery(REDUCED_MOTION);
-  const isNarrow = useMediaQuery(NARROW);
+  const reducedMotion = useMediaQuery(REDUCED_MOTION_QUERY);
+  const isNarrow = useMediaQuery(NARROW_SCREEN_QUERY);
   const hasParticles = !reducedMotion && (effects.rain > 0 || effects.snow > 0 || effects.fireflies > 0);
 
   if (!hasParticles && effects.grain === 0 && effects.vignette === 0) return null;

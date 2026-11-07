@@ -30,3 +30,39 @@ body {
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
+
+/* Interaction feedback: every button glides between states and presses in slightly. */
+@layer base {
+  button,
+  [role='tab'],
+  [role='option'],
+  select {
+    transition-property: background-color, color, border-color, box-shadow, opacity, transform;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  button:not(:disabled):active,
+  [role='tab']:active,
+  [role='option']:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Respect the system setting: motion becomes instant, nothing loops. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  button:not(:disabled):active,
+  [role='tab']:active,
+  [role='option']:active {
+    transform: none;
+  }
+}

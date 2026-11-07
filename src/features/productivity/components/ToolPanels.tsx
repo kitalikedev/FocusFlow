@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from 'react';
+import { usePresence } from '@/core/ui/usePresence';
 import { useUiStore } from '@/core/ui/useUiStore';
 import { useProductivityData } from '../hooks/useProductivityData';
 
@@ -14,12 +15,15 @@ export const ToolPanels: React.FC = () => {
   const isNoteOpen = useUiStore((state) => state.isNoteOpen);
   const togglePanel = useUiStore((state) => state.togglePanel);
 
+  const tasks = usePresence(isTasksOpen);
+  const note = usePresence(isNoteOpen);
+
   if (isZen) return null;
 
   return (
     <Suspense fallback={null}>
-      {isTasksOpen && <TasksPanel onClose={() => togglePanel('tasks')} />}
-      {isNoteOpen && <NotePanel onClose={() => togglePanel('note')} />}
+      {tasks.mounted && <TasksPanel closing={tasks.closing} onClose={() => togglePanel('tasks')} />}
+      {note.mounted && <NotePanel closing={note.closing} onClose={() => togglePanel('note')} />}
     </Suspense>
   );
 };

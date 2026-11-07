@@ -1,17 +1,27 @@
 import { create } from 'zustand';
-import type { AmbientSoundType, YouTubeTrack } from '@/shared/types/contracts';
+import type { YouTubeTrack } from '@/shared/types/contracts';
 import { useSettingsStore } from '@/core/data/useSettingsStore';
-import { setChannelVolume, setAmbientPaused, AMBIENT_CHANNELS } from '../lib/ambientEngine';
+import { CHANNEL_DEFS } from '../lib/channelDefs';
+import { setChannelVolume, setAmbientPaused } from '../lib/ambientEngine';
 import { fetchVideoTitle, parseYouTubeId, watchUrl } from '../lib/youtube';
 
 export const QUEUE_STORAGE_KEY = 'focusflow_youtube_queue';
+export const LEVELS_STORAGE_KEY = 'focusflow_audio_levels';
 export const QUEUE_MAX = 20;
+export const DEFAULT_YOUTUBE_VOLUME = 0.7;
 const PERSIST_DELAY_MS = 500;
 
-export type ChannelVolumes = Record<AmbientSoundType, number>;
+/** Slider values 0..1 of every ambient channel, by channel id. */
+export type ChannelVolumes = Record<string, number>;
+
+/** Channels saved with the account (database columns volume_rain / volume_brown_noise / volume_campfire). */
+const SETTINGS_CHANNELS = CHANNEL_DEFS.filter((def) => def.persist === 'settings').map((def) => def.id);
+const DEVICE_CHANNELS = CHANNEL_DEFS.filter((def) => def.persist === 'device').map((def) => def.id);
 
 export interface AudioState {
   volumes: ChannelVolumes;
+  /** Volume of the YouTube player relative to the master volume, 0..1. */
+  youtubeVolume: number;
   /** Ambient channels are silent until the user starts them (no sound on page load). */
   isAmbientPaused: boolean;
   queue: YouTubeTrack[];
@@ -21,7 +31,9 @@ export interface AudioState {
   isAddingTrack: boolean;
   trackError: string | null;
 
-  setVolume: (type: AmbientSoundType, volume: number) => void;
+  setVolume: (id: string, volume: number) => void;
+  setYouTubeVolume: (volume: number) => void;
+  /** Applies volumes loaded from the settings (account or guest data). */
   hydrateVolumes: (volumes: ChannelVolumes) => void;
   toggleAmbient: () => void;
   addTrack: (url: string) => Promise<boolean>;
@@ -70,15 +82,51 @@ function writeQueue(queue: YouTubeTrack[], currentIndex: number): void {
   }
 }
 
+function clampLevel(value: unknown, fallback: number): number {
+  return typeof value === 'number' && Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : fallback;
+}
+
+/** Levels that only live on this device: the YouTube volume and device-only channels such as lofi. */
+export function readDeviceLevels(): { youtube: number; channels: ChannelVolumes } {
+  let raw: Record<string, unknown> = {};
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(LEVELS_STORAGE_KEY) ?? 'null');
+    if (typeof parsed === 'object' && parsed !== null) raw = parsed as Record<string, unknown>;
+  } catch {
+    // corrupted value: start from defaults
+  }
+  const channels: ChannelVolumes = {};
+  DEVICE_CHANNELS.forEach((id) => {
+    channels[id] = clampLevel(raw[id], 0);
+  });
+  return { youtube: clampLevel(raw.youtube, DEFAULT_YOUTUBE_VOLUME), channels };
+}
+
+function writeDeviceLevels(youtube: number, volumes: ChannelVolumes): void {
+  const levels: Record<string, number> = { youtube };
+  DEVICE_CHANNELS.forEach((id) => {
+    levels[id] = volumes[id] ?? 0;
+  });
+  try {
+    localStorage.setItem(LEVELS_STORAGE_KEY, JSON.stringify(levels));
+  } catch {
+    // Storage blocked: the levels still apply for this visit.
+  }
+}
+
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 
-/** Debounced save of the channel volumes into user_settings.ambient_volumes (one update per burst). */
+/** Debounced save of the account channels into user_settings (one update per burst of slider moves). */
 function persistVolumes(volumes: ChannelVolumes): void {
   if (persistTimer) clearTimeout(persistTimer);
   persistTimer = setTimeout(() => {
     persistTimer = null;
     const current = useSettingsStore.getState().settings.ambientVolumes;
-    void useSettingsStore.getState().update({ ambientVolumes: { ...current, ...volumes } });
+    const patch: Record<string, number> = {};
+    SETTINGS_CHANNELS.forEach((id) => {
+      patch[id] = volumes[id] ?? 0;
+    });
+    void useSettingsStore.getState().update({ ambientVolumes: { ...current, ...patch } });
   }, PERSIST_DELAY_MS);
 }
 
@@ -87,9 +135,19 @@ export function hasPendingVolumeSave(): boolean {
 }
 
 const stored = readStoredQueue();
+const device = readDeviceLevels();
+
+function initialVolumes(): ChannelVolumes {
+  const volumes: ChannelVolumes = {};
+  CHANNEL_DEFS.forEach((def) => {
+    volumes[def.id] = def.persist === 'device' ? (device.channels[def.id] ?? 0) : 0;
+  });
+  return volumes;
+}
 
 export const useAudioStore = create<AudioState>((set, get) => ({
-  volumes: { rain: 0, brownNoise: 0, campfire: 0 },
+  volumes: initialVolumes(),
+  youtubeVolume: device.youtube,
   isAmbientPaused: true,
   queue: stored.queue,
   currentIndex: stored.currentIndex,
@@ -97,21 +155,33 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   isAddingTrack: false,
   trackError: null,
 
-  setVolume: (type, volume) => {
-    const volumes = { ...get().volumes, [type]: Math.min(1, Math.max(0, volume)) };
+  setVolume: (id, volume) => {
+    const level = Math.min(1, Math.max(0, volume));
+    const volumes = { ...get().volumes, [id]: level };
     set({ volumes });
-    setChannelVolume(type, volumes[type]);
+    setChannelVolume(id, level);
     // Moving a slider up is an explicit "play" gesture.
-    if (volumes[type] > 0 && get().isAmbientPaused) {
+    if (level > 0 && get().isAmbientPaused) {
       set({ isAmbientPaused: false });
       setAmbientPaused(false);
     }
-    persistVolumes(volumes);
+    if (SETTINGS_CHANNELS.includes(id)) persistVolumes(volumes);
+    else writeDeviceLevels(get().youtubeVolume, volumes);
   },
 
-  hydrateVolumes: (volumes) => {
+  setYouTubeVolume: (volume) => {
+    const youtubeVolume = Math.min(1, Math.max(0, volume));
+    set({ youtubeVolume });
+    writeDeviceLevels(youtubeVolume, get().volumes);
+  },
+
+  hydrateVolumes: (loaded) => {
+    const volumes = { ...get().volumes };
+    SETTINGS_CHANNELS.forEach((id) => {
+      volumes[id] = loaded[id] ?? 0;
+    });
     set({ volumes });
-    AMBIENT_CHANNELS.forEach((type) => setChannelVolume(type, volumes[type]));
+    Object.keys(volumes).forEach((id) => setChannelVolume(id, volumes[id]));
   },
 
   toggleAmbient: () => {
@@ -186,7 +256,7 @@ export const useAudioStore = create<AudioState>((set, get) => ({
 
   togglePauseAll: () => {
     const { isAmbientPaused, volumes, wantsYouTubePlaying, currentIndex } = get();
-    const ambientAudible = !isAmbientPaused && AMBIENT_CHANNELS.some((type) => volumes[type] > 0);
+    const ambientAudible = !isAmbientPaused && Object.values(volumes).some((level) => level > 0);
     if (ambientAudible || wantsYouTubePlaying) {
       set({ isAmbientPaused: true, wantsYouTubePlaying: false });
       setAmbientPaused(true);

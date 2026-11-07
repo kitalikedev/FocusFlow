@@ -73,3 +73,13 @@ describe('applyTheme', () => {
     expect(style.getPropertyValue('--panel-bg')).toBe('rgba(0, 0, 0, 0.8)');
   });
 });
+
+describe('glowShadow', () => {
+  it('is none at 0 and grows with the level, clamped to 0..100', async () => {
+    const { glowShadow } = await import('../applyTheme');
+    expect(glowShadow(0, '#fff')).toBe('none');
+    expect(glowShadow(-5, '#fff')).toBe('none');
+    expect(glowShadow(100, '#0ff')).toBe('0 0 14.0px #0ff, 0 0 36.0px #0ff');
+    expect(glowShadow(500, '#0ff')).toBe(glowShadow(100, '#0ff'));
+  });
+});

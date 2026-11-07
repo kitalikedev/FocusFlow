@@ -21,6 +21,7 @@ export const LIMITS = {
 export const CLOCK_VISUAL_MODES = ['minimal', 'circular_ring', 'retro_flip'] as const;
 export const CLOCK_POSITIONS = ['center', 'mini_corner', 'zen'] as const;
 
+/** Same default as the database column; the visible wallpaper comes from `activeTheme.wallpaperRef`. */
 export const DEFAULT_WALLPAPER_ID = 'preset-lofi-cafe';
 
 function isRecord(value: unknown): value is Record<string, unknown> {

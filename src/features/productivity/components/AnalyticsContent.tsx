@@ -67,6 +67,8 @@ export const AnalyticsContent: React.FC = () => {
                   rx={4}
                   fill="var(--color-accent)"
                   opacity={index === todayIndex ? 1 : 0.45}
+                  className="animate-bar-grow"
+                  style={{ transformBox: 'fill-box', transformOrigin: 'bottom', animationDelay: `${index * 50}ms` }}
                 >
                   <title>{`${WEEKDAY_LABELS[index]}: ${formatMinutes(minutes)}`}</title>
                 </rect>

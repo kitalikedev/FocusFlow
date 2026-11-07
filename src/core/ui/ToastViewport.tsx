@@ -21,7 +21,7 @@ export const ToastViewport: React.FC = () => {
           key={toast.id}
           role="status"
           data-testid="toast"
-          className={`pointer-events-auto flex w-full items-center justify-between gap-3 rounded-capsule border border-capsule-border bg-capsule-bg px-4 py-2 text-sm backdrop-blur-capsule motion-safe:transition-opacity ${VARIANT_CLASS[toast.variant]}`}
+          className={`pointer-events-auto flex w-full items-center justify-between gap-3 rounded-capsule border border-capsule-border bg-capsule-bg px-4 py-2 text-sm backdrop-blur-capsule animate-toast-in ${VARIANT_CLASS[toast.variant]}`}
         >
           <span>{toast.message}</span>
           <button

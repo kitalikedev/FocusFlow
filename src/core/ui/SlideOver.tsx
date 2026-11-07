@@ -5,6 +5,8 @@ export interface SlideOverProps {
   title: string;
   onClose: () => void;
   testId?: string;
+  /** True while the exit animation plays (see usePresence). */
+  closing?: boolean;
   /** Rendered under the title (tabs, actions). */
   toolbar?: React.ReactNode;
   children: React.ReactNode;
@@ -14,7 +16,7 @@ export interface SlideOverProps {
  * Modal side panel: slides over the right edge on desktop, 85 % bottom sheet on phones (FR-22, FR-25).
  * Esc or a click on the backdrop closes it; focus moves into the panel and back to the opener on close.
  */
-export const SlideOver: React.FC<SlideOverProps> = ({ title, onClose, testId, toolbar, children }) => {
+export const SlideOver: React.FC<SlideOverProps> = ({ title, onClose, testId, closing = false, toolbar, children }) => {
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -33,7 +35,12 @@ export const SlideOver: React.FC<SlideOverProps> = ({ title, onClose, testId, to
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end max-sm:items-end">
-      <div data-testid="slide-over-backdrop" aria-hidden="true" className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div
+        data-testid="slide-over-backdrop"
+        aria-hidden="true"
+        className={`absolute inset-0 bg-black/40 ${closing ? 'animate-fade-out' : 'animate-fade-in'}`}
+        onClick={onClose}
+      />
       <div
         ref={panelRef}
         data-testid={testId}
@@ -41,7 +48,7 @@ export const SlideOver: React.FC<SlideOverProps> = ({ title, onClose, testId, to
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="relative flex h-full w-full flex-col overflow-hidden border-l text-white shadow-2xl outline-none sm:w-[440px] max-sm:h-[85vh] max-sm:rounded-t-2xl max-sm:border-l-0 max-sm:border-t"
+        className={`${closing ? 'pointer-events-none animate-slide-out-right max-sm:animate-sheet-out' : 'animate-slide-in-right max-sm:animate-sheet-in'} relative flex h-full w-full flex-col overflow-hidden border-l text-white shadow-2xl outline-none sm:w-[440px] max-sm:h-[85vh] max-sm:rounded-t-2xl max-sm:border-l-0 max-sm:border-t`}
         style={{
           backgroundColor: 'var(--panel-bg)',
           backdropFilter: 'blur(var(--capsule-blur))',

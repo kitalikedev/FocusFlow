@@ -1,23 +1,30 @@
-/* Animated wallpapers: a slow gradient drift (GPU-cheap background-position animation). */
+/*
+ * Animated wallpapers pan an oversized gradient layer with `transform` (composited on the GPU) instead of
+ * animating `background-position`, which would repaint the whole screen on every frame.
+ */
+.ff-wallpaper-art {
+  position: absolute;
+  inset: 0;
+}
+
 .ff-wallpaper-drift {
-  background-size: 400% 400%;
-  animation: ff-wallpaper-drift 40s ease-in-out infinite;
+  inset: -15%;
+  will-change: transform;
+  animation: ff-wallpaper-drift 45s ease-in-out infinite alternate;
 }
 
 @keyframes ff-wallpaper-drift {
-  0% {
-    background-position: 0% 50%;
+  from {
+    transform: translate3d(-9%, -7%, 0) rotate(0deg);
   }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
+  to {
+    transform: translate3d(9%, 7%, 0) rotate(3deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ff-wallpaper-drift {
     animation: none;
+    transform: none;
   }
 }

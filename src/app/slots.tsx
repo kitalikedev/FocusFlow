@@ -8,6 +8,7 @@ import {
   ThemeCustomizerModal as ThemeThemeCustomizerModal,
 } from '@/features/theme-wallpaper';
 import { ControlBar as AudioControlBar, SoundPanel as AudioSoundPanel } from '@/features/audio';
+import { QuoteDisplay as QuotesDisplay } from '@/features/quotes';
 import {
   FocusIntent as ProductivityFocusIntent,
   ToolPanels as ProductivityToolPanels,
@@ -114,5 +115,11 @@ export const ToolPanelsSlot: React.FC = () => (
 export const AnalyticsSlot: React.FC = () => (
   <SlotErrorBoundary>
     <ProductivityAnalyticsModal />
+  </SlotErrorBoundary>
+);
+
+export const QuoteSlot: React.FC = () => (
+  <SlotErrorBoundary>
+    <QuotesDisplay />
   </SlotErrorBoundary>
 );

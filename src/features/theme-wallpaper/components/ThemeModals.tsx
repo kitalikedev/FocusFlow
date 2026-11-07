@@ -1,4 +1,5 @@
 import React, { lazy, Suspense, useCallback } from 'react';
+import { usePresence } from '@/core/ui/usePresence';
 import { useUiStore } from '@/core/ui/useUiStore';
 
 // The whole Themes panel (library, customizer, saved themes) loads on first open.
@@ -13,11 +14,13 @@ export const ThemeCustomizerModal: React.FC = () => {
     [],
   );
 
-  if (!isThemeOpen && !isPickerOpen) return null;
+  const { mounted, closing } = usePresence(isThemeOpen || isPickerOpen);
+
+  if (!mounted) return null;
 
   return (
     <Suspense fallback={null}>
-      <ThemePanel onClose={close} />
+      <ThemePanel closing={closing} onClose={close} />
     </Suspense>
   );
 };
