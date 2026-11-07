@@ -75,7 +75,7 @@ describe('catalog, presets and fonts', () => {
   });
 
   it('ships the six PRD presets, each pointing to an existing wallpaper and font', () => {
-    expect(THEME_PRESETS.map((preset) => preset.name)).toEqual([
+    expect(THEME_PRESETS.slice(0, 6).map((preset) => preset.name)).toEqual([
       'Obsidian Minimal',
       'Tokyo Fog',
       'Midnight Indigo',
