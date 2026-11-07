@@ -10,6 +10,7 @@ export default {
           DEFAULT: 'var(--color-accent)',
           contrast: 'var(--color-accent-contrast)',
         },
+        panel: 'var(--panel-bg)',
         capsule: {
           bg: 'var(--capsule-bg)',
           border: 'var(--capsule-border-color)',

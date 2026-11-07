@@ -31,8 +31,6 @@ const SyncIndicator: React.FC<{ status: SyncStatus }> = ({ status }) => {
 
 export const HudSlot: React.FC = () => {
   const {
-    cycleDots,
-    completedDots,
     sessionsToday,
     streakCount,
     syncStatus,
@@ -56,31 +54,8 @@ export const HudSlot: React.FC = () => {
         <span className="font-semibold tracking-wider text-sm opacity-90">FocusFlow</span>
       </div>
 
-      {/* Cycle Indicator, session counter & Streak */}
+      {/* Session counter & Streak (the cycle dots live in the clock capsule, AC-30.1) */}
       <div className="flex items-center gap-4">
-        {/* Cycle Dots (AC-30.1) */}
-        <div
-          data-testid="cycle-dots"
-          role="img"
-          aria-label={`${completedDots} of ${cycleDots} focus sessions done in this cycle`}
-          className="flex items-center gap-1.5"
-          title="Pomodoro Cycles"
-        >
-          {Array.from({ length: cycleDots }).map((_, index) => {
-            const isFilled = index < completedDots;
-            return (
-              <span
-                key={index}
-                data-testid={`cycle-dot-${index}`}
-                data-filled={isFilled}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  isFilled ? 'bg-accent' : 'border border-white/20'
-                }`}
-              />
-            );
-          })}
-        </div>
-
         <span data-testid="sessions-today" className="text-xs text-white/80" title="Focus sessions completed today">
           {sessionsToday} today
         </span>

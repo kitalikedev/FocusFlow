@@ -36,30 +36,14 @@ afterEach(() => {
 });
 
 describe('HudSlot', () => {
-  it('renders brand, cycle dots, session counter, streak badge and fullscreen button', () => {
+  it('renders brand, session counter, streak badge and fullscreen button', () => {
     render(<HudSlot />);
 
     expect(screen.getByText('FocusFlow')).toBeInTheDocument();
-    expect(screen.getAllByTestId(/cycle-dot-/)).toHaveLength(4);
+    expect(screen.queryByTestId('cycle-dots')).not.toBeInTheDocument();
     expect(screen.getByTestId('sessions-today')).toHaveTextContent('0 today');
     expect(screen.getByTestId('streak-badge')).toHaveTextContent('0');
     expect(screen.getByTestId('fullscreen-btn')).toBeInTheDocument();
-  });
-
-  it('AC-30.1: 2 of 4 dots are lit after two focus sessions', () => {
-    useTimerStore.setState({ cyclesCompleted: 2, sessionType: 'short_break' });
-    render(<HudSlot />);
-    const dots = screen.getAllByTestId(/cycle-dot-/);
-    expect(dots.map((dot) => dot.getAttribute('data-filled'))).toEqual(['true', 'true', 'false', 'false']);
-    expect(screen.getByTestId('cycle-dots')).toHaveAttribute('aria-label', '2 of 4 focus sessions done in this cycle');
-  });
-
-  it('follows a custom long break interval and fills every dot during the long break', () => {
-    useTimerStore.setState({ longBreakInterval: 3, cyclesCompleted: 3, sessionType: 'long_break' });
-    render(<HudSlot />);
-    const dots = screen.getAllByTestId(/cycle-dot-/);
-    expect(dots).toHaveLength(3);
-    expect(dots.every((dot) => dot.getAttribute('data-filled') === 'true')).toBe(true);
   });
 
   it('shows the real session count and streak', () => {

@@ -7,11 +7,11 @@ import {
   WallpaperPickerModal as ThemeWallpaperPickerModal,
   ThemeCustomizerModal as ThemeThemeCustomizerModal,
 } from '@/features/theme-wallpaper';
-import { ControlBar as AudioControlBar } from '@/features/audio';
+import { ControlBar as AudioControlBar, SoundPanel as AudioSoundPanel } from '@/features/audio';
 import {
   FocusIntent as ProductivityFocusIntent,
-  DesktopSidePanels as ProductivitySidePanels,
-  MobileDrawerTabs as ProductivityDrawerTabs,
+  ToolPanels as ProductivityToolPanels,
+  AnalyticsModal as ProductivityAnalyticsModal,
 } from '@/features/productivity';
 
 interface ErrorBoundaryProps {
@@ -99,14 +99,20 @@ export const ControlBarSlot: React.FC = () => (
   </SlotErrorBoundary>
 );
 
-export const SidePanelsSlot: React.FC = () => (
+export const SoundPanelSlot: React.FC = () => (
   <SlotErrorBoundary>
-    <ProductivitySidePanels />
+    <AudioSoundPanel />
   </SlotErrorBoundary>
 );
 
-export const DrawerTabsSlot: React.FC = () => (
+export const ToolPanelsSlot: React.FC = () => (
   <SlotErrorBoundary>
-    <ProductivityDrawerTabs />
+    <ProductivityToolPanels />
+  </SlotErrorBoundary>
+);
+
+export const AnalyticsSlot: React.FC = () => (
+  <SlotErrorBoundary>
+    <ProductivityAnalyticsModal />
   </SlotErrorBoundary>
 );

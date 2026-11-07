@@ -1,4 +1,5 @@
 import { ThemeTokens } from '@/shared/types/contracts';
+import { withAlpha } from './color';
 
 /**
  * Apply theme tokens to document root as CSS variables.
@@ -12,8 +13,11 @@ export function applyTheme(tokens: ThemeTokens): void {
 
   root.style.setProperty('--color-accent', tokens.colorAccent);
   root.style.setProperty('--color-accent-contrast', tokens.colorAccentContrast);
-  root.style.setProperty('--capsule-bg', tokens.capsuleBg);
+  // The capsule color carries the opacity token as its alpha, so the opacity slider changes the glass.
+  root.style.setProperty('--capsule-bg', withAlpha(tokens.capsuleBg, tokens.capsuleOpacity));
   root.style.setProperty('--capsule-opacity', String(tokens.capsuleOpacity));
+  // Tool panels hold long text, so they never get more transparent than 80 % (readability on any wallpaper).
+  root.style.setProperty('--panel-bg', withAlpha(tokens.capsuleBg, Math.max(0.8, tokens.capsuleOpacity)));
   root.style.setProperty('--capsule-blur', `${tokens.capsuleBlur}px`);
   root.style.setProperty('--capsule-radius', `${tokens.capsuleRadius}px`);
   root.style.setProperty('--capsule-border-width', `${tokens.capsuleBorderWidth}px`);

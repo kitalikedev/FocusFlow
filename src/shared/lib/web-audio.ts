@@ -54,6 +54,17 @@ function getContext(): AudioContext | null {
   return context;
 }
 
+/** The shared context (created on first use), or null when Web Audio is unavailable. */
+export function getAudioContext(): AudioContext | null {
+  return getContext();
+}
+
+/** Master gain every sound must connect to, so the master volume and mute (M) apply to it. */
+export function getMasterGain(): GainNode | null {
+  getContext();
+  return masterGain;
+}
+
 /** Creates (or resumes) the context; call it from a user gesture such as pressing Start. */
 export async function initAudioContext(): Promise<void> {
   const ctx = getContext();

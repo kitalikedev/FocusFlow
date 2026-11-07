@@ -221,3 +221,24 @@ describe('master volume and mute (AC-08.1, AC-18.1)', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('getAudioContext / getMasterGain', () => {
+  it('returns the single shared context and its master gain', async () => {
+    const audio = await loadModule();
+    const context = audio.getAudioContext();
+    const master = audio.getMasterGain();
+    expect(context).toBe(contexts[0]);
+    expect(audio.getAudioContext()).toBe(context);
+    expect(contexts).toHaveLength(1);
+    expect(master).toBe(gains[0]);
+    expect(master?.connect).toHaveBeenCalledWith(contexts[0].destination);
+  });
+
+  it('returns null when Web Audio is unavailable', async () => {
+    vi.unstubAllGlobals();
+    delete (window as unknown as { AudioContext?: unknown }).AudioContext;
+    const audio = await loadModule();
+    expect(audio.getAudioContext()).toBeNull();
+    expect(audio.getMasterGain()).toBeNull();
+  });
+});

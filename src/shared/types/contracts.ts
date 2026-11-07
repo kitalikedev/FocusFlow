@@ -15,7 +15,12 @@ export interface UiState {
   isAnalyticsOpen: boolean;
   isMobileDrawerOpen: boolean;
   activeDrawerTab: DrawerTab;
+  isTasksOpen: boolean;
+  isNoteOpen: boolean;
 }
+
+/** Floating tool panels opened from the bottom-left dock. */
+export type ToolPanel = 'tasks' | 'note' | 'mixer';
 
 export interface UiActions {
   toggleZen: () => void;
@@ -27,6 +32,8 @@ export interface UiActions {
   setAnalyticsOpen: (isOpen: boolean) => void;
   setMobileDrawerOpen: (isOpen: boolean) => void;
   setActiveDrawerTab: (tab: DrawerTab) => void;
+  /** Opens or closes a dock panel; `exclusive` closes the other panels first (phones show one at a time). */
+  togglePanel: (panel: ToolPanel, exclusive?: boolean) => void;
   closeAllModals: () => void;
 }
 

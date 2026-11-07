@@ -1,0 +1,23 @@
+/* Animated wallpapers: a slow gradient drift (GPU-cheap background-position animation). */
+.ff-wallpaper-drift {
+  background-size: 400% 400%;
+  animation: ff-wallpaper-drift 40s ease-in-out infinite;
+}
+
+@keyframes ff-wallpaper-drift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ff-wallpaper-drift {
+    animation: none;
+  }
+}

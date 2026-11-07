@@ -111,3 +111,27 @@ describe('useUiStore', () => {
     expect(useUiStore.getState().activeDrawerTab).toBe('tasks');
   });
 });
+
+describe('useUiStore.togglePanel', () => {
+  beforeEach(() => {
+    useUiStore.setState({ isTasksOpen: false, isNoteOpen: false, isMixerOpen: false });
+  });
+
+  it('opens several panels side by side on desktop and closes one on a second click', () => {
+    const { togglePanel } = useUiStore.getState();
+    togglePanel('tasks');
+    togglePanel('note');
+    expect(useUiStore.getState()).toMatchObject({ isTasksOpen: true, isNoteOpen: true, isMixerOpen: false });
+    togglePanel('tasks');
+    expect(useUiStore.getState()).toMatchObject({ isTasksOpen: false, isNoteOpen: true });
+  });
+
+  it('exclusive mode keeps only the toggled panel open (phones)', () => {
+    const { togglePanel } = useUiStore.getState();
+    togglePanel('tasks', true);
+    togglePanel('mixer', true);
+    expect(useUiStore.getState()).toMatchObject({ isTasksOpen: false, isNoteOpen: false, isMixerOpen: true });
+    togglePanel('mixer', true);
+    expect(useUiStore.getState().isMixerOpen).toBe(false);
+  });
+});
