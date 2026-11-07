@@ -6,6 +6,8 @@ import { setChannelVolume, setAmbientPaused } from '../lib/ambientEngine';
 import { fetchVideoTitle, parseYouTubeId, watchUrl } from '../lib/youtube';
 
 export const QUEUE_STORAGE_KEY = 'focusflow_youtube_queue';
+export const LEVELS_STORAGE_KEY = 'focusflow_audio_levels';
+export const DEFAULT_YOUTUBE_VOLUME = 0.7;
 export const QUEUE_MAX = 20;
 const PERSIST_DELAY_MS = 500;
 
@@ -13,10 +15,14 @@ const PERSIST_DELAY_MS = 500;
 export type ChannelVolumes = Record<string, number>;
 
 /** Channels saved with the account (database columns volume_rain / volume_brown_noise / volume_campfire). */
-const SETTINGS_CHANNELS = CHANNEL_DEFS.map((def) => def.id);
+const SETTINGS_CHANNELS = CHANNEL_DEFS.filter((def) => def.persist === 'settings').map((def) => def.id);
+/** Channels without a database column (lofi): their volume lives on this device only. */
+const DEVICE_CHANNELS = CHANNEL_DEFS.filter((def) => def.persist === 'device').map((def) => def.id);
 
 export interface AudioState {
   volumes: ChannelVolumes;
+  /** Volume of the YouTube player relative to the master volume, 0..1. */
+  youtubeVolume: number;
   /** Ambient channels are silent until the user starts them (no sound on page load). */
   isAmbientPaused: boolean;
   queue: YouTubeTrack[];
@@ -27,10 +33,13 @@ export interface AudioState {
   trackError: string | null;
 
   setVolume: (id: string, volume: number) => void;
+  setYouTubeVolume: (volume: number) => void;
   /** Applies volumes loaded from the settings (account or guest data). */
   hydrateVolumes: (volumes: ChannelVolumes) => void;
   toggleAmbient: () => void;
   addTrack: (url: string) => Promise<boolean>;
+  /** Adds a ready-made station (known title, no lookup) to the end of the queue. */
+  addStation: (station: { title: string; url: string }) => boolean;
   removeTrack: (id: string) => void;
   playAt: (index: number) => void;
   next: () => void;
@@ -76,6 +85,30 @@ function writeQueue(queue: YouTubeTrack[], currentIndex: number): void {
   }
 }
 
+/** Levels that only live on this device (YouTube volume), by key. Anything unreadable is dropped. */
+export function readDeviceLevels(): Record<string, number> {
+  const levels: Record<string, number> = {};
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(LEVELS_STORAGE_KEY) ?? 'null');
+    if (typeof parsed === 'object' && parsed !== null) {
+      for (const [key, value] of Object.entries(parsed)) {
+        if (typeof value === 'number' && Number.isFinite(value)) levels[key] = Math.min(1, Math.max(0, value));
+      }
+    }
+  } catch {
+    // corrupted value: start from defaults
+  }
+  return levels;
+}
+
+export function writeDeviceLevel(key: string, level: number): void {
+  try {
+    localStorage.setItem(LEVELS_STORAGE_KEY, JSON.stringify({ ...readDeviceLevels(), [key]: level }));
+  } catch {
+    // Storage blocked: the level still applies for this visit.
+  }
+}
+
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** Debounced save of the account channels into user_settings (one update per burst of slider moves). */
@@ -99,15 +132,17 @@ export function hasPendingVolumeSave(): boolean {
 const stored = readStoredQueue();
 
 function initialVolumes(): ChannelVolumes {
+  const saved = readDeviceLevels();
   const volumes: ChannelVolumes = {};
   CHANNEL_DEFS.forEach((def) => {
-    volumes[def.id] = 0;
+    volumes[def.id] = def.persist === 'device' ? (saved[def.id] ?? 0) : 0;
   });
   return volumes;
 }
 
 export const useAudioStore = create<AudioState>((set, get) => ({
   volumes: initialVolumes(),
+  youtubeVolume: readDeviceLevels().youtube ?? DEFAULT_YOUTUBE_VOLUME,
   isAmbientPaused: true,
   queue: stored.queue,
   currentIndex: stored.currentIndex,
@@ -125,7 +160,14 @@ export const useAudioStore = create<AudioState>((set, get) => ({
       set({ isAmbientPaused: false });
       setAmbientPaused(false);
     }
-    persistVolumes(volumes);
+    if (SETTINGS_CHANNELS.includes(id)) persistVolumes(volumes);
+    else if (DEVICE_CHANNELS.includes(id)) writeDeviceLevel(id, level);
+  },
+
+  setYouTubeVolume: (volume) => {
+    const youtubeVolume = Math.min(1, Math.max(0, volume));
+    set({ youtubeVolume });
+    writeDeviceLevel('youtube', youtubeVolume);
   },
 
   hydrateVolumes: (loaded) => {
@@ -159,6 +201,19 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     const queue = [...get().queue, track];
     const currentIndex = get().currentIndex === -1 ? 0 : get().currentIndex;
     set({ queue, currentIndex, isAddingTrack: false });
+    writeQueue(queue, currentIndex);
+    return true;
+  },
+
+  addStation: (station) => {
+    if (get().queue.length >= QUEUE_MAX) {
+      set({ trackError: `The queue holds up to ${QUEUE_MAX} tracks.` });
+      return false;
+    }
+    const track: YouTubeTrack = { id: crypto.randomUUID(), url: station.url, title: station.title };
+    const queue = [...get().queue, track];
+    const currentIndex = get().currentIndex === -1 ? 0 : get().currentIndex;
+    set({ queue, currentIndex, trackError: null });
     writeQueue(queue, currentIndex);
     return true;
   },

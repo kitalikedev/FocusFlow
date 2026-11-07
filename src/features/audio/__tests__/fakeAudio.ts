@@ -7,6 +7,16 @@ export interface FakeNode {
   stop?: ReturnType<typeof vi.fn>;
 }
 
+/** AudioParam double: a plain value plus the scheduling methods the synthesizers call. */
+function fakeParam(value = 0) {
+  return {
+    value,
+    setValueAtTime: vi.fn(),
+    linearRampToValueAtTime: vi.fn(),
+    exponentialRampToValueAtTime: vi.fn(),
+  };
+}
+
 export interface FakeGain extends FakeNode {
   gain: { value: number };
 }
@@ -27,25 +37,25 @@ export class FakeContext {
   }
 
   createGain(): FakeGain {
-    const gain = { ...this.node(), gain: { value: 1 } };
+    const gain = { ...this.node(), gain: fakeParam(1) };
     this.gains.push(gain);
     return gain;
   }
 
   createBufferSource() {
-    const source = { ...this.node(), buffer: null, loop: false, start: vi.fn(), stop: vi.fn() };
+    const source = { ...this.node(), buffer: null, loop: false, start: vi.fn(), stop: vi.fn(), onended: null };
     this.sources.push(source);
     return source;
   }
 
   createOscillator() {
-    const oscillator = { ...this.node(), frequency: { value: 0 }, start: vi.fn(), stop: vi.fn() };
+    const oscillator = { ...this.node(), frequency: fakeParam(), type: '', start: vi.fn(), stop: vi.fn(), onended: null };
     this.oscillators.push(oscillator);
     return oscillator;
   }
 
   createBiquadFilter() {
-    const filter = { ...this.node(), type: '', frequency: { value: 0 }, Q: { value: 0 } };
+    const filter = { ...this.node(), type: '', frequency: fakeParam(), Q: fakeParam() };
     this.filters.push(filter);
     return filter;
   }
