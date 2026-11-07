@@ -1,1 +1,2 @@
-export { ClockDisplay, ClockSettingsPopover } from './ClockDisplay';
+export { ClockDisplay } from './components/ClockDisplay';
+export { ClockSettingsPopover } from './components/ClockSettingsPopover';
