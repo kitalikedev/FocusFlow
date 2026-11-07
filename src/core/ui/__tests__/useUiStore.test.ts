@@ -11,8 +11,6 @@ describe('useUiStore', () => {
       isThemeCustomizerOpen: false,
       isClockSettingsOpen: false,
       isAnalyticsOpen: false,
-      isMobileDrawerOpen: false,
-      activeDrawerTab: 'timer',
     });
   });
 
@@ -79,7 +77,7 @@ describe('useUiStore', () => {
     expect(isFullscreenSupported()).toBe(false);
   });
 
-  it('manages modal open states and closes all with closeAllModals', () => {
+  it('manages the modal open states independently', () => {
     useUiStore.getState().setMixerOpen(true);
     useUiStore.getState().setWallpaperPickerOpen(true);
     useUiStore.getState().setThemeCustomizerOpen(true);
@@ -87,28 +85,11 @@ describe('useUiStore', () => {
     useUiStore.getState().setAnalyticsOpen(true);
 
     const state = useUiStore.getState();
-    expect(state.isMixerOpen).toBe(true);
-    expect(state.isWallpaperPickerOpen).toBe(true);
-    expect(state.isThemeCustomizerOpen).toBe(true);
-    expect(state.isClockSettingsOpen).toBe(true);
-    expect(state.isAnalyticsOpen).toBe(true);
+    expect([state.isMixerOpen, state.isWallpaperPickerOpen, state.isThemeCustomizerOpen, state.isClockSettingsOpen, state.isAnalyticsOpen]).toEqual([true, true, true, true, true]);
 
-    useUiStore.getState().closeAllModals();
-
-    const closedState = useUiStore.getState();
-    expect(closedState.isMixerOpen).toBe(false);
-    expect(closedState.isWallpaperPickerOpen).toBe(false);
-    expect(closedState.isThemeCustomizerOpen).toBe(false);
-    expect(closedState.isClockSettingsOpen).toBe(false);
-    expect(closedState.isAnalyticsOpen).toBe(false);
-  });
-
-  it('updates active drawer tab and mobile drawer state', () => {
-    useUiStore.getState().setMobileDrawerOpen(true);
-    useUiStore.getState().setActiveDrawerTab('tasks');
-
-    expect(useUiStore.getState().isMobileDrawerOpen).toBe(true);
-    expect(useUiStore.getState().activeDrawerTab).toBe('tasks');
+    useUiStore.getState().setThemeCustomizerOpen(false);
+    expect(useUiStore.getState().isThemeCustomizerOpen).toBe(false);
+    expect(useUiStore.getState().isAnalyticsOpen).toBe(true);
   });
 });
 

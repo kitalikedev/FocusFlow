@@ -109,7 +109,10 @@ export const ClockDisplay: React.FC = () => {
           </span>
         </div>
 
-        <ClockFace visualMode={visualMode} position="center" />
+        {/* The key restarts the fade whenever the timer mode or the clock style changes. */}
+        <div key={`${mode}-${visualMode}`} className="animate-fade-in">
+          <ClockFace visualMode={visualMode} position="center" />
+        </div>
 
         <div {...zenProps(isZen, 'flex items-center gap-2')}>
           <button type="button" data-testid="start-pause-btn" onClick={toggleRun} className={`${CONTROL_BUTTON_CLASS} bg-white/10`}>

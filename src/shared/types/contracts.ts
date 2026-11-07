@@ -3,8 +3,6 @@
 // ==========================================
 // 1. UI STATE CONTRACTS (useUiStore)
 // ==========================================
-export type DrawerTab = 'timer' | 'tasks' | 'note' | 'ambient' | 'theme' | 'analytics';
-
 export interface UiState {
   isZen: boolean;
   isFullscreen: boolean;
@@ -13,8 +11,6 @@ export interface UiState {
   isThemeCustomizerOpen: boolean;
   isClockSettingsOpen: boolean;
   isAnalyticsOpen: boolean;
-  isMobileDrawerOpen: boolean;
-  activeDrawerTab: DrawerTab;
   isTasksOpen: boolean;
   isNoteOpen: boolean;
 }
@@ -30,11 +26,8 @@ export interface UiActions {
   setThemeCustomizerOpen: (isOpen: boolean) => void;
   setClockSettingsOpen: (isOpen: boolean) => void;
   setAnalyticsOpen: (isOpen: boolean) => void;
-  setMobileDrawerOpen: (isOpen: boolean) => void;
-  setActiveDrawerTab: (tab: DrawerTab) => void;
   /** Opens or closes a dock panel; `exclusive` closes the other panels first (phones show one at a time). */
   togglePanel: (panel: ToolPanel, exclusive?: boolean) => void;
-  closeAllModals: () => void;
 }
 
 // ==========================================
@@ -64,6 +57,8 @@ export interface EffectsConfig {
   fireflies: number;  // Cường độ đom đóm (0% - 100%, tối đa 40 hạt)
   grain: number;      // Hạt phim điện ảnh (0% - 100%)
   vignette: number;   // Tối góc quang học (0% - 100%)
+  scanlines: number;  // Sọc ngang kiểu màn hình CRT (0% - 100%)
+  glow: number;       // Chữ đồng hồ phát sáng neon theo màu accent (0% - 100%)
 }
 
 export interface ThemeConfig {

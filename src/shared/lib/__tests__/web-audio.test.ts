@@ -242,3 +242,33 @@ describe('getAudioContext / getMasterGain', () => {
     expect(audio.getMasterGain()).toBeNull();
   });
 });
+
+describe('rampGain', () => {
+  it('glides with setTargetAtTime from the current time when the browser supports it', async () => {
+    const audio = await loadModule();
+    audio.initAudioContext();
+    const setTargetAtTime = vi.fn();
+    const cancelScheduledValues = vi.fn();
+    const node = { gain: { value: 0, setTargetAtTime, cancelScheduledValues } } as unknown as GainNode;
+    audio.rampGain(node, 0.4, 0.5);
+    expect(cancelScheduledValues).toHaveBeenCalledWith(10);
+    expect(setTargetAtTime).toHaveBeenCalledWith(0.4, 10, 0.5);
+  });
+
+  it('changes the value at once where setTargetAtTime does not exist', async () => {
+    const audio = await loadModule();
+    const node = { gain: { value: 0 } } as unknown as GainNode;
+    audio.rampGain(node, 0.7, 0.5);
+    expect(node.gain.value).toBe(0.7);
+  });
+
+  it('master mute glides instead of jumping once the context exists', async () => {
+    const audio = await loadModule();
+    audio.getMasterGain();
+    const master = gains[0] as unknown as { gain: { value: number; setTargetAtTime?: unknown } };
+    expect(master.gain.value).toBe(0.8); // initial level is set at once
+    master.gain.setTargetAtTime = vi.fn();
+    audio.toggleMasterMute();
+    expect(master.gain.setTargetAtTime).toHaveBeenCalledWith(0, 10, 0.08);
+  });
+});

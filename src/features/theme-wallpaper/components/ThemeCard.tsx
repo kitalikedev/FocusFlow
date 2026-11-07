@@ -25,7 +25,7 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({ name, config, isActive, on
       data-testid={testId}
       aria-pressed={isActive}
       onClick={onSelect}
-      className={`group flex flex-col gap-1.5 text-left focus-visible:outline-none`}
+      className="group flex flex-col gap-1.5 text-left transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none"
     >
       <span
         className={`relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl transition ${
@@ -48,7 +48,7 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({ name, config, isActive, on
           25:00
         </span>
         {isActive && (
-          <span className="absolute right-1.5 top-1.5 rounded-full bg-white p-0.5 text-black">
+          <span className="absolute right-1.5 top-1.5 animate-pop rounded-full bg-white p-0.5 text-black">
             <Check className="h-3 w-3" aria-hidden="true" />
           </span>
         )}
@@ -77,7 +77,7 @@ export const WallpaperSwatch: React.FC<SwatchProps> = ({ label, style, isActive,
       title={label}
       aria-pressed={isActive}
       onClick={onSelect}
-      className={`block aspect-video w-full overflow-hidden rounded-lg transition focus-visible:outline-none ${
+      className={`block aspect-video w-full overflow-hidden rounded-lg transition duration-200 hover:-translate-y-0.5 focus-visible:outline-none ${
         isActive ? 'ring-2 ring-white' : 'ring-1 ring-white/10 hover:ring-white/40 focus-visible:ring-white/60'
       }`}
       style={style}

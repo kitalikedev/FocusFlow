@@ -114,7 +114,7 @@ export const TaskRow: React.FC<{ task: TaskItem; onLabelClick: (label: string) =
   const overdue = isOverdue(task);
 
   return (
-    <li data-testid="task-row" className="group flex items-start gap-3 rounded-xl px-2 py-2 hover:bg-white/5">
+    <li data-testid="task-row" className="group flex animate-row-in items-start gap-3 rounded-xl px-2 py-2 hover:bg-white/5">
       <button
         type="button"
         role="checkbox"
@@ -125,7 +125,7 @@ export const TaskRow: React.FC<{ task: TaskItem; onLabelClick: (label: string) =
           task.isCompleted ? 'border-accent bg-accent text-accent-contrast' : 'border-white/40 hover:border-white'
         }`}
       >
-        {task.isCompleted && <Check className="h-3 w-3" aria-hidden="true" />}
+        {task.isCompleted && <Check className="h-3 w-3 animate-pop" aria-hidden="true" />}
       </button>
       <div className="min-w-0 flex-1">
         <p

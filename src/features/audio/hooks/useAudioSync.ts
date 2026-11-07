@@ -10,9 +10,10 @@ export function useVolumeHydration(): void {
       const { settings, status } = useSettingsStore.getState();
       if (status !== 'ready' || hasPendingVolumeSave()) return;
       const { rain, brownNoise, campfire } = settings.ambientVolumes;
+      const loaded = { rain, brownNoise, campfire };
       const current = useAudioStore.getState().volumes;
-      if (current.rain === rain && current.brownNoise === brownNoise && current.campfire === campfire) return;
-      useAudioStore.getState().hydrateVolumes({ rain, brownNoise, campfire });
+      if (Object.entries(loaded).every(([id, level]) => current[id] === level)) return;
+      useAudioStore.getState().hydrateVolumes(loaded);
     };
     apply();
     return useSettingsStore.subscribe(apply);

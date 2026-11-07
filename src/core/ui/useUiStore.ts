@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { DrawerTab, ToolPanel, UiActions, UiState } from '@/shared/types/contracts';
+import { ToolPanel, UiActions, UiState } from '@/shared/types/contracts';
 
 export type UiStore = UiState & UiActions;
 
@@ -11,8 +11,6 @@ const initialState: UiState = {
   isThemeCustomizerOpen: false,
   isClockSettingsOpen: false,
   isAnalyticsOpen: false,
-  isMobileDrawerOpen: false,
-  activeDrawerTab: 'timer',
   isTasksOpen: false,
   isNoteOpen: false,
 };
@@ -43,8 +41,6 @@ export const useUiStore = create<UiStore>((set) => ({
   setThemeCustomizerOpen: (isOpen: boolean) => set({ isThemeCustomizerOpen: isOpen }),
   setClockSettingsOpen: (isOpen: boolean) => set({ isClockSettingsOpen: isOpen }),
   setAnalyticsOpen: (isOpen: boolean) => set({ isAnalyticsOpen: isOpen }),
-  setMobileDrawerOpen: (isOpen: boolean) => set({ isMobileDrawerOpen: isOpen }),
-  setActiveDrawerTab: (tab: DrawerTab) => set({ activeDrawerTab: tab }),
 
   togglePanel: (panel: ToolPanel, exclusive = false) =>
     set((state) => {
@@ -52,15 +48,6 @@ export const useUiStore = create<UiStore>((set) => ({
       const next = !state[flag];
       if (!exclusive) return { [flag]: next };
       return { isTasksOpen: false, isNoteOpen: false, isMixerOpen: false, [flag]: next };
-    }),
-
-  closeAllModals: () =>
-    set({
-      isMixerOpen: false,
-      isWallpaperPickerOpen: false,
-      isThemeCustomizerOpen: false,
-      isClockSettingsOpen: false,
-      isAnalyticsOpen: false,
     }),
 }));
 

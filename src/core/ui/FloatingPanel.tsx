@@ -8,6 +8,8 @@ export interface FloatingPanelProps {
   actions?: React.ReactNode;
   onClose: () => void;
   testId?: string;
+  /** True while the exit animation plays (see usePresence). */
+  closing?: boolean;
   /** Desktop width class, 340 px by default. */
   widthClass?: string;
   children: React.ReactNode;
@@ -31,6 +33,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
   actions,
   onClose,
   testId,
+  closing = false,
   widthClass = 'sm:w-[340px]',
   children,
 }) => {
@@ -51,7 +54,7 @@ export const FloatingPanel: React.FC<FloatingPanelProps> = ({
     <section
       data-testid={testId}
       aria-label={title}
-      className={`pointer-events-auto flex flex-col overflow-hidden border text-white shadow-2xl shadow-black/50 max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-40 max-sm:h-[85vh] max-sm:rounded-t-2xl sm:max-h-[min(70vh,560px)] sm:rounded-2xl ${widthClass}`}
+      className={`${closing ? 'pointer-events-none animate-panel-out max-sm:animate-sheet-out' : 'pointer-events-auto animate-panel-in max-sm:animate-sheet-in'} flex flex-col overflow-hidden border text-white shadow-2xl shadow-black/50 max-sm:fixed max-sm:inset-x-0 max-sm:bottom-0 max-sm:z-40 max-sm:h-[85vh] max-sm:rounded-t-2xl sm:max-h-[min(70vh,560px)] sm:rounded-2xl ${widthClass}`}
       style={PANEL_STYLE}
     >
       <header className="flex items-center gap-2 border-b border-white/10 px-4 py-3">

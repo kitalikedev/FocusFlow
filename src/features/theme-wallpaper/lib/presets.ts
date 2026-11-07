@@ -9,7 +9,7 @@ export interface ThemePreset {
   config: ThemeConfig;
 }
 
-const NO_EFFECTS = { rain: 0, snow: 0, fireflies: 0, grain: 0, vignette: 0 };
+const NO_EFFECTS = { rain: 0, snow: 0, fireflies: 0, grain: 0, vignette: 0, scanlines: 0, glow: 0 };
 
 function fontStack(id: string): string {
   return FONT_OPTIONS.find((font) => font.id === id)?.stack ?? OBSIDIAN_MINIMAL_TOKENS.fontClock;

@@ -1,5 +1,6 @@
 import React, { lazy, Suspense, useCallback } from 'react';
 import { SlideOver } from '@/core/ui/SlideOver';
+import { usePresence } from '@/core/ui/usePresence';
 import { useUiStore } from '@/core/ui/useUiStore';
 
 const AnalyticsContent = lazy(() => import('./AnalyticsContent'));
@@ -10,10 +11,12 @@ export const AnalyticsModal: React.FC = () => {
   const setOpen = useUiStore((state) => state.setAnalyticsOpen);
   const close = useCallback(() => setOpen(false), [setOpen]);
 
-  if (!isOpen) return null;
+  const { mounted, closing } = usePresence(isOpen);
+
+  if (!mounted) return null;
 
   return (
-    <SlideOver title="Focus Analytics" testId="analytics-panel" onClose={close}>
+    <SlideOver title="Focus Analytics" testId="analytics-panel" closing={closing} onClose={close}>
       <Suspense fallback={<p className="p-5 text-xs text-white/50">Loading…</p>}>
         <AnalyticsContent />
       </Suspense>

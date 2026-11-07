@@ -11,7 +11,7 @@ const FIELD_CLASS =
   'rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 text-xs text-white placeholder:text-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40';
 
 /** Task manager (FR-19): quick add, edit, complete, delete, search, filter and sort. */
-export const TasksPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+export const TasksPanel: React.FC<{ onClose: () => void; closing?: boolean }> = ({ onClose, closing }) => {
   const tasks = useTasksStore((state) => state.tasks);
   const status = useTasksStore((state) => state.status);
   const view = useTasksStore((state) => state.view);
@@ -35,6 +35,7 @@ export const TasksPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     <FloatingPanel
       title="Tasks"
       testId="tasks-panel"
+      closing={closing}
       icon={<ListChecks className="h-4 w-4" />}
       onClose={onClose}
       actions={<span className="text-xs text-white/50">{openCount} open</span>}

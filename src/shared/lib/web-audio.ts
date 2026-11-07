@@ -23,8 +23,25 @@ function resolveConstructor(): AudioContextConstructor | null {
   return window.AudioContext ?? legacy.webkitAudioContext ?? null;
 }
 
+/** Master changes glide over ~0.25 s so muting and volume steps never click. */
+const MASTER_TIME_CONSTANT = 0.08;
+
+/**
+ * Glides a gain toward `target` (exponential approach, ~95 % after 3 time constants). Falls back to an
+ * immediate change where the browser or a test double has no `setTargetAtTime`.
+ */
+export function rampGain(node: GainNode, target: number, timeConstant: number): void {
+  const param = node.gain;
+  if (context && typeof param.setTargetAtTime === 'function') {
+    param.cancelScheduledValues?.(context.currentTime);
+    param.setTargetAtTime(target, context.currentTime, timeConstant);
+  } else {
+    param.value = target;
+  }
+}
+
 function applyMasterGain(): void {
-  if (masterGain) masterGain.gain.value = muted ? 0 : masterVolume;
+  if (masterGain) rampGain(masterGain, muted ? 0 : masterVolume, MASTER_TIME_CONSTANT);
 }
 
 /** Autoplay policy: a suspended context is resumed by the first user gesture (ARCHITECTURE 14.2). */
@@ -48,7 +65,7 @@ function getContext(): AudioContext | null {
     return null;
   }
   masterGain = context.createGain();
-  applyMasterGain();
+  masterGain.gain.value = muted ? 0 : masterVolume; // starting value is set at once, only changes glide
   masterGain.connect(context.destination);
   if (context.state === 'suspended') resumeOnFirstGesture(context);
   return context;

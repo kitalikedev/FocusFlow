@@ -55,7 +55,7 @@ describe('useThemeStore whole-theme actions', () => {
     const config = {
       presetId: 'tokyo-fog',
       tokens: { ...OBSIDIAN_MINIMAL_TOKENS, colorAccent: '#f5f5f4', capsuleBg: '#18181b', capsuleOpacity: 0.6 },
-      effects: { rain: 40, snow: 0, fireflies: 0, grain: 10, vignette: 0 },
+      effects: { rain: 40, snow: 0, fireflies: 0, grain: 10, vignette: 0, scanlines: 0, glow: 0 },
       wallpaperRef: { type: 'preset' as const, idOrColor: 'gradient-thermal' },
     };
     useThemeStore.getState().setConfig(config);
@@ -72,8 +72,19 @@ describe('useThemeStore whole-theme actions', () => {
     useThemeStore.getState().setWallpaper({ type: 'solid', idOrColor: '#121214' });
 
     const { config, tokens } = useThemeStore.getState();
-    expect(config.effects).toEqual({ rain: 0, snow: 30, fireflies: 0, grain: 0, vignette: 0 });
+    expect(config.effects).toEqual({ rain: 0, snow: 30, fireflies: 0, grain: 0, vignette: 0, scanlines: 0, glow: 0 });
     expect(config.wallpaperRef).toEqual({ type: 'solid', idOrColor: '#121214' });
     expect(tokens).toEqual(OBSIDIAN_MINIMAL_TOKENS);
+  });
+});
+
+describe('clock glow', () => {
+  it('follows the Glow effect and the accent color', () => {
+    useThemeStore.getState().resetTheme();
+    expect(document.documentElement.style.getPropertyValue('--clock-glow')).toBe('none');
+    useThemeStore.getState().setEffects({ glow: 50 });
+    expect(document.documentElement.style.getPropertyValue('--clock-glow')).toBe('0 0 7.0px #ffffff, 0 0 18.0px #ffffff');
+    useThemeStore.getState().setTokens({ colorAccent: '#ff2d95' });
+    expect(document.documentElement.style.getPropertyValue('--clock-glow')).toContain('#ff2d95');
   });
 });

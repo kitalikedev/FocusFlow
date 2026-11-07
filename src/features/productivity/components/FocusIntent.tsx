@@ -105,7 +105,7 @@ export const FocusIntent: React.FC = () => {
           id={listId}
           role="listbox"
           aria-label="Open tasks"
-          className="absolute right-0 top-full z-40 mt-2 w-72 rounded-xl border p-1 shadow-2xl"
+          className="absolute right-0 top-full z-40 mt-2 w-72 animate-panel-in rounded-xl border p-1 shadow-2xl"
           style={{ backgroundColor: 'var(--panel-bg)', borderColor: 'var(--capsule-border-color)', backdropFilter: 'blur(var(--capsule-blur))' }}
         >
           {openTasks.length === 0 ? (

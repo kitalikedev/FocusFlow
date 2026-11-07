@@ -20,7 +20,7 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
 
   setTokens: (partial: Partial<ThemeTokens>) => {
     const updatedTokens = { ...get().tokens, ...partial };
-    applyTheme(updatedTokens);
+    applyTheme(updatedTokens, get().config.effects);
     set((state) => ({
       tokens: updatedTokens,
       config: {
@@ -31,18 +31,21 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
   },
 
   setConfig: (config: ThemeConfig) => {
-    applyTheme(config.tokens);
+    applyTheme(config.tokens, config.effects);
     set({ tokens: config.tokens, config });
   },
 
-  setEffects: (partial: Partial<EffectsConfig>) =>
-    set((state) => ({ config: { ...state.config, effects: { ...state.config.effects, ...partial } } })),
+  setEffects: (partial: Partial<EffectsConfig>) => {
+    const effects = { ...get().config.effects, ...partial };
+    applyTheme(get().tokens, effects);
+    set((state) => ({ config: { ...state.config, effects } }));
+  },
 
   setWallpaper: (wallpaperRef: ThemeConfig['wallpaperRef']) =>
     set((state) => ({ config: { ...state.config, wallpaperRef } })),
 
   resetTheme: () => {
-    applyTheme(OBSIDIAN_MINIMAL_TOKENS);
+    applyTheme(OBSIDIAN_MINIMAL_TOKENS, OBSIDIAN_MINIMAL_CONFIG.effects);
     set({
       tokens: OBSIDIAN_MINIMAL_TOKENS,
       config: OBSIDIAN_MINIMAL_CONFIG,

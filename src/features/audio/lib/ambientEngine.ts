@@ -1,100 +1,26 @@
-import type { AmbientSoundType } from '@/shared/types/contracts';
-import { getAudioContext, getMasterGain } from '@/shared/lib/web-audio';
-import { createBuffer, fillCrackle, fillNoise } from './noise';
+import { getAudioContext, getMasterGain, rampGain } from '@/shared/lib/web-audio';
+import { CHANNEL_DEFS, findChannelDef, type ChannelGraph } from './channelDefs';
 
-export const AMBIENT_CHANNELS: AmbientSoundType[] = ['rain', 'brownNoise', 'campfire'];
+export const AMBIENT_CHANNELS: string[] = CHANNEL_DEFS.map((def) => def.id);
 
-interface Channel {
-  gain: GainNode;
-  nodes: AudioScheduledSourceNode[];
-}
+/** Volume changes glide for about 1.5 s (3 time constants of 0.5 s), so nothing ever clicks or jumps. */
+export const FADE_TIME_CONSTANT = 0.5;
+const FADE_OUT_MS = 2000;
 
-const LOOP_SECONDS = 4;
-
-/** Builds one channel graph; every channel ends in its own GainNode connected to the master gain. */
-function buildChannel(type: AmbientSoundType, ctx: AudioContext, master: GainNode): Channel {
-  const gain = ctx.createGain();
-  gain.gain.value = 0;
-  gain.connect(master);
-  const nodes: AudioScheduledSourceNode[] = [];
-
-  const loop = (buffer: AudioBuffer): AudioBufferSourceNode => {
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
-    nodes.push(source);
-    return source;
-  };
-
-  if (type === 'rain') {
-    // White noise through a band-pass and a low-pass whose cutoff drifts like falling drops (AC-16.1).
-    const source = loop(createBuffer(ctx, LOOP_SECONDS, (data) => fillNoise(data, 'white')));
-    const bandpass = ctx.createBiquadFilter();
-    bandpass.type = 'bandpass';
-    bandpass.frequency.value = 1200;
-    bandpass.Q.value = 0.5;
-    const lowpass = ctx.createBiquadFilter();
-    lowpass.type = 'lowpass';
-    lowpass.frequency.value = 3000;
-    for (const [rate, depth] of [
-      [0.13, 1200],
-      [0.37, 600],
-    ] as const) {
-      const lfo = ctx.createOscillator();
-      lfo.frequency.value = rate;
-      const lfoDepth = ctx.createGain();
-      lfoDepth.gain.value = depth;
-      lfo.connect(lfoDepth);
-      lfoDepth.connect(lowpass.frequency);
-      nodes.push(lfo);
-    }
-    source.connect(bandpass);
-    bandpass.connect(lowpass);
-    lowpass.connect(gain);
-  } else if (type === 'brownNoise') {
-    const source = loop(createBuffer(ctx, LOOP_SECONDS, (data) => fillNoise(data, 'brown')));
-    const lowpass = ctx.createBiquadFilter();
-    lowpass.type = 'lowpass';
-    lowpass.frequency.value = 700;
-    source.connect(lowpass);
-    lowpass.connect(gain);
-  } else {
-    // Warm brown-noise bed plus sparse high-pass crackles (AC-16.4).
-    const bed = loop(createBuffer(ctx, LOOP_SECONDS, (data) => fillNoise(data, 'brown')));
-    const bedFilter = ctx.createBiquadFilter();
-    bedFilter.type = 'lowpass';
-    bedFilter.frequency.value = 350;
-    const bedGain = ctx.createGain();
-    bedGain.gain.value = 0.6;
-    bed.connect(bedFilter);
-    bedFilter.connect(bedGain);
-    bedGain.connect(gain);
-
-    const crackle = loop(createBuffer(ctx, 6, (data, rate) => fillCrackle(data, rate)));
-    const crackleFilter = ctx.createBiquadFilter();
-    crackleFilter.type = 'highpass';
-    crackleFilter.frequency.value = 1200;
-    const crackleGain = ctx.createGain();
-    crackleGain.gain.value = 0.8;
-    crackle.connect(crackleFilter);
-    crackleFilter.connect(crackleGain);
-    crackleGain.connect(gain);
-  }
-
-  nodes.forEach((node) => node.start());
-  return { gain, nodes };
-}
-
-const channels = new Map<AmbientSoundType, Channel>();
-const volumes: Record<AmbientSoundType, number> = { rain: 0, brownNoise: 0, campfire: 0 };
+const channels = new Map<string, ChannelGraph>();
+const volumes = new Map<string, number>();
+const releaseTimers = new Map<string, ReturnType<typeof setTimeout>>();
 let paused = false;
 
 function clamp(volume: number): number {
   return Math.min(1, Math.max(0, Number.isFinite(volume) ? volume : 0));
 }
 
-function release(type: AmbientSoundType): void {
-  const channel = channels.get(type);
+function release(id: string): void {
+  const timer = releaseTimers.get(id);
+  if (timer) clearTimeout(timer);
+  releaseTimers.delete(id);
+  const channel = channels.get(id);
   if (!channel) return;
   channel.nodes.forEach((node) => {
     try {
@@ -105,32 +31,55 @@ function release(type: AmbientSoundType): void {
     node.disconnect();
   });
   channel.gain.disconnect();
-  channels.delete(type);
+  channels.delete(id);
 }
 
-/** Creates the graph only while the channel is audible, and frees it again at 0 (no idle CPU). */
-function sync(type: AmbientSoundType): void {
-  const effective = paused ? 0 : volumes[type];
+/**
+ * Creates the graph while the channel is audible, fades it in, and after a fade-out frees it again so a
+ * silent channel costs no CPU.
+ */
+function sync(id: string): void {
+  const def = findChannelDef(id);
+  if (!def) return;
+  const effective = paused ? 0 : (volumes.get(id) ?? 0) * def.scale;
+  const channel = channels.get(id);
+
   if (effective <= 0) {
-    release(type);
+    if (!channel) return;
+    rampGain(channel.gain, 0, FADE_TIME_CONSTANT / 2);
+    if (!releaseTimers.has(id)) {
+      releaseTimers.set(
+        id,
+        setTimeout(() => {
+          releaseTimers.delete(id);
+          if (paused || (volumes.get(id) ?? 0) <= 0) release(id);
+        }, FADE_OUT_MS),
+      );
+    }
     return;
   }
-  let channel = channels.get(type);
-  if (!channel) {
+
+  const pending = releaseTimers.get(id);
+  if (pending) {
+    clearTimeout(pending);
+    releaseTimers.delete(id);
+  }
+  let live = channel;
+  if (!live) {
     const ctx = getAudioContext();
     const master = getMasterGain();
     if (!ctx || !master) return;
     if (ctx.state === 'suspended') void ctx.resume().catch(() => {});
-    channel = buildChannel(type, ctx, master);
-    channels.set(type, channel);
+    live = def.build(ctx, master);
+    channels.set(id, live);
   }
   // AC-16.2: only this channel's gain changes, the other channels keep playing untouched.
-  channel.gain.gain.value = effective;
+  rampGain(live.gain, effective, FADE_TIME_CONSTANT);
 }
 
-export function setChannelVolume(type: AmbientSoundType, volume: number): void {
-  volumes[type] = clamp(volume);
-  sync(type);
+export function setChannelVolume(id: string, volume: number): void {
+  volumes.set(id, clamp(volume));
+  sync(id);
 }
 
 export function setAmbientPaused(isPaused: boolean): void {
@@ -138,15 +87,13 @@ export function setAmbientPaused(isPaused: boolean): void {
   AMBIENT_CHANNELS.forEach(sync);
 }
 
-export function isChannelActive(type: AmbientSoundType): boolean {
-  return channels.has(type);
+export function isChannelActive(id: string): boolean {
+  return channels.has(id);
 }
 
 /** Test helper: drops every channel and resets the state. */
 export function resetAmbientEngine(): void {
   AMBIENT_CHANNELS.forEach(release);
-  AMBIENT_CHANNELS.forEach((type) => {
-    volumes[type] = 0;
-  });
+  volumes.clear();
   paused = false;
 }

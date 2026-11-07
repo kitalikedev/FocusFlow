@@ -1,18 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CloudRain, Flame, ListMusic, Music, Pause, Play, Plus, SkipBack, SkipForward, Trash2, Volume2, VolumeX, Waves } from 'lucide-react';
-import type { AmbientSoundType } from '@/shared/types/contracts';
+import { ListMusic, Music, Pause, Play, Plus, SkipBack, SkipForward, Trash2, Volume2, VolumeX } from 'lucide-react';
 import { useSettingsStore } from '@/core/data/useSettingsStore';
 import { FloatingPanel } from '@/core/ui/FloatingPanel';
+import { usePresence } from '@/core/ui/usePresence';
 import { useUiStore } from '@/core/ui/useUiStore';
 import { setMasterVolume, toggleMasterMute } from '@/shared/lib/web-audio';
 import { useMuted } from '../hooks/useAudioSync';
+import { CHANNEL_DEFS } from '../lib/channelDefs';
 import { useAudioStore } from '../store/useAudioStore';
-
-const CHANNELS: { type: AmbientSoundType; label: string; Icon: typeof CloudRain }[] = [
-  { type: 'rain', label: 'Rain', Icon: CloudRain },
-  { type: 'brownNoise', label: 'Brown Noise', Icon: Waves },
-  { type: 'campfire', label: 'Campfire', Icon: Flame },
-];
 
 const ICON_BUTTON =
   'rounded-lg p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40';
@@ -104,6 +99,8 @@ const MasterVolume: React.FC = () => {
 
 const YouTubeQueue: React.FC = () => {
   const [url, setUrl] = useState('');
+  const youtubeVolume = useAudioStore((state) => state.youtubeVolume);
+  const setYouTubeVolume = useAudioStore((state) => state.setYouTubeVolume);
   const queue = useAudioStore((state) => state.queue);
   const currentIndex = useAudioStore((state) => state.currentIndex);
   const wantsPlaying = useAudioStore((state) => state.wantsYouTubePlaying);
@@ -181,6 +178,14 @@ const YouTubeQueue: React.FC = () => {
         </div>
       )}
 
+      <SliderRow
+        id="youtube-volume"
+        label="Music"
+        icon={<Music className="h-4 w-4" />}
+        value={youtubeVolume}
+        onChange={setYouTubeVolume}
+      />
+
       {queue.length > 0 && (
         <ol data-testid="youtube-queue" aria-label="Queue" className="flex flex-col gap-1">
           {queue.map((track, index) => (
@@ -220,12 +225,15 @@ export const SoundPanel: React.FC = () => {
   const setVolume = useAudioStore((state) => state.setVolume);
   const toggleAmbient = useAudioStore((state) => state.toggleAmbient);
 
-  if (!isOpen || isZen) return null;
+  const { mounted, closing } = usePresence(isOpen);
+
+  if (!mounted || isZen) return null;
 
   return (
     <FloatingPanel
       title="Sounds"
       testId="sound-panel"
+      closing={closing}
       icon={<Music className="h-4 w-4" />}
       onClose={() => setOpen(false)}
       actions={
@@ -245,14 +253,14 @@ export const SoundPanel: React.FC = () => {
           <h3 id="ambient-title" className="text-xs font-medium uppercase tracking-wider text-white/50">
             Ambient
           </h3>
-          {CHANNELS.map(({ type, label, Icon }) => (
+          {CHANNEL_DEFS.map(({ id, label, icon: Icon }) => (
             <SliderRow
-              key={type}
-              id={`ambient-${type}`}
+              key={id}
+              id={`ambient-${id}`}
               label={label}
               icon={<Icon className="h-4 w-4" />}
-              value={volumes[type]}
-              onChange={(value) => setVolume(type, value)}
+              value={volumes[id] ?? 0}
+              onChange={(value) => setVolume(id, value)}
             />
           ))}
           <MasterVolume />

@@ -1,4 +1,4 @@
-import { ThemeTokens } from '@/shared/types/contracts';
+import { EffectsConfig, ThemeTokens } from '@/shared/types/contracts';
 import { withAlpha } from './color';
 
 /**
@@ -6,7 +6,7 @@ import { withAlpha } from './color';
  * Designed to execute in < 50ms without full page re-render.
  * Sets exactly the 15 design tokens defined in PRD FR-24 and ARCHITECTURE 4.2.
  */
-export function applyTheme(tokens: ThemeTokens): void {
+export function applyTheme(tokens: ThemeTokens, effects?: EffectsConfig): void {
   if (typeof document === 'undefined') return;
 
   const root = document.documentElement;
@@ -29,4 +29,16 @@ export function applyTheme(tokens: ThemeTokens): void {
   root.style.setProperty('--bg-blur', `${tokens.bgBlur}px`);
   root.style.setProperty('--bg-brightness', `${tokens.bgBrightness}%`);
   root.style.setProperty('--bg-solid-color', tokens.bgSolidColor);
+
+  // Neon glow of the clock digits follows the accent color (effect "Glow", 0 = off).
+  if (effects) root.style.setProperty('--clock-glow', glowShadow(effects.glow, tokens.colorAccent));
+}
+
+/** `text-shadow` value for the clock digits: two soft halos in the accent color, `none` at 0. */
+export function glowShadow(glow: number, accent: string): string {
+  const level = Math.min(100, Math.max(0, glow)) / 100;
+  if (level === 0) return 'none';
+  const near = (level * 14).toFixed(1);
+  const far = (level * 36).toFixed(1);
+  return `0 0 ${near}px ${accent}, 0 0 ${far}px ${accent}`;
 }

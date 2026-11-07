@@ -1,14 +1,33 @@
 /** Buffers for the synthesized ambient sounds (FR-16). Everything is generated locally: 0 network request. */
 
-export type NoiseKind = 'white' | 'brown';
+export type NoiseKind = 'white' | 'pink' | 'brown';
 
-/** Uniform white noise, or brown noise made by integrating white noise (AC-16.3). */
+/**
+ * White noise, pink noise (Paul Kellet's filter: softer, warmer, like real rain) or brown noise made by
+ * integrating white noise (AC-16.3).
+ */
 export function fillNoise(data: Float32Array, kind: NoiseKind, random: () => number = Math.random): void {
   let last = 0;
+  let b0 = 0;
+  let b1 = 0;
+  let b2 = 0;
+  let b3 = 0;
+  let b4 = 0;
+  let b5 = 0;
+  let b6 = 0;
   for (let i = 0; i < data.length; i += 1) {
     const white = random() * 2 - 1;
     if (kind === 'white') {
       data[i] = white;
+    } else if (kind === 'pink') {
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.969 * b2 + white * 0.153852;
+      b3 = 0.8665 * b3 + white * 0.3104856;
+      b4 = 0.55 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.016898;
+      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+      b6 = white * 0.115926;
     } else {
       // Leaky integrator keeps the walk bounded; 3.5 brings the level back to roughly unit gain.
       last = (last + 0.02 * white) / 1.02;
