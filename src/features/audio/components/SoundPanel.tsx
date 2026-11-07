@@ -99,8 +99,6 @@ const MasterVolume: React.FC = () => {
 
 const YouTubeQueue: React.FC = () => {
   const [url, setUrl] = useState('');
-  const youtubeVolume = useAudioStore((state) => state.youtubeVolume);
-  const setYouTubeVolume = useAudioStore((state) => state.setYouTubeVolume);
   const queue = useAudioStore((state) => state.queue);
   const currentIndex = useAudioStore((state) => state.currentIndex);
   const wantsPlaying = useAudioStore((state) => state.wantsYouTubePlaying);
@@ -177,14 +175,6 @@ const YouTubeQueue: React.FC = () => {
           </button>
         </div>
       )}
-
-      <SliderRow
-        id="youtube-volume"
-        label="Music"
-        icon={<Music className="h-4 w-4" />}
-        value={youtubeVolume}
-        onChange={setYouTubeVolume}
-      />
 
       {queue.length > 0 && (
         <ol data-testid="youtube-queue" aria-label="Queue" className="flex flex-col gap-1">

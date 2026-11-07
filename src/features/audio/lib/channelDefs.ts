@@ -13,8 +13,6 @@ export interface ChannelDef {
   icon: LucideIcon;
   /** Slider 100 % maps to this gain, so every channel feels equally loud (rain is the harshest). */
   scale: number;
-  /** `settings` volumes are saved with the account (database columns); `device` volumes only on this device. */
-  persist: 'settings' | 'device';
   build: (ctx: AudioContext, master: GainNode) => ChannelGraph;
 }
 
@@ -109,14 +107,11 @@ function buildCampfire(ctx: AudioContext, master: GainNode): ChannelGraph {
   return startGraph(gain, nodes);
 }
 
-/**
- * Every ambient channel the mixer shows, in display order. A new channel (for example the generated lofi
- * music) is one more entry here plus its builder in its own file.
- */
+/** Every ambient channel the mixer shows, in display order. */
 export const CHANNEL_DEFS: ChannelDef[] = [
-  { id: 'rain', label: 'Rain', icon: CloudRain, scale: 0.55, persist: 'settings', build: buildRain },
-  { id: 'brownNoise', label: 'Brown Noise', icon: Waves, scale: 0.9, persist: 'settings', build: buildBrownNoise },
-  { id: 'campfire', label: 'Campfire', icon: Flame, scale: 0.9, persist: 'settings', build: buildCampfire },
+  { id: 'rain', label: 'Rain', icon: CloudRain, scale: 0.55, build: buildRain },
+  { id: 'brownNoise', label: 'Brown Noise', icon: Waves, scale: 0.9, build: buildBrownNoise },
+  { id: 'campfire', label: 'Campfire', icon: Flame, scale: 0.9, build: buildCampfire },
 ];
 
 export function findChannelDef(id: string): ChannelDef | undefined {
