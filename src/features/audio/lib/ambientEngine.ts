@@ -22,6 +22,7 @@ function release(id: string): void {
   releaseTimers.delete(id);
   const channel = channels.get(id);
   if (!channel) return;
+  channel.dispose?.();
   channel.nodes.forEach((node) => {
     try {
       node.stop();

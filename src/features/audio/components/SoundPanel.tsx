@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ListMusic, Music, Pause, Play, Plus, SkipBack, SkipForward, Trash2, Volume2, VolumeX } from 'lucide-react';
+import { ListMusic, Music, Radio, Pause, Play, Plus, SkipBack, SkipForward, Trash2, Volume2, VolumeX } from 'lucide-react';
 import { useSettingsStore } from '@/core/data/useSettingsStore';
 import { FloatingPanel } from '@/core/ui/FloatingPanel';
 import { usePresence } from '@/core/ui/usePresence';
@@ -7,6 +7,7 @@ import { useUiStore } from '@/core/ui/useUiStore';
 import { setMasterVolume, toggleMasterMute } from '@/shared/lib/web-audio';
 import { useMuted } from '../hooks/useAudioSync';
 import { CHANNEL_DEFS } from '../lib/channelDefs';
+import { LOFI_RADIO } from '../lib/lofiRadio';
 import { useAudioStore } from '../store/useAudioStore';
 
 const ICON_BUTTON =
@@ -97,8 +98,38 @@ const MasterVolume: React.FC = () => {
   );
 };
 
+const LofiRadio: React.FC = () => {
+  const addStation = useAudioStore((state) => state.addStation);
+  return (
+    <div className="flex flex-col gap-1">
+      <h4 className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-white/40">
+        <Radio className="h-3 w-3" aria-hidden="true" />
+        Lofi radio
+      </h4>
+      <ul className="flex flex-col">
+        {LOFI_RADIO.map((station) => (
+          <li key={station.id}>
+            <button
+              type="button"
+              data-testid={`radio-${station.id}`}
+              onClick={() => addStation(station)}
+              title={`Add ${station.title} to the queue`}
+              className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs text-white/70 hover:bg-white/5 hover:text-white"
+            >
+              <Plus className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+              <span className="min-w-0 truncate">{station.title}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 const YouTubeQueue: React.FC = () => {
   const [url, setUrl] = useState('');
+  const youtubeVolume = useAudioStore((state) => state.youtubeVolume);
+  const setYouTubeVolume = useAudioStore((state) => state.setYouTubeVolume);
   const queue = useAudioStore((state) => state.queue);
   const currentIndex = useAudioStore((state) => state.currentIndex);
   const wantsPlaying = useAudioStore((state) => state.wantsYouTubePlaying);
@@ -175,6 +206,14 @@ const YouTubeQueue: React.FC = () => {
           </button>
         </div>
       )}
+
+      <SliderRow
+        id="youtube-volume"
+        label="Music"
+        icon={<Music className="h-4 w-4" />}
+        value={youtubeVolume}
+        onChange={setYouTubeVolume}
+      />
 
       {queue.length > 0 && (
         <ol data-testid="youtube-queue" aria-label="Queue" className="flex flex-col gap-1">
@@ -261,6 +300,7 @@ export const SoundPanel: React.FC = () => {
             YouTube
           </h3>
           <YouTubeQueue />
+          <LofiRadio />
         </section>
       </div>
     </FloatingPanel>

@@ -1,10 +1,13 @@
-import { CloudRain, Flame, Waves, type LucideIcon } from 'lucide-react';
+import { CloudRain, Coffee, Flame, Waves, type LucideIcon } from 'lucide-react';
+import { buildLofiChannel } from './lofi';
 import { createBuffer, fillCrackle, fillNoise } from './noise';
 
 /** A running channel: its own GainNode (connected to the master) plus every source that must be stopped. */
 export interface ChannelGraph {
   gain: GainNode;
   nodes: AudioScheduledSourceNode[];
+  /** Extra clean-up for channels with their own scheduler (timers, per-note nodes). */
+  dispose?: () => void;
 }
 
 export interface ChannelDef {
@@ -13,6 +16,8 @@ export interface ChannelDef {
   icon: LucideIcon;
   /** Slider 100 % maps to this gain, so every channel feels equally loud (rain is the harshest). */
   scale: number;
+  /** `settings` volumes are saved with the account (database columns); `device` volumes only on this device. */
+  persist: 'settings' | 'device';
   build: (ctx: AudioContext, master: GainNode) => ChannelGraph;
 }
 
@@ -109,9 +114,10 @@ function buildCampfire(ctx: AudioContext, master: GainNode): ChannelGraph {
 
 /** Every ambient channel the mixer shows, in display order. */
 export const CHANNEL_DEFS: ChannelDef[] = [
-  { id: 'rain', label: 'Rain', icon: CloudRain, scale: 0.55, build: buildRain },
-  { id: 'brownNoise', label: 'Brown Noise', icon: Waves, scale: 0.9, build: buildBrownNoise },
-  { id: 'campfire', label: 'Campfire', icon: Flame, scale: 0.9, build: buildCampfire },
+  { id: 'rain', label: 'Rain', icon: CloudRain, scale: 0.55, persist: 'settings', build: buildRain },
+  { id: 'brownNoise', label: 'Brown Noise', icon: Waves, scale: 0.9, persist: 'settings', build: buildBrownNoise },
+  { id: 'campfire', label: 'Campfire', icon: Flame, scale: 0.9, persist: 'settings', build: buildCampfire },
+  { id: 'lofi', label: 'Lofi', icon: Coffee, scale: 0.7, persist: 'device', build: buildLofiChannel },
 ];
 
 export function findChannelDef(id: string): ChannelDef | undefined {

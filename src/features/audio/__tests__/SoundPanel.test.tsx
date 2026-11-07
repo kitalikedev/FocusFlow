@@ -27,9 +27,10 @@ vi.mock('@/shared/lib/web-audio', () => ({
 }));
 
 import { ControlBar, SoundPanel } from '../index';
-import { QUEUE_STORAGE_KEY, readStoredQueue, useAudioStore } from '../store/useAudioStore';
+import { DEFAULT_YOUTUBE_VOLUME, LEVELS_STORAGE_KEY, QUEUE_STORAGE_KEY, readDeviceLevels, readStoredQueue, useAudioStore } from '../store/useAudioStore';
 import { resetAmbientEngine, setAmbientPaused } from '../lib/ambientEngine';
 import { useUiStore } from '@/core/ui/useUiStore';
+import { useSettingsStore } from '@/core/data/useSettingsStore';
 import { setMasterVolume, toggleMasterMute } from '@/shared/lib/web-audio';
 
 function channelGains(): FakeGain[] {
@@ -48,6 +49,7 @@ beforeEach(() => {
   setAmbientPaused(true);
   useAudioStore.setState({
     volumes: { rain: 0, brownNoise: 0, campfire: 0 },
+    youtubeVolume: DEFAULT_YOUTUBE_VOLUME,
     isAmbientPaused: true,
     queue: [],
     currentIndex: -1,
@@ -116,6 +118,60 @@ describe('SoundPanel', () => {
     fireEvent.change(screen.getByPlaceholderText('Paste a YouTube link'), { target: { value: 'https://vimeo.com/1' } });
     fireEvent.click(screen.getByTestId('add-track-btn'));
     expect(await screen.findByRole('alert')).toHaveTextContent('valid YouTube');
+  });
+
+  it('the Music slider sets the YouTube volume on its own and remembers it on this device', () => {
+    render(<SoundPanel />);
+    expect(screen.getByLabelText('Music')).toHaveValue('70');
+    fireEvent.change(screen.getByLabelText('Music'), { target: { value: '30' } });
+    expect(useAudioStore.getState().youtubeVolume).toBe(0.3);
+    expect(useAudioStore.getState().volumes).toEqual({ rain: 0, brownNoise: 0, campfire: 0 });
+    expect(JSON.parse(localStorage.getItem(LEVELS_STORAGE_KEY) ?? '{}').youtube).toBe(0.3);
+    expect(readDeviceLevels().youtube).toBe(0.3);
+  });
+
+  it('keeps other saved levels when the YouTube volume changes and ignores corrupted data', () => {
+    localStorage.setItem(LEVELS_STORAGE_KEY, JSON.stringify({ other: 0.5, youtube: 9, bad: 'loud' }));
+    expect(readDeviceLevels()).toEqual({ other: 0.5, youtube: 1 });
+    useAudioStore.getState().setYouTubeVolume(0.2);
+    expect(JSON.parse(localStorage.getItem(LEVELS_STORAGE_KEY) ?? '{}')).toEqual({ other: 0.5, youtube: 0.2 });
+    localStorage.setItem(LEVELS_STORAGE_KEY, 'nope');
+    expect(readDeviceLevels()).toEqual({});
+  });
+
+  it('shows the Lofi channel and keeps its volume on this device, not in the account settings', () => {
+    const update = vi.spyOn(useSettingsStore.getState(), 'update').mockResolvedValue(undefined);
+    vi.useFakeTimers();
+    render(<SoundPanel />);
+    fireEvent.change(screen.getByLabelText('Lofi'), { target: { value: '40' } });
+    vi.advanceTimersByTime(1000); // longer than the debounce of the account volumes
+    vi.useRealTimers();
+    expect(useAudioStore.getState().volumes.lofi).toBe(0.4);
+    expect(useAudioStore.getState().isAmbientPaused).toBe(false);
+    expect(readDeviceLevels().lofi).toBe(0.4);
+    expect(update).not.toHaveBeenCalled();
+    expect(channelGains().length).toBeGreaterThan(0);
+  });
+
+  it('adds a lofi radio station to the queue with its own title', () => {
+    render(<SoundPanel />);
+    fireEvent.click(screen.getByTestId('radio-lofi-girl'));
+    expect(useAudioStore.getState().queue).toHaveLength(1);
+    expect(useAudioStore.getState().queue[0].title).toContain('lofi hip hop radio');
+    expect(useAudioStore.getState().currentIndex).toBe(0);
+    expect(readStoredQueue().queue).toHaveLength(1);
+    fireEvent.click(screen.getByTestId('radio-synthwave'));
+    expect(useAudioStore.getState().queue).toHaveLength(2);
+    expect(useAudioStore.getState().currentIndex).toBe(0);
+  });
+
+  it('does not add stations beyond the queue limit', () => {
+    const full = Array.from({ length: 20 }, (_, n) => ({ id: `t${n}`, title: `T${n}`, url: `https://www.youtube.com/watch?v=abcdefghij${n % 10}` }));
+    useAudioStore.setState({ queue: full, currentIndex: 0 });
+    render(<SoundPanel />);
+    fireEvent.click(screen.getByTestId('radio-lofi-girl'));
+    expect(useAudioStore.getState().queue).toHaveLength(20);
+    expect(useAudioStore.getState().trackError).toContain('up to 20');
   });
 
   it('plays, skips and removes queue items', () => {
