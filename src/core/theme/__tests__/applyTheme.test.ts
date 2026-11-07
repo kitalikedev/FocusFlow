@@ -68,7 +68,8 @@ describe('applyTheme', () => {
     );
     expect(style.getPropertyValue('--bg-solid-color')).toBe(OBSIDIAN_MINIMAL_TOKENS.bgSolidColor);
 
-    // Verify exactly 15 CSS properties are registered
-    expect(style.length).toBe(15);
+    // The 15 tokens plus the derived --panel-bg (tool panels, never below 80 % opacity)
+    expect(style.length).toBe(16);
+    expect(style.getPropertyValue('--panel-bg')).toBe('rgba(0, 0, 0, 0.8)');
   });
 });

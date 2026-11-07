@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { DrawerTab, UiActions, UiState } from '@/shared/types/contracts';
+import { DrawerTab, ToolPanel, UiActions, UiState } from '@/shared/types/contracts';
 
 export type UiStore = UiState & UiActions;
 
@@ -13,6 +13,14 @@ const initialState: UiState = {
   isAnalyticsOpen: false,
   isMobileDrawerOpen: false,
   activeDrawerTab: 'timer',
+  isTasksOpen: false,
+  isNoteOpen: false,
+};
+
+const PANEL_FLAGS: Record<ToolPanel, 'isTasksOpen' | 'isNoteOpen' | 'isMixerOpen'> = {
+  tasks: 'isTasksOpen',
+  note: 'isNoteOpen',
+  mixer: 'isMixerOpen',
 };
 
 export const useUiStore = create<UiStore>((set) => ({
@@ -37,6 +45,14 @@ export const useUiStore = create<UiStore>((set) => ({
   setAnalyticsOpen: (isOpen: boolean) => set({ isAnalyticsOpen: isOpen }),
   setMobileDrawerOpen: (isOpen: boolean) => set({ isMobileDrawerOpen: isOpen }),
   setActiveDrawerTab: (tab: DrawerTab) => set({ activeDrawerTab: tab }),
+
+  togglePanel: (panel: ToolPanel, exclusive = false) =>
+    set((state) => {
+      const flag = PANEL_FLAGS[panel];
+      const next = !state[flag];
+      if (!exclusive) return { [flag]: next };
+      return { isTasksOpen: false, isNoteOpen: false, isMixerOpen: false, [flag]: next };
+    }),
 
   closeAllModals: () =>
     set({

@@ -23,8 +23,9 @@ let loadSequence = 0;
 // so two overlapping saves would let the later write drop the earlier patch.
 let saveQueue: Promise<void> = Promise.resolve();
 
+/** Loads the whole saved theme (tokens, effects and wallpaper), not only its tokens. */
 function applyThemeFrom(settings: UserSettings): void {
-  useThemeStore.getState().setTokens(settings.activeTheme.tokens);
+  useThemeStore.getState().setConfig(settings.activeTheme);
 }
 
 export const useSettingsStore = create<SettingsStoreState>((set) => ({

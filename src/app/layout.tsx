@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { useAuthStore } from '@/core/auth/useAuthStore';
 import { ToastViewport } from '@/core/ui/ToastViewport';
+import { QuickControls, ToolDock } from '@/core/hud/Dock';
 import {
   WallpaperLayerSlot,
   EffectsLayerSlot,
@@ -11,8 +12,9 @@ import {
   WallpaperPickerSlot,
   ThemeCustomizerSlot,
   ControlBarSlot,
-  SidePanelsSlot,
-  DrawerTabsSlot,
+  SoundPanelSlot,
+  ToolPanelsSlot,
+  AnalyticsSlot,
 } from './slots';
 
 // Auth dialogs are loaded on demand so they never weigh on the initial bundle.
@@ -36,35 +38,39 @@ export const Layout: React.FC = () => {
     <WallpaperLayerSlot>
       <EffectsLayerSlot />
 
-      <div className="relative z-10 flex flex-col justify-between w-screen h-screen overflow-hidden">
-        {/* Tier 1: Header HUD */}
+      <div className="relative z-10 flex h-screen w-screen flex-col overflow-hidden">
+        {/* Top: brand, today's sessions, streak, sync and account */}
         <HudSlot />
 
-        {/* Tier 2: Center Workspace & Capsule */}
-        <main className="flex-1 flex flex-col items-center justify-center px-4 relative">
-          <div className="w-full flex items-center justify-center relative">
-            <SidePanelsSlot />
-
-            <div className="flex flex-col items-center gap-6 z-20">
-              <FocusIntentSlot />
-              <div className="relative">
-                <ClockDisplaySlot />
-                <ClockSettingsSlot />
-              </div>
+        {/* Center: focus intent and the clock capsule */}
+        <main className="relative flex flex-1 flex-col items-center justify-center px-4 pb-20">
+          <div className="z-20 flex flex-col items-center gap-6">
+            <FocusIntentSlot />
+            <div className="relative">
+              <ClockDisplaySlot />
+              <ClockSettingsSlot />
             </div>
           </div>
         </main>
+      </div>
 
-        {/* Tier 3: Bottom Control Bar & Mobile Drawer */}
-        <div className="w-full">
+      {/* Bottom: floating tools above the two docks (desktop); tools become bottom sheets on phones */}
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex flex-col gap-3 p-4">
+        <div className="flex items-end gap-3">
+          <ToolPanelsSlot />
+          <SoundPanelSlot />
+        </div>
+        <div className="flex items-center justify-between gap-3 [&>*]:pointer-events-auto">
+          <ToolDock />
           <ControlBarSlot />
-          <DrawerTabsSlot />
+          <QuickControls />
         </div>
       </div>
 
-      {/* Global Modals */}
+      {/* Global panels and dialogs */}
       <WallpaperPickerSlot />
       <ThemeCustomizerSlot />
+      <AnalyticsSlot />
       <AuthOverlays />
       <ToastViewport />
     </WallpaperLayerSlot>

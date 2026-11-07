@@ -45,3 +45,35 @@ describe('useThemeStore', () => {
     expect(document.documentElement.style.getPropertyValue(obsoleteToken)).toBe('');
   });
 });
+
+describe('useThemeStore whole-theme actions', () => {
+  beforeEach(() => {
+    useThemeStore.getState().resetTheme();
+  });
+
+  it('setConfig swaps tokens, effects and wallpaper at once and applies the CSS variables', () => {
+    const config = {
+      presetId: 'tokyo-fog',
+      tokens: { ...OBSIDIAN_MINIMAL_TOKENS, colorAccent: '#f5f5f4', capsuleBg: '#18181b', capsuleOpacity: 0.6 },
+      effects: { rain: 40, snow: 0, fireflies: 0, grain: 10, vignette: 0 },
+      wallpaperRef: { type: 'preset' as const, idOrColor: 'gradient-thermal' },
+    };
+    useThemeStore.getState().setConfig(config);
+
+    const state = useThemeStore.getState();
+    expect(state.config).toEqual(config);
+    expect(state.tokens).toEqual(config.tokens);
+    expect(document.documentElement.style.getPropertyValue('--color-accent')).toBe('#f5f5f4');
+    expect(document.documentElement.style.getPropertyValue('--capsule-bg')).toBe('rgba(24, 24, 27, 0.6)');
+  });
+
+  it('setEffects and setWallpaper only touch their own part of the config', () => {
+    useThemeStore.getState().setEffects({ snow: 30 });
+    useThemeStore.getState().setWallpaper({ type: 'solid', idOrColor: '#121214' });
+
+    const { config, tokens } = useThemeStore.getState();
+    expect(config.effects).toEqual({ rain: 0, snow: 30, fireflies: 0, grain: 0, vignette: 0 });
+    expect(config.wallpaperRef).toEqual({ type: 'solid', idOrColor: '#121214' });
+    expect(tokens).toEqual(OBSIDIAN_MINIMAL_TOKENS);
+  });
+});
