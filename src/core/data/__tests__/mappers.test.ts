@@ -14,7 +14,7 @@ import {
   UserSettingsRow,
 } from '../mappers';
 import { createDefaultSettings } from '../defaults';
-import { OBSIDIAN_MINIMAL_CONFIG } from '@/core/theme/presets';
+import { DEFAULT_THEME_CONFIG } from '@/core/theme/presets';
 
 const settingsRow: UserSettingsRow = {
   id: 's1',
@@ -46,7 +46,7 @@ describe('settings mapping', () => {
     expect(settings.clockVisualMode).toBe('circular_ring');
     expect(settings.autoStartBreaks).toBe(true);
     expect(settings.isMigrated).toBe(true);
-    expect(settings.activeTheme).toBe(OBSIDIAN_MINIMAL_CONFIG);
+    expect(settings.activeTheme).toBe(DEFAULT_THEME_CONFIG);
   });
 
   it('flattens a full settings object into columns', () => {
@@ -174,7 +174,7 @@ describe('other mappings', () => {
     });
 
     const theme = rowToSavedTheme({ id: 'th', user_id: 'u', name: 'N', config: {}, created_at: 'c', updated_at: 'u' });
-    expect(theme.config).toBe(OBSIDIAN_MINIMAL_CONFIG);
+    expect(theme.config).toBe(DEFAULT_THEME_CONFIG);
     expect(savedThemeToRow(theme, 'u9')).toMatchObject({ id: 'th', user_id: 'u9', name: 'N' });
   });
 });

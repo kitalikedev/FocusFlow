@@ -7,7 +7,7 @@ import {
   normalizeSettings,
   parseThemeConfig,
 } from '../defaults';
-import { OBSIDIAN_MINIMAL_CONFIG } from '@/core/theme/presets';
+import { DEFAULT_THEME_CONFIG } from '@/core/theme/presets';
 
 describe('clamp helpers', () => {
   it('clampInt rounds, clamps and falls back', () => {
@@ -28,11 +28,11 @@ describe('clamp helpers', () => {
 });
 
 describe('parseThemeConfig', () => {
-  it('falls back to Obsidian Minimal for non-objects', () => {
-    expect(parseThemeConfig(null)).toBe(OBSIDIAN_MINIMAL_CONFIG);
-    expect(parseThemeConfig('nope')).toBe(OBSIDIAN_MINIMAL_CONFIG);
-    expect(parseThemeConfig([])).toBe(OBSIDIAN_MINIMAL_CONFIG);
-    expect(parseThemeConfig({})).toBe(OBSIDIAN_MINIMAL_CONFIG);
+  it('falls back to the default Nebula theme for non-objects', () => {
+    expect(parseThemeConfig(null)).toBe(DEFAULT_THEME_CONFIG);
+    expect(parseThemeConfig('nope')).toBe(DEFAULT_THEME_CONFIG);
+    expect(parseThemeConfig([])).toBe(DEFAULT_THEME_CONFIG);
+    expect(parseThemeConfig({})).toBe(DEFAULT_THEME_CONFIG);
   });
 
   it('merges valid tokens and ignores unknown or wrongly typed ones', () => {
@@ -44,8 +44,8 @@ describe('parseThemeConfig', () => {
     });
     expect(config.presetId).toBe('custom');
     expect(config.tokens.colorAccent).toBe('#ff0000');
-    expect(config.tokens.capsuleBlur).toBe(OBSIDIAN_MINIMAL_CONFIG.tokens.capsuleBlur);
-    expect(config.tokens.capsuleRadius).toBe(OBSIDIAN_MINIMAL_CONFIG.tokens.capsuleRadius);
+    expect(config.tokens.capsuleBlur).toBe(DEFAULT_THEME_CONFIG.tokens.capsuleBlur);
+    expect(config.tokens.capsuleRadius).toBe(DEFAULT_THEME_CONFIG.tokens.capsuleRadius);
     expect('evil' in config.tokens).toBe(false);
     expect(config.effects.rain).toBe(100);
     expect(config.effects.snow).toBe(0);
@@ -55,9 +55,18 @@ describe('parseThemeConfig', () => {
 
   it('uses defaults when tokens, effects and wallpaperRef are missing or invalid', () => {
     const config = parseThemeConfig({ tokens: 5, effects: 5, wallpaperRef: { type: 'video', idOrColor: '' } });
-    expect(config.tokens).toEqual(OBSIDIAN_MINIMAL_CONFIG.tokens);
-    expect(config.wallpaperRef).toEqual(OBSIDIAN_MINIMAL_CONFIG.wallpaperRef);
+    expect(config.tokens).toEqual(DEFAULT_THEME_CONFIG.tokens);
+    expect(config.wallpaperRef).toEqual(DEFAULT_THEME_CONFIG.wallpaperRef);
     expect(config.presetId).toBeUndefined();
+  });
+
+  it('never mixes a valid type with a missing id (or the other way round) in the wallpaper reference', () => {
+    expect(parseThemeConfig({ wallpaperRef: { type: 'solid' } }).wallpaperRef).toEqual(DEFAULT_THEME_CONFIG.wallpaperRef);
+    expect(parseThemeConfig({ wallpaperRef: { idOrColor: '#123456' } }).wallpaperRef).toEqual(DEFAULT_THEME_CONFIG.wallpaperRef);
+    expect(parseThemeConfig({ wallpaperRef: { type: 'solid', idOrColor: '#123456' } }).wallpaperRef).toEqual({
+      type: 'solid',
+      idOrColor: '#123456',
+    });
   });
 });
 
@@ -66,7 +75,7 @@ describe('normalizeSettings', () => {
     const settings = normalizeSettings(undefined);
     expect(settings.timerDurations).toEqual({ focus: 1500, shortBreak: 300, longBreak: 900 });
     expect(settings.activeWallpaperId).toBe('preset-lofi-cafe');
-    expect(settings.activeTheme).toBe(OBSIDIAN_MINIMAL_CONFIG);
+    expect(settings.activeTheme).toBe(DEFAULT_THEME_CONFIG);
   });
 
   it('clamps out-of-range values and rejects invalid enums', () => {

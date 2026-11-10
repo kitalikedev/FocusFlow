@@ -1,0 +1,54 @@
+/*
+ * End-credits look: a quote rolls slowly from the bottom to the top of the screen, fading in and out at the
+ * edges. Only `transform` is animated, so the browser does not repaint the page while it moves.
+ */
+.ff-credits {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18%, #000 82%, transparent 100%);
+}
+
+.ff-credit-roll {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  width: min(36rem, 86vw);
+  margin: 0 auto;
+  text-align: center;
+  will-change: transform;
+  animation: ff-credit-roll var(--ff-roll-seconds, 22s) linear forwards;
+}
+
+@keyframes ff-credit-roll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100vh - 100%));
+  }
+}
+
+/* Wide screens: the credits roll in the free space to the right of the clock instead of over it. */
+@media (min-width: 1024px) {
+  .ff-credit-roll {
+    left: auto;
+    right: 4vw;
+    width: min(20rem, 24vw);
+    margin: 0;
+  }
+
+  .ff-credit-roll.ff-credit-static {
+    top: 50%;
+  }
+}
+
+/* Reduced motion: the quote stays in the middle of the screen instead of rolling. */
+.ff-credit-roll.ff-credit-static {
+  top: 50%;
+  animation: none;
+  transform: translateY(-50%);
+}

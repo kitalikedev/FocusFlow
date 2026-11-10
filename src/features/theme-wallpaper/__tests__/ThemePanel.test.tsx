@@ -50,7 +50,7 @@ describe('Themes panel — Library', () => {
     await openPanel();
     fireEvent.click(screen.getByTestId('wallpaper-gradient-thermal'));
     expect(useThemeStore.getState().config.wallpaperRef).toEqual({ type: 'preset', idOrColor: 'gradient-thermal' });
-    expect(useThemeStore.getState().tokens.colorAccent).toBe('#ffffff');
+    expect(useThemeStore.getState().tokens.colorAccent).toBe('#c4b5fd'); // Nebula accent stays
     expect(screen.getByTestId('wallpaper-gradient-thermal').className).toContain('ring-2 ring-white');
     await waitFor(async () => expect((await savedSettings()).activeWallpaperId).toBe('gradient-thermal'));
   });
@@ -186,6 +186,13 @@ describe('Themes panel — My Themes (FR-27)', () => {
 describe('WallpaperLayer and EffectsLayer', () => {
   it('renders solid, preset and custom backgrounds with dim and brightness', async () => {
     const { rerender } = await act(async () => render(<WallpaperLayer />));
+    // The default is the Nebula wallpaper: a slowly drifting gradient with the theme's 10 % dim.
+    expect(screen.getByTestId('wallpaper-layer')).toHaveAttribute('data-wallpaper', 'preset:abstract-nebula');
+    expect(screen.getByTestId('wallpaper-art').className).toContain('ff-wallpaper-drift');
+    expect(screen.getByTestId('wallpaper-dim').style.opacity).toBe('0.1');
+
+    act(() => useThemeStore.getState().setWallpaper({ type: 'solid', idOrColor: '#09090b' }));
+    rerender(<WallpaperLayer />);
     expect(screen.getByTestId('wallpaper-layer')).toHaveAttribute('data-wallpaper', 'solid:#09090b');
     expect(screen.queryByTestId('wallpaper-dim')).not.toBeInTheDocument();
 
@@ -194,7 +201,7 @@ describe('WallpaperLayer and EffectsLayer', () => {
     const image = screen.getByTestId('wallpaper-image');
     expect(screen.getByTestId('wallpaper-art').className).toContain('ff-wallpaper-drift');
     expect(image.style.filter).toBe('brightness(100%) blur(0px)');
-    expect(screen.getByTestId('wallpaper-dim').style.opacity).toBe('0.2');
+    expect(screen.getByTestId('wallpaper-dim').style.opacity).toBe('0.1');
 
     act(() => {
       useThemeLibraryStore.setState({
@@ -217,6 +224,7 @@ describe('WallpaperLayer and EffectsLayer', () => {
   });
 
   it('draws grain and vignette as static layers and nothing when all effects are off', () => {
+    act(() => useThemeStore.getState().setEffects({ grain: 0 })); // Nebula starts with a little grain
     const { container, rerender } = render(<EffectsLayer />);
     expect(container).toBeEmptyDOMElement();
     act(() => useThemeStore.getState().setEffects({ grain: 40, vignette: 60 }));
@@ -233,7 +241,7 @@ describe('WallpaperLayer and EffectsLayer', () => {
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
     })) as unknown as typeof window.matchMedia;
-    act(() => useThemeStore.getState().setEffects({ fireflies: 50 }));
+    act(() => useThemeStore.getState().setEffects({ grain: 0, fireflies: 50 }));
     const { container } = render(<EffectsLayer />);
     expect(container).toBeEmptyDOMElement();
     delete (window as unknown as { matchMedia?: unknown }).matchMedia;

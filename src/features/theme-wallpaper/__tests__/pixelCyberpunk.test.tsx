@@ -60,10 +60,10 @@ describe('pixel and cyberpunk wallpapers', () => {
 });
 
 describe('new theme presets', () => {
-  it('ships 11 presets: the original six plus five new ones', () => {
-    expect(THEME_PRESETS).toHaveLength(11);
-    expect(THEME_PRESETS.slice(6).map((preset) => preset.id)).toEqual(NEW_PRESETS);
-    expect(THEME_PRESETS.slice(6).map((preset) => preset.name)).toEqual([
+  it('ships 12 presets: Nebula, the original six and five new ones', () => {
+    expect(THEME_PRESETS).toHaveLength(12);
+    expect(THEME_PRESETS.slice(7).map((preset) => preset.id)).toEqual(NEW_PRESETS);
+    expect(THEME_PRESETS.slice(7).map((preset) => preset.name)).toEqual([
       'Cyberpunk Neon',
       'Synthwave',
       'Pixel Night',
@@ -73,7 +73,7 @@ describe('new theme presets', () => {
   });
 
   it('every new preset points to an existing wallpaper and font and passes the readability rules', () => {
-    THEME_PRESETS.slice(6).forEach(({ config }) => {
+    THEME_PRESETS.slice(7).forEach(({ config }) => {
       if (config.wallpaperRef.type === 'preset') expect(findWallpaper(config.wallpaperRef.idOrColor)).toBeDefined();
       expect(fontFromStack(config.tokens.fontClock)).toBeDefined();
       expect(relativeLuminance(parseColor(config.tokens.capsuleBg)!)).toBeLessThanOrEqual(0.2);
@@ -98,6 +98,7 @@ describe('Scanlines and Glow', () => {
     URL.createObjectURL = vi.fn(() => 'blob:x');
     useAuthStore.setState({ user: null, isGuest: true, isLoading: false });
     useThemeStore.getState().resetTheme();
+    useThemeStore.getState().setEffects({ grain: 0 }); // Nebula starts with a little grain
     useThemeLibraryStore.setState({ customWallpapers: [], savedThemes: [], isUploading: false });
     useUiStore.setState({ isThemeCustomizerOpen: false, isWallpaperPickerOpen: false });
   });

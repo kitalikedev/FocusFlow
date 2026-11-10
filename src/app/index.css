@@ -3,23 +3,24 @@
 @tailwind utilities;
 
 :root {
-  /* Obsidian Minimal Default Tokens (15 Design Tokens per PRD FR-24) */
-  --color-accent: #ffffff;
+  /* Nebula (default theme) tokens, so the first paint already matches (15 Design Tokens per PRD FR-24) */
+  --color-accent: #c4b5fd;
   --color-accent-contrast: #000000;
-  --capsule-bg: rgba(0, 0, 0, 0.35);
-  --capsule-opacity: 0.35;
-  --panel-bg: rgba(0, 0, 0, 0.8);
+  --capsule-bg: rgba(11, 6, 24, 0.55);
+  --capsule-opacity: 0.55;
+  --panel-bg: rgba(11, 6, 24, 0.8);
   --capsule-blur: 24px;
   --capsule-radius: 24px;
   --capsule-border-width: 1px;
-  --capsule-border-color: rgba(255, 255, 255, 0.1);
+  --capsule-border-color: rgba(196, 181, 253, 0.25);
+  --clock-glow: 0 0 3.5px #c4b5fd, 0 0 9.0px #c4b5fd;
   --font-clock: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --clock-scale: 100%;
   --clock-weight: 600;
-  --bg-dim: 20%;
+  --bg-dim: 10%;
   --bg-blur: 0px;
   --bg-brightness: 100%;
-  --bg-solid-color: #09090b;
+  --bg-solid-color: #05030f;
 }
 
 body {

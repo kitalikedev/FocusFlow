@@ -1,5 +1,5 @@
 import type { ThemeConfig, ThemeTokens } from '@/shared/types/contracts';
-import { OBSIDIAN_MINIMAL_CONFIG, OBSIDIAN_MINIMAL_TOKENS } from '@/core/theme/presets';
+import { NEBULA_CONFIG, OBSIDIAN_MINIMAL_CONFIG, OBSIDIAN_MINIMAL_TOKENS } from '@/core/theme/presets';
 import { accentContrastColor } from './contrast';
 import { FONT_OPTIONS } from './fonts';
 
@@ -29,6 +29,7 @@ function preset(
 
 /** The six FocusFlow presets of PRD FR-27 (AC-27.1). */
 export const THEME_PRESETS: ThemePreset[] = [
+  { id: 'nebula', name: 'Nebula', config: NEBULA_CONFIG },
   { id: 'obsidian-minimal', name: 'Obsidian Minimal', config: OBSIDIAN_MINIMAL_CONFIG },
   preset(
     'tokyo-fog',

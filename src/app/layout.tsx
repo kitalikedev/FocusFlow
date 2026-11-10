@@ -43,8 +43,8 @@ export const Layout: React.FC = () => {
         {/* Top: brand, today's sessions, streak, sync and account */}
         <HudSlot />
 
-        {/* Top right, under the HUD: random quote (hidden unless the user turns it on) */}
-        <div className="pointer-events-none absolute right-6 top-16 z-10 max-w-xs text-right max-sm:right-4 max-sm:top-14 max-sm:max-w-[60vw]">
+        {/* Top right, under the HUD: random quotes as end credits (hidden unless the user turns them on); above the clock so a quote passing over it stays readable on small screens */}
+        <div className="pointer-events-none absolute right-6 top-16 z-30 max-w-xs text-right max-sm:right-4 max-sm:top-14 max-sm:max-w-[60vw]">
           <QuoteSlot />
         </div>
 
