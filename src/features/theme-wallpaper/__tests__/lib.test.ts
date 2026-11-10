@@ -74,8 +74,9 @@ describe('catalog, presets and fonts', () => {
     expect(solidLuminance('bad')).toBe(0);
   });
 
-  it('ships the six PRD presets, each pointing to an existing wallpaper and font', () => {
-    expect(THEME_PRESETS.slice(0, 6).map((preset) => preset.name)).toEqual([
+  it('starts with the default Nebula theme, then the six PRD presets, each pointing to an existing wallpaper and font', () => {
+    expect(THEME_PRESETS[0].name).toBe('Nebula');
+    expect(THEME_PRESETS.slice(1, 7).map((preset) => preset.name)).toEqual([
       'Obsidian Minimal',
       'Tokyo Fog',
       'Midnight Indigo',

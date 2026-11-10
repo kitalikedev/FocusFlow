@@ -9,7 +9,7 @@ import {
 } from '@/shared/lib/__mocks__/supabase';
 import { AppError } from '@/shared/lib/errors';
 import { ThemeLimitError } from '@/shared/types/contracts';
-import { OBSIDIAN_MINIMAL_CONFIG } from '@/core/theme/presets';
+import { DEFAULT_THEME_CONFIG, OBSIDIAN_MINIMAL_CONFIG } from '@/core/theme/presets';
 import { SupabaseRepository } from '../SupabaseRepository';
 
 vi.mock('@/shared/lib/supabase');
@@ -412,7 +412,7 @@ describe('SupabaseRepository', () => {
       const builder = createMockQueryBuilder({ data: [themeRow] });
       queue(builder);
       const themes = await repo.getSavedThemes();
-      expect(themes[0].config).toBe(OBSIDIAN_MINIMAL_CONFIG);
+      expect(themes[0].config).toBe(DEFAULT_THEME_CONFIG);
       expect(builder.order).toHaveBeenCalledWith('created_at', { ascending: true });
 
       queue(createMockQueryBuilder({ data: null }));

@@ -78,12 +78,16 @@ export const WALLPAPER_CATALOG: CatalogWallpaper[] = [
   gradient('gradient-cotton', 'Cotton', 135, ['#c7d2fe', '#fbcfe8', '#e0f2fe']),
   gradient('gradient-lavender', 'Lavender', 160, ['#ede9fe', '#c4b5fd', '#a5b4fc']),
   gradient('gradient-mint', 'Mint', 160, ['#ecfdf5', '#a7f3d0', '#5eead4']),
-  layered(
-    'abstract-nebula',
-    'Nebula',
-    'radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.55), transparent 45%), radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.5), transparent 50%), radial-gradient(circle at 50% 100%, rgba(236, 72, 153, 0.35), transparent 55%), #05030f',
-    ['#05030f', '#05030f', '#7c3aed', '#2563eb'],
-  ),
+  {
+    // The default wallpaper: slowly drifting violet and blue clouds (GPU transform, see wallpapers.css).
+    ...layered(
+      'abstract-nebula',
+      'Nebula',
+      'radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.55), transparent 45%), radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.5), transparent 50%), radial-gradient(circle at 50% 100%, rgba(236, 72, 153, 0.35), transparent 55%), #05030f',
+      ['#05030f', '#05030f', '#7c3aed', '#2563eb'],
+    ),
+    animationClass: 'ff-wallpaper-drift',
+  },
   layered(
     'abstract-dusk',
     'Dusk Mesh',

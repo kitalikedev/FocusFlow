@@ -1,5 +1,5 @@
 import { ThemeConfig, ThemeTokens, UserSettings } from '@/shared/types/contracts';
-import { OBSIDIAN_MINIMAL_CONFIG, OBSIDIAN_MINIMAL_TOKENS } from '@/core/theme/presets';
+import { DEFAULT_THEME_CONFIG, DEFAULT_THEME_TOKENS } from '@/core/theme/presets';
 
 /** Limits enforced by the database (ERD) or chosen for Guest Mode so migration never exceeds them. */
 export const LIMITS = {
@@ -55,7 +55,7 @@ function pickString(value: unknown, fallback: string): string {
   return typeof value === 'string' && value.length > 0 ? value : fallback;
 }
 
-/** Creates the default settings object (Obsidian Minimal, 25/5/15, preset wallpaper). */
+/** Creates the default settings object (Nebula theme, 25/5/15, preset wallpaper). */
 export function createDefaultSettings(): UserSettings {
   return {
     timerDurations: { focus: 1500, shortBreak: 300, longBreak: 900 },
@@ -67,40 +67,44 @@ export function createDefaultSettings(): UserSettings {
     autoStartFocus: false,
     longBreakInterval: 4,
     isMigrated: false,
-    activeTheme: OBSIDIAN_MINIMAL_CONFIG,
+    activeTheme: DEFAULT_THEME_CONFIG,
     updatedAt: new Date().toISOString(),
   };
 }
 
 /**
  * Whitelist-based theme parsing: only known token keys with the correct primitive type are accepted,
- * everything else falls back to Obsidian Minimal (also guards imported or tampered data).
+ * everything else falls back to the default theme (also guards imported or tampered data).
  */
 export function parseThemeConfig(raw: unknown): ThemeConfig {
   // `{}` is the database default and means "use the default theme".
-  if (!isRecord(raw) || Object.keys(raw).length === 0) return OBSIDIAN_MINIMAL_CONFIG;
+  if (!isRecord(raw) || Object.keys(raw).length === 0) return DEFAULT_THEME_CONFIG;
 
-  const tokens: ThemeTokens = { ...OBSIDIAN_MINIMAL_TOKENS };
+  const tokens: ThemeTokens = { ...DEFAULT_THEME_TOKENS };
   const rawTokens = isRecord(raw.tokens) ? raw.tokens : {};
-  for (const key of Object.keys(OBSIDIAN_MINIMAL_TOKENS) as (keyof ThemeTokens)[]) {
+  for (const key of Object.keys(DEFAULT_THEME_TOKENS) as (keyof ThemeTokens)[]) {
     const candidate = rawTokens[key];
-    if (typeof candidate === typeof OBSIDIAN_MINIMAL_TOKENS[key]) {
+    if (typeof candidate === typeof DEFAULT_THEME_TOKENS[key]) {
       if (typeof candidate === 'number' && !Number.isFinite(candidate)) continue;
       (tokens as unknown as Record<string, unknown>)[key] = candidate;
     }
   }
 
   const rawEffects = isRecord(raw.effects) ? raw.effects : {};
-  const effects = { ...OBSIDIAN_MINIMAL_CONFIG.effects };
+  const effects = { ...DEFAULT_THEME_CONFIG.effects };
   for (const key of Object.keys(effects) as (keyof typeof effects)[]) {
     effects[key] = clampInt(rawEffects[key], 0, 100, effects[key]);
   }
 
   const rawWallpaper = isRecord(raw.wallpaperRef) ? raw.wallpaperRef : {};
-  const wallpaperRef = {
-    type: pickOne(rawWallpaper.type, ['preset', 'custom', 'solid'] as const, 'solid'),
-    idOrColor: pickString(rawWallpaper.idOrColor, OBSIDIAN_MINIMAL_CONFIG.wallpaperRef.idOrColor),
-  };
+  // A wallpaper reference only makes sense as a pair: if either half is unusable, use the default pair
+  // (never a mix such as type "solid" with a preset id).
+  const wallpaperType = (['preset', 'custom', 'solid'] as const).find((type) => type === rawWallpaper.type);
+  const wallpaperValue = pickString(rawWallpaper.idOrColor, '');
+  const wallpaperRef =
+    wallpaperType && wallpaperValue
+      ? { type: wallpaperType, idOrColor: wallpaperValue }
+      : { ...DEFAULT_THEME_CONFIG.wallpaperRef };
 
   return {
     presetId: typeof raw.presetId === 'string' ? raw.presetId : undefined,

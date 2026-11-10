@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { EffectsConfig, ThemeConfig, ThemeTokens } from '@/shared/types/contracts';
-import { OBSIDIAN_MINIMAL_CONFIG, OBSIDIAN_MINIMAL_TOKENS } from './presets';
+import { DEFAULT_THEME_CONFIG, DEFAULT_THEME_TOKENS } from './presets';
 import { applyTheme } from './applyTheme';
 
 export interface ThemeStoreState {
@@ -15,8 +15,8 @@ export interface ThemeStoreState {
 }
 
 export const useThemeStore = create<ThemeStoreState>((set, get) => ({
-  tokens: OBSIDIAN_MINIMAL_TOKENS,
-  config: OBSIDIAN_MINIMAL_CONFIG,
+  tokens: DEFAULT_THEME_TOKENS,
+  config: DEFAULT_THEME_CONFIG,
 
   setTokens: (partial: Partial<ThemeTokens>) => {
     const updatedTokens = { ...get().tokens, ...partial };
@@ -45,10 +45,10 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
     set((state) => ({ config: { ...state.config, wallpaperRef } })),
 
   resetTheme: () => {
-    applyTheme(OBSIDIAN_MINIMAL_TOKENS, OBSIDIAN_MINIMAL_CONFIG.effects);
+    applyTheme(DEFAULT_THEME_TOKENS, DEFAULT_THEME_CONFIG.effects);
     set({
-      tokens: OBSIDIAN_MINIMAL_TOKENS,
-      config: OBSIDIAN_MINIMAL_CONFIG,
+      tokens: DEFAULT_THEME_TOKENS,
+      config: DEFAULT_THEME_CONFIG,
     });
   },
 }));
