@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { InternalClockProps } from '@/shared/types/contracts';
 import { formatClock } from '../lib/formatClock';
-import { REDUCED_MOTION_QUERY, useMediaQuery } from '../hooks/useMediaQuery';
+import { REDUCED_MOTION_QUERY, useMediaQuery } from '@/core/ui/useMediaQuery';
 import { CLOCK_SCALE_STYLE, CLOCK_TEXT_STYLE } from './clockText';
 import './retroFlip.css';
 

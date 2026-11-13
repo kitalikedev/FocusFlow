@@ -15,5 +15,3 @@ export const CSS_VARIABLE_MAP = {
   bgBrightness: '--bg-brightness',
   bgSolidColor: '--bg-solid-color',
 } as const;
-
-export type ThemeCssVariable = (typeof CSS_VARIABLE_MAP)[keyof typeof CSS_VARIABLE_MAP];

@@ -3,7 +3,7 @@ import { Pause, Play, RotateCcw, Settings2, SkipForward } from 'lucide-react';
 import { useTimerStore } from '@/core/timer/useTimerStore';
 import { useUiStore } from '@/core/ui/useUiStore';
 import { useClockPreferences } from '../hooks/useClockPreferences';
-import { NARROW_SCREEN_QUERY, useMediaQuery } from '../hooks/useMediaQuery';
+import { NARROW_SCREEN_QUERY, useMediaQuery } from '@/core/ui/useMediaQuery';
 import { CONTROL_BUTTON_CLASS, MODE_TABS, SESSION_LABELS } from '../lib/labels';
 import { ClockFace } from './ClockFace';
 import { CycleDots } from './CycleDots';
