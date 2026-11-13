@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import { FLIP_DURATION_MS, RetroFlipClock } from '../components/RetroFlipClock';
-import { REDUCED_MOTION_QUERY } from '../hooks/useMediaQuery';
+import { REDUCED_MOTION_QUERY } from '@/core/ui/useMediaQuery';
 import { mockMediaQueries } from './testUtils';
 
 beforeEach(() => {

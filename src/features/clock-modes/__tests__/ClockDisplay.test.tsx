@@ -15,7 +15,7 @@ import { useSettingsStore } from '@/core/data/useSettingsStore';
 import { useTimerStore } from '@/core/timer/useTimerStore';
 import { useUiStore } from '@/core/ui/useUiStore';
 import { ClockDisplay, ClockSettingsPopover } from '../index';
-import { NARROW_SCREEN_QUERY } from '../hooks/useMediaQuery';
+import { NARROW_SCREEN_QUERY } from '@/core/ui/useMediaQuery';
 import { mockMediaQueries, resetStores } from './testUtils';
 
 function setPreferences(patch: Record<string, string>) {

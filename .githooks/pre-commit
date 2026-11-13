@@ -1,0 +1,4 @@
+#!/bin/sh
+# Blocks commits that contain .env files or secrets (see scripts/check-secrets.mjs).
+# Enabled automatically by `npm install` through the "prepare" script.
+node scripts/check-secrets.mjs --staged
