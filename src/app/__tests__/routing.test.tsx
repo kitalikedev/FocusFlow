@@ -21,7 +21,7 @@ vi.mock('../slots', () => {
     ControlBarSlot: stub('control-bar'),
     SoundPanelSlot: stub('sound-panel'),
     ToolPanelsSlot: stub('tool-panels'),
-    TasksPageSlot: stub('tasks-page'),
+    ThemesPageSlot: stub('themes-page'),
     AnalyticsPageSlot: stub('analytics-page'),
     QuoteSlot: stub('quotes'),
   };
@@ -54,12 +54,17 @@ describe('website pages', () => {
   });
 
   it.each([
-    ['/tasks', 'tasks-page'],
+    ['/themes', 'themes-page'],
     ['/analytics', 'analytics-page'],
   ])('shows the page for %s inside the website frame', async (path, testId) => {
     renderAt(path);
     expect(await screen.findByTestId(testId)).toBeInTheDocument();
     expect(screen.getByTestId('site-layout')).toBeInTheDocument();
+  });
+
+  it('has no separate Tasks page: tasks live in the workspace, so the old address goes home', async () => {
+    renderAt('/tasks');
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
   });
 
   it('shows the Tracking page as coming soon', async () => {
@@ -83,16 +88,16 @@ describe('website pages', () => {
   });
 
   it('has the page links next to the brand and marks the current page', async () => {
-    renderAt('/tasks');
-    await screen.findByTestId('tasks-page');
+    renderAt('/tracking');
+    await screen.findByTestId('tracking-page');
     const nav = screen.getByRole('navigation', { name: 'Pages' });
     expect(within(nav).getAllByRole('link').map((link) => link.textContent)).toEqual([
-      'Tasks',
+      'Themes',
       'Analytics',
       'Tracking',
       'About',
     ]);
-    expect(nav.querySelector('[aria-current="page"]')).toHaveTextContent('Tasks');
+    expect(nav.querySelector('[aria-current="page"]')).toHaveTextContent('Tracking');
   });
 
   it('navigates between the pages and back home through the brand', async () => {
@@ -123,7 +128,7 @@ describe('menu for small screens', () => {
     expect(button).toHaveAttribute('aria-expanded', 'true');
     // The four pages plus the "Open FocusFlow" button that only the menu shows on phones.
     expect(within(screen.getByTestId('site-menu')).getAllByRole('link').map((link) => link.textContent)).toEqual([
-      'Tasks',
+      'Themes',
       'Analytics',
       'Tracking',
       'About',
@@ -168,8 +173,8 @@ describe('workspace at /app', () => {
   });
 
   it('keeps the workspace mounted while a website page is shown so the timer and sounds keep going', async () => {
-    renderAt('/tasks');
-    await screen.findByTestId('tasks-page');
+    renderAt('/analytics');
+    await screen.findByTestId('analytics-page');
     const shell = screen.getByTestId('app-shell');
     expect(shell).toHaveAttribute('hidden');
     expect(within(shell).getByTestId('control-bar')).toBeInTheDocument();

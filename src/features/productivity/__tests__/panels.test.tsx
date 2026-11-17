@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { AnalyticsPage, FocusIntent, TasksPage, ToolPanels } from '../index';
+import { AnalyticsPage, FocusIntent, ToolPanels } from '../index';
 import { INTENT_DRAFT_KEY, readIntentDraft } from '../components/FocusIntent';
 import { useTasksStore } from '../store/useTasksStore';
 import { NOTE_SAVE_DELAY_MS, useNoteStore } from '../store/useNoteStore';
@@ -182,20 +182,6 @@ describe('FocusIntent (FR-29)', () => {
     expect(screen.getByText(/No open tasks/)).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-  });
-});
-
-describe('TasksPage (FR-19)', () => {
-  it('shows the page title, adds a task and lists it with the open count', async () => {
-    render(<TasksPage />);
-    expect(screen.getByRole('heading', { level: 1, name: 'Tasks' })).toBeInTheDocument();
-    await screen.findByLabelText('New task');
-    expect(screen.getByText(/^0 open/)).toBeInTheDocument();
-
-    await addTask('Write the report');
-    expect(screen.getByTestId('task-title')).toHaveTextContent('Write the report');
-    expect(screen.getByText(/^1 open/)).toBeInTheDocument();
-    expect(document.title).toBe('Tasks · FocusFlow');
   });
 });
 

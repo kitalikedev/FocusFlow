@@ -18,7 +18,7 @@ import {
   ControlBarSlot,
   SoundPanelSlot,
   ToolPanelsSlot,
-  TasksPageSlot,
+  ThemesPageSlot,
   AnalyticsPageSlot,
   QuoteSlot,
 } from './slots';
@@ -104,7 +104,7 @@ export const Layout: React.FC = () => {
         <Routes>
           <Route element={<SiteLayout />}>
             <Route index element={<HomePage />} />
-            <Route path="tasks" element={<TasksPageSlot />} />
+            <Route path="themes" element={<ThemesPageSlot />} />
             <Route path="analytics" element={<AnalyticsPageSlot />} />
             <Route path="tracking" element={<TrackingPage />} />
             <Route path="about" element={<AboutPage />} />

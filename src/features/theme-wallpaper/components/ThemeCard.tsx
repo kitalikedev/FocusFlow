@@ -8,25 +8,21 @@ import { backgroundFor } from './WallpaperLayer';
 interface ThemeCardProps {
   name: string;
   config: ThemeConfig;
-  isActive: boolean;
-  onSelect: () => void;
+  isActive?: boolean;
+  /** Without it the card is a plain preview that cannot be clicked (used by the Themes page). */
+  onSelect?: () => void;
   testId?: string;
 }
 
 /** Thumbnail of a whole theme: its wallpaper with a mini capsule in its accent and font (AC-13.1 ring). */
-export const ThemeCard: React.FC<ThemeCardProps> = ({ name, config, isActive, onSelect, testId }) => {
+export const ThemeCard: React.FC<ThemeCardProps> = ({ name, config, isActive = false, onSelect, testId }) => {
   const customs = useThemeLibraryStore((state) => state.customWallpapers);
   const background = backgroundFor(config.wallpaperRef, customs, config.tokens.bgSolidColor, false);
   const { tokens } = config;
+  const className = 'group flex flex-col gap-1.5 text-left transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none';
 
-  return (
-    <button
-      type="button"
-      data-testid={testId}
-      aria-pressed={isActive}
-      onClick={onSelect}
-      className="group flex flex-col gap-1.5 text-left transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-none"
-    >
+  const content = (
+    <>
       <span
         className={`relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl transition ${
           isActive ? 'ring-2 ring-white' : 'ring-1 ring-white/10 group-hover:ring-white/40 group-focus-visible:ring-white/60'
@@ -54,6 +50,20 @@ export const ThemeCard: React.FC<ThemeCardProps> = ({ name, config, isActive, on
         )}
       </span>
       <span className="truncate text-xs text-white/80">{name}</span>
+    </>
+  );
+
+  if (!onSelect) {
+    return (
+      <div data-testid={testId} className="flex flex-col gap-1.5 text-left">
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <button type="button" data-testid={testId} aria-pressed={isActive} onClick={onSelect} className={className}>
+      {content}
     </button>
   );
 };

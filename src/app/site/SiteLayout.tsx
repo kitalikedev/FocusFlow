@@ -4,7 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { OpenAppButton } from './OpenAppButton';
 
 const SITE_LINKS = [
-  { to: '/tasks', label: 'Tasks' },
+  { to: '/themes', label: 'Themes' },
   { to: '/analytics', label: 'Analytics' },
   { to: '/tracking', label: 'Tracking' },
   { to: '/about', label: 'About' },
