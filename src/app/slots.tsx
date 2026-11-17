@@ -7,13 +7,13 @@ import {
   EffectsLayer as ThemeEffectsLayer,
   WallpaperPickerModal as ThemeWallpaperPickerModal,
   ThemeCustomizerModal as ThemeThemeCustomizerModal,
+  ThemesPage as ThemeThemesPage,
 } from '@/features/theme-wallpaper';
 import { ControlBar as AudioControlBar, SoundPanel as AudioSoundPanel } from '@/features/audio';
 import { QuoteDisplay as QuotesDisplay } from '@/features/quotes';
 import {
   FocusIntent as ProductivityFocusIntent,
   ToolPanels as ProductivityToolPanels,
-  TasksPage as ProductivityTasksPage,
   AnalyticsPage as ProductivityAnalyticsPage,
 } from '@/features/productivity';
 
@@ -124,9 +124,9 @@ export const ToolPanelsSlot: React.FC = () => (
   </SlotErrorBoundary>
 );
 
-export const TasksPageSlot: React.FC = () => (
+export const ThemesPageSlot: React.FC = () => (
   <SlotErrorBoundary>
-    <ProductivityTasksPage />
+    <ThemeThemesPage />
   </SlotErrorBoundary>
 );
 
