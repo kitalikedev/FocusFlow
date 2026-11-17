@@ -8,9 +8,12 @@ describe('Application Smoke Test', () => {
     // CI and fresh clones have no .env.local: the app must still start as a guest.
     vi.stubEnv('VITE_SUPABASE_URL', '');
     vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', '');
+    // The workspace lives at /app.
+    window.history.pushState({}, '', '/app');
   });
   afterEach(() => {
     vi.unstubAllEnvs();
+    window.history.pushState({}, '', '/');
   });
 
   it('renders App shell, Frosted Glass Capsule, default time 25:00, and HUD', async () => {
@@ -18,7 +21,7 @@ describe('Application Smoke Test', () => {
       render(<App />);
     });
 
-    expect(screen.getByText('FocusFlow')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'FocusFlow' })).toHaveAttribute('href', '/');
     expect(screen.getByTestId('clock-capsule')).toBeInTheDocument();
     expect(screen.getByTestId('clock-time')).toHaveTextContent('25:00');
     expect(screen.getByTestId('control-bar')).toBeInTheDocument();

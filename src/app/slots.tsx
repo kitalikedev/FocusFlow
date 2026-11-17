@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { HudSlot as CoreHudSlot } from '@/core/hud/HudSlot';
 import { ClockDisplay, ClockSettingsPopover } from '@/features/clock-modes';
 import {
@@ -61,7 +62,17 @@ export const EffectsLayerSlot: React.FC = () => (
 
 export const HudSlot: React.FC = () => (
   <SlotErrorBoundary>
-    <CoreHudSlot />
+    <CoreHudSlot
+      brand={
+        <Link
+          to="/"
+          title="Back to the FocusFlow website"
+          className="rounded-lg text-sm font-semibold tracking-wider opacity-90 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+        >
+          FocusFlow
+        </Link>
+      }
+    />
   </SlotErrorBoundary>
 );
 

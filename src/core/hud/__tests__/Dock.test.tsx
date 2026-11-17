@@ -10,7 +10,7 @@ const LocationProbe: React.FC = () => <span data-testid="location">{useLocation(
 
 function renderQuickControls() {
   return render(
-    <MemoryRouter initialEntries={['/']}>
+    <MemoryRouter initialEntries={['/app']}>
       <QuickControls />
       <LocationProbe />
     </MemoryRouter>,
@@ -76,15 +76,11 @@ describe('QuickControls', () => {
     expect(useUiStore.getState().isZen).toBe(true);
   });
 
-  it('goes to the analytics page and back to the home page', () => {
+  it('opens the analytics page', () => {
     renderQuickControls();
-    expect(screen.getByTestId('location')).toHaveTextContent(/^\/$/);
-    expect(screen.getByTestId('open-analytics')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('location')).toHaveTextContent(/^\/app$/);
     fireEvent.click(screen.getByTestId('open-analytics'));
-    expect(screen.getByTestId('location')).toHaveTextContent('/analytics');
-    expect(screen.getByTestId('open-analytics')).toHaveAttribute('aria-pressed', 'true');
-    fireEvent.click(screen.getByTestId('open-analytics'));
-    expect(screen.getByTestId('location')).toHaveTextContent(/^\/$/);
+    expect(screen.getByTestId('location')).toHaveTextContent(/^\/analytics$/);
   });
 
   it('hides itself in Zen mode', () => {

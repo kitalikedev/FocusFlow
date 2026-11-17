@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // The slots pull in every feature (audio, wallpapers...); the routing test only needs a marker for each.
@@ -29,7 +29,6 @@ vi.mock('../slots', () => {
 
 import { Layout } from '../layout';
 import { useAuthStore } from '@/core/auth/useAuthStore';
-import { useUiStore } from '@/core/ui/useUiStore';
 
 function renderAt(path: string) {
   return render(
@@ -42,69 +41,138 @@ function renderAt(path: string) {
 beforeEach(() => {
   cleanup();
   useAuthStore.setState({ isAuthModalOpen: false, mergePrompt: 'hidden' });
-  useUiStore.setState({ isZen: false });
 });
 
-describe('pages and navigation', () => {
-  it('shows the clock on the home page and no other page', () => {
+describe('website pages', () => {
+  it('shows the home page with a way into the workspace', async () => {
     renderAt('/');
-    expect(screen.getByTestId('clock')).toBeInTheDocument();
-    expect(screen.queryByTestId('tasks-page')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('analytics-page')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'A calm place to get more done' })).toBeInTheDocument();
+    const [open] = screen.getAllByRole('link', { name: /Open FocusFlow/ });
+    expect(open).toHaveAttribute('href', '/app');
+    expect(screen.getByTestId('app-shell')).toHaveAttribute('hidden');
     expect(document.title).toBe('FocusFlow');
   });
 
   it.each([
     ['/tasks', 'tasks-page'],
     ['/analytics', 'analytics-page'],
-  ])('shows the page for %s instead of the clock', (path, testId) => {
+  ])('shows the page for %s inside the website frame', async (path, testId) => {
     renderAt(path);
-    expect(screen.getByTestId(testId)).toBeInTheDocument();
-    expect(screen.queryByTestId('clock')).not.toBeInTheDocument();
+    expect(await screen.findByTestId(testId)).toBeInTheDocument();
+    expect(screen.getByTestId('site-layout')).toBeInTheDocument();
+  });
+
+  it('shows the Tracking page as coming soon', async () => {
+    renderAt('/tracking');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Tracking' })).toBeInTheDocument();
+    expect(screen.getByTestId('coming-soon')).toHaveTextContent('Coming soon');
+    expect(document.title).toBe('Tracking · FocusFlow');
   });
 
   it('shows the About page with the team and a contact link', async () => {
     renderAt('/about');
     expect(await screen.findByRole('heading', { level: 1, name: 'About FocusFlow' })).toBeInTheDocument();
     expect(screen.getByText('Đàm Huỳnh Hoài Nam')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /GitHub/ })).toHaveAttribute('href', 'https://github.com/kitalikedev/FocusFlow/issues');
+    expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/kitalikedev/FocusFlow/issues');
     expect(document.title).toBe('About FocusFlow · FocusFlow');
   });
 
-  it('sends unknown addresses back to the home page', () => {
+  it('sends unknown addresses back to the home page', async () => {
     renderAt('/does-not-exist');
-    expect(screen.getByTestId('clock')).toBeInTheDocument();
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
   });
 
-  it('keeps the docks and sounds mounted on every page so nothing stops while navigating', () => {
+  it('has the page links next to the brand and marks the current page', async () => {
     renderAt('/tasks');
-    expect(screen.getByTestId('tool-dock')).toBeInTheDocument();
-    expect(screen.getByTestId('control-bar')).toBeInTheDocument();
-    expect(screen.getByTestId('sound-panel')).toBeInTheDocument();
+    await screen.findByTestId('tasks-page');
+    const nav = screen.getByRole('navigation', { name: 'Pages' });
+    expect(within(nav).getAllByRole('link').map((link) => link.textContent)).toEqual([
+      'Tasks',
+      'Analytics',
+      'Tracking',
+      'About',
+    ]);
+    expect(nav.querySelector('[aria-current="page"]')).toHaveTextContent('Tasks');
   });
 
-  it('navigates with the page links and marks the current page', async () => {
+  it('navigates between the pages and back home through the brand', async () => {
     renderAt('/');
+    await screen.findByTestId('home-page');
     const nav = screen.getByRole('navigation', { name: 'Pages' });
-    expect(nav.querySelector('[aria-current="page"]')).toHaveTextContent('Workspace');
 
-    fireEvent.click(screen.getByRole('link', { name: 'Tasks' }));
-    expect(screen.getByTestId('tasks-page')).toBeInTheDocument();
-    expect(nav.querySelector('[aria-current="page"]')).toHaveTextContent('Tasks');
+    fireEvent.click(within(nav).getByRole('link', { name: 'Analytics' }));
+    expect(await screen.findByTestId('analytics-page')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('link', { name: 'Analytics' }));
-    expect(screen.getByTestId('analytics-page')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('link', { name: 'About' }));
+    fireEvent.click(within(nav).getByRole('link', { name: 'About' }));
     expect(await screen.findByTestId('about-page')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('link', { name: 'Workspace' }));
-    expect(screen.getByTestId('clock')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('link', { name: 'FocusFlow' }));
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
+  });
+});
+
+describe('menu for small screens', () => {
+  it('opens and closes with the menu button', async () => {
+    renderAt('/');
+    await screen.findByTestId('home-page');
+    const button = screen.getByTestId('site-menu-btn');
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByTestId('site-menu')).not.toBeInTheDocument();
+
+    fireEvent.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+    // The four pages plus the "Open FocusFlow" button that only the menu shows on phones.
+    expect(within(screen.getByTestId('site-menu')).getAllByRole('link').map((link) => link.textContent)).toEqual([
+      'Tasks',
+      'Analytics',
+      'Tracking',
+      'About',
+      'Open FocusFlow',
+    ]);
+
+    fireEvent.click(button);
+    expect(screen.queryByTestId('site-menu')).not.toBeInTheDocument();
   });
 
-  it('hides the navigation in Zen mode', () => {
-    useUiStore.setState({ isZen: true });
+  it('closes with Escape and after choosing a page', async () => {
     renderAt('/');
-    expect(screen.queryByTestId('page-nav')).not.toBeInTheDocument();
+    await screen.findByTestId('home-page');
+    fireEvent.click(screen.getByTestId('site-menu-btn'));
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(screen.queryByTestId('site-menu')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('site-menu-btn'));
+    fireEvent.click(within(screen.getByTestId('site-menu')).getByRole('link', { name: 'Tracking' }));
+    expect(await screen.findByTestId('tracking-page')).toBeInTheDocument();
+    expect(screen.queryByTestId('site-menu')).not.toBeInTheDocument();
+  });
+
+  it('closes when clicking outside the header', async () => {
+    renderAt('/');
+    await screen.findByTestId('home-page');
+    fireEvent.click(screen.getByTestId('site-menu-btn'));
+    fireEvent.pointerDown(screen.getByTestId('home-page'));
+    expect(screen.queryByTestId('site-menu')).not.toBeInTheDocument();
+  });
+});
+
+describe('workspace at /app', () => {
+  it('shows the workspace and no website frame', () => {
+    renderAt('/app');
+    const shell = screen.getByTestId('app-shell');
+    expect(shell).not.toHaveAttribute('hidden');
+    expect(within(shell).getByTestId('clock')).toBeInTheDocument();
+    expect(within(shell).getByTestId('tool-dock')).toBeInTheDocument();
+    expect(screen.queryByTestId('site-layout')).not.toBeInTheDocument();
+    expect(document.title).toBe('Workspace · FocusFlow');
+  });
+
+  it('keeps the workspace mounted while a website page is shown so the timer and sounds keep going', async () => {
+    renderAt('/tasks');
+    await screen.findByTestId('tasks-page');
+    const shell = screen.getByTestId('app-shell');
+    expect(shell).toHaveAttribute('hidden');
+    expect(within(shell).getByTestId('control-bar')).toBeInTheDocument();
+    expect(within(shell).getByTestId('sound-panel')).toBeInTheDocument();
   });
 });
