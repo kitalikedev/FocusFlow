@@ -10,7 +10,6 @@ describe('useUiStore', () => {
       isWallpaperPickerOpen: false,
       isThemeCustomizerOpen: false,
       isClockSettingsOpen: false,
-      isAnalyticsOpen: false,
     });
   });
 
@@ -82,14 +81,13 @@ describe('useUiStore', () => {
     useUiStore.getState().setWallpaperPickerOpen(true);
     useUiStore.getState().setThemeCustomizerOpen(true);
     useUiStore.getState().setClockSettingsOpen(true);
-    useUiStore.getState().setAnalyticsOpen(true);
 
     const state = useUiStore.getState();
-    expect([state.isMixerOpen, state.isWallpaperPickerOpen, state.isThemeCustomizerOpen, state.isClockSettingsOpen, state.isAnalyticsOpen]).toEqual([true, true, true, true, true]);
+    expect([state.isMixerOpen, state.isWallpaperPickerOpen, state.isThemeCustomizerOpen, state.isClockSettingsOpen]).toEqual([true, true, true, true]);
 
     useUiStore.getState().setThemeCustomizerOpen(false);
     expect(useUiStore.getState().isThemeCustomizerOpen).toBe(false);
-    expect(useUiStore.getState().isAnalyticsOpen).toBe(true);
+    expect(useUiStore.getState().isClockSettingsOpen).toBe(true);
   });
 });
 

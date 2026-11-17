@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { AnalyticsModal, FocusIntent, ToolPanels } from '../index';
+import { AnalyticsPage, FocusIntent, TasksPage, ToolPanels } from '../index';
 import { INTENT_DRAFT_KEY, readIntentDraft } from '../components/FocusIntent';
 import { useTasksStore } from '../store/useTasksStore';
 import { NOTE_SAVE_DELAY_MS, useNoteStore } from '../store/useNoteStore';
@@ -14,7 +14,7 @@ import { getLocalRepository } from '@/core/data/useDataRepository';
 beforeEach(() => {
   localStorage.clear();
   useAuthStore.setState({ user: null, isGuest: true, isLoading: false });
-  useUiStore.setState({ isZen: false, isTasksOpen: false, isNoteOpen: false, isAnalyticsOpen: false });
+  useUiStore.setState({ isZen: false, isTasksOpen: false, isNoteOpen: false });
   useTasksStore.setState({ tasks: [], status: 'idle', view: DEFAULT_VIEW });
   useNoteStore.setState({ content: '', status: 'idle', isLoaded: false });
   useFocusIntentStore.setState({ intentTitle: '', taskId: null });
@@ -185,7 +185,21 @@ describe('FocusIntent (FR-29)', () => {
   });
 });
 
-describe('AnalyticsModal (FR-21)', () => {
+describe('TasksPage (FR-19)', () => {
+  it('shows the page title, adds a task and lists it with the open count', async () => {
+    render(<TasksPage />);
+    expect(screen.getByRole('heading', { level: 1, name: 'Tasks' })).toBeInTheDocument();
+    await screen.findByLabelText('New task');
+    expect(screen.getByText(/^0 open/)).toBeInTheDocument();
+
+    await addTask('Write the report');
+    expect(screen.getByTestId('task-title')).toHaveTextContent('Write the report');
+    expect(screen.getByText(/^1 open/)).toBeInTheDocument();
+    expect(document.title).toBe('Tasks · FocusFlow');
+  });
+});
+
+describe('AnalyticsPage (FR-21)', () => {
   it('shows weekly bars, streak, intents and history', async () => {
     const now = new Date();
     useFocusSessionsStore.setState({
@@ -194,9 +208,9 @@ describe('AnalyticsModal (FR-21)', () => {
         { id: '2', durationMinutes: 50, completedAt: now.toISOString() },
       ],
     });
-    useUiStore.setState({ isAnalyticsOpen: true });
-    render(<AnalyticsModal />);
+    render(<AnalyticsPage />);
 
+    expect(screen.getByRole('heading', { level: 1, name: 'Focus Analytics' })).toBeInTheDocument();
     expect(await screen.findByTestId('week-chart')).toBeInTheDocument();
     const todayIndex = (now.getDay() + 6) % 7;
     expect(screen.getByTestId(`bar-${todayIndex}`)).toHaveAttribute('data-minutes', '75');
@@ -204,8 +218,5 @@ describe('AnalyticsModal (FR-21)', () => {
     expect(screen.getByTestId('today-count')).toHaveTextContent('2 sessions');
     expect(screen.getAllByText('Thiết kế UI Tokens').length).toBeGreaterThan(0);
     expect(within(screen.getByTestId('session-history')).getAllByRole('listitem')).toHaveLength(2);
-
-    fireEvent.keyDown(window, { key: 'Escape' });
-    expect(useUiStore.getState().isAnalyticsOpen).toBe(false);
   });
 });

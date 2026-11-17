@@ -44,7 +44,8 @@ function handleKeyDown(event: KeyboardEvent): void {
   if (key === 'f') {
     const ui = useUiStore.getState();
     if (event.shiftKey) ui.toggleFullscreen();
-    else ui.toggleZen();
+    // Zen hides the navigation, so it only makes sense on the home page where the clock is.
+    else if (window.location.pathname === '/') ui.toggleZen();
     return;
   }
 

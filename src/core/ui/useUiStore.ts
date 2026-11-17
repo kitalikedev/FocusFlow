@@ -10,7 +10,6 @@ const initialState: UiState = {
   isWallpaperPickerOpen: false,
   isThemeCustomizerOpen: false,
   isClockSettingsOpen: false,
-  isAnalyticsOpen: false,
   isTasksOpen: false,
   isNoteOpen: false,
 };
@@ -40,7 +39,6 @@ export const useUiStore = create<UiStore>((set) => ({
   setWallpaperPickerOpen: (isOpen: boolean) => set({ isWallpaperPickerOpen: isOpen }),
   setThemeCustomizerOpen: (isOpen: boolean) => set({ isThemeCustomizerOpen: isOpen }),
   setClockSettingsOpen: (isOpen: boolean) => set({ isClockSettingsOpen: isOpen }),
-  setAnalyticsOpen: (isOpen: boolean) => set({ isAnalyticsOpen: isOpen }),
 
   togglePanel: (panel: ToolPanel, exclusive = false) =>
     set((state) => {
