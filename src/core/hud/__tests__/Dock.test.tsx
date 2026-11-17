@@ -1,9 +1,21 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router-dom';
 import { QuickControls, ToolDock } from '../Dock';
 import { FloatingPanel } from '../../ui/FloatingPanel';
 import { SlideOver } from '../../ui/SlideOver';
 import { useUiStore } from '../../ui/useUiStore';
+
+const LocationProbe: React.FC = () => <span data-testid="location">{useLocation().pathname}</span>;
+
+function renderQuickControls() {
+  return render(
+    <MemoryRouter initialEntries={['/']}>
+      <QuickControls />
+      <LocationProbe />
+    </MemoryRouter>,
+  );
+}
 
 function mockNarrow(isNarrow: boolean) {
   window.matchMedia = vi.fn().mockImplementation((query: string) => ({
@@ -22,7 +34,6 @@ beforeEach(() => {
     isNoteOpen: false,
     isMixerOpen: false,
     isThemeCustomizerOpen: false,
-    isAnalyticsOpen: false,
   });
 });
 afterEach(() => {
@@ -55,21 +66,30 @@ describe('ToolDock', () => {
 });
 
 describe('QuickControls', () => {
-  it('opens and closes the theme library and analytics, and enters Zen', () => {
-    render(<QuickControls />);
+  it('opens and closes the theme library and enters Zen', () => {
+    renderQuickControls();
     fireEvent.click(screen.getByTestId('open-themes'));
     expect(useUiStore.getState().isThemeCustomizerOpen).toBe(true);
     fireEvent.click(screen.getByTestId('open-themes'));
     expect(useUiStore.getState().isThemeCustomizerOpen).toBe(false);
-    fireEvent.click(screen.getByTestId('open-analytics'));
-    expect(useUiStore.getState().isAnalyticsOpen).toBe(true);
     fireEvent.click(screen.getByTestId('enter-zen'));
     expect(useUiStore.getState().isZen).toBe(true);
   });
 
+  it('goes to the analytics page and back to the home page', () => {
+    renderQuickControls();
+    expect(screen.getByTestId('location')).toHaveTextContent(/^\/$/);
+    expect(screen.getByTestId('open-analytics')).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(screen.getByTestId('open-analytics'));
+    expect(screen.getByTestId('location')).toHaveTextContent('/analytics');
+    expect(screen.getByTestId('open-analytics')).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByTestId('open-analytics'));
+    expect(screen.getByTestId('location')).toHaveTextContent(/^\/$/);
+  });
+
   it('hides itself in Zen mode', () => {
     useUiStore.setState({ isZen: true });
-    render(<QuickControls />);
+    renderQuickControls();
     expect(screen.queryByTestId('quick-controls')).not.toBeInTheDocument();
   });
 });

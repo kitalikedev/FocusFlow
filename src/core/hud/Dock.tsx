@@ -1,8 +1,11 @@
 import React from 'react';
 import { BarChart3, EyeOff, ListChecks, Music, NotebookPen, Palette } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { ToolPanel } from '@/shared/types/contracts';
 import { useUiStore } from '../ui/useUiStore';
 import { NARROW_SCREEN_QUERY, useMediaQuery } from '../ui/useMediaQuery';
+
+const ANALYTICS_PATH = '/analytics';
 
 const DOCK_STYLE: React.CSSProperties = {
   backgroundColor: 'var(--capsule-bg)',
@@ -76,14 +79,14 @@ export const ToolDock: React.FC = () => {
   );
 };
 
-/** Bottom-right quick controls: theme library, analytics and Zen (shortcut F). */
+/** Bottom-right quick controls: theme library, the analytics page and Zen (shortcut F). */
 export const QuickControls: React.FC = () => {
   const isZen = useUiStore((state) => state.isZen);
   const isThemeOpen = useUiStore((state) => state.isThemeCustomizerOpen);
-  const isAnalyticsOpen = useUiStore((state) => state.isAnalyticsOpen);
   const setThemeOpen = useUiStore((state) => state.setThemeCustomizerOpen);
-  const setAnalyticsOpen = useUiStore((state) => state.setAnalyticsOpen);
   const toggleZen = useUiStore((state) => state.toggleZen);
+  const navigate = useNavigate();
+  const isAnalyticsPage = useLocation().pathname === ANALYTICS_PATH;
 
   if (isZen) return null;
 
@@ -104,9 +107,9 @@ export const QuickControls: React.FC = () => {
       <DockButton
         label="Focus analytics"
         testId="open-analytics"
-        isActive={isAnalyticsOpen}
+        isActive={isAnalyticsPage}
         icon={<BarChart3 className="h-4 w-4" aria-hidden="true" />}
-        onClick={() => setAnalyticsOpen(!isAnalyticsOpen)}
+        onClick={() => navigate(isAnalyticsPage ? '/' : ANALYTICS_PATH)}
       />
       <DockButton
         label="Zen mode (F)"

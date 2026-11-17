@@ -10,7 +10,6 @@ export interface UiState {
   isWallpaperPickerOpen: boolean;
   isThemeCustomizerOpen: boolean;
   isClockSettingsOpen: boolean;
-  isAnalyticsOpen: boolean;
   isTasksOpen: boolean;
   isNoteOpen: boolean;
 }
@@ -25,7 +24,6 @@ export interface UiActions {
   setWallpaperPickerOpen: (isOpen: boolean) => void;
   setThemeCustomizerOpen: (isOpen: boolean) => void;
   setClockSettingsOpen: (isOpen: boolean) => void;
-  setAnalyticsOpen: (isOpen: boolean) => void;
   /** Opens or closes a dock panel; `exclusive` closes the other panels first (phones show one at a time). */
   togglePanel: (panel: ToolPanel, exclusive?: boolean) => void;
 }

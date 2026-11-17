@@ -1,7 +1,10 @@
 import React, { lazy, Suspense } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuthStore } from '@/core/auth/useAuthStore';
 import { ToastViewport } from '@/core/ui/ToastViewport';
+import { usePageTitle } from '@/core/ui/usePageTitle';
 import { QuickControls, ToolDock } from '@/core/hud/Dock';
+import { PageNav } from './PageNav';
 import {
   WallpaperLayerSlot,
   EffectsLayerSlot,
@@ -14,13 +17,15 @@ import {
   ControlBarSlot,
   SoundPanelSlot,
   ToolPanelsSlot,
-  AnalyticsSlot,
+  TasksPageSlot,
+  AnalyticsPageSlot,
   QuoteSlot,
 } from './slots';
 
-// Auth dialogs are loaded on demand so they never weigh on the initial bundle.
+// Auth dialogs and the About page are loaded on demand so they never weigh on the initial bundle.
 const AuthModal = lazy(() => import('@/core/auth/AuthModal'));
 const GuestMergeDialog = lazy(() => import('@/core/auth/GuestMergeDialog'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
 
 const AuthOverlays: React.FC = () => {
   const isAuthModalOpen = useAuthStore((state) => state.isAuthModalOpen);
@@ -34,6 +39,30 @@ const AuthOverlays: React.FC = () => {
   );
 };
 
+/** Home page: focus intent and the clock capsule in the center of the screen. */
+const WorkspacePage: React.FC = () => {
+  usePageTitle();
+
+  return (
+    <main className="relative flex flex-1 flex-col items-center justify-center px-4 pb-20">
+      <div className="z-20 flex flex-col items-center gap-6">
+        <FocusIntentSlot />
+        <div className="relative">
+          <ClockDisplaySlot />
+          <ClockSettingsSlot />
+        </div>
+      </div>
+    </main>
+  );
+};
+
+/** Scrollable area for the full pages; the bottom padding keeps the content clear of the docks. */
+const PageFrame: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <main className="relative z-20 flex-1 overflow-y-auto px-4 pb-40 pt-4">
+    <Suspense fallback={<p className="text-center text-xs text-white/60">Loading…</p>}>{children}</Suspense>
+  </main>
+);
+
 export const Layout: React.FC = () => {
   return (
     <WallpaperLayerSlot>
@@ -42,22 +71,42 @@ export const Layout: React.FC = () => {
       <div className="relative z-10 flex h-screen w-screen flex-col overflow-hidden">
         {/* Top: brand, today's sessions, streak, sync and account */}
         <HudSlot />
+        <PageNav />
 
         {/* Top right, under the HUD: random quotes as end credits (hidden unless the user turns them on); above the clock so a quote passing over it stays readable on small screens */}
-        <div className="pointer-events-none absolute right-6 top-16 z-30 max-w-xs text-right max-sm:right-4 max-sm:top-14 max-sm:max-w-[60vw]">
+        <div className="pointer-events-none absolute right-6 top-16 z-30 max-w-xs text-right max-sm:right-4 max-sm:top-28 max-sm:max-w-[60vw]">
           <QuoteSlot />
         </div>
 
-        {/* Center: focus intent and the clock capsule */}
-        <main className="relative flex flex-1 flex-col items-center justify-center px-4 pb-20">
-          <div className="z-20 flex flex-col items-center gap-6">
-            <FocusIntentSlot />
-            <div className="relative">
-              <ClockDisplaySlot />
-              <ClockSettingsSlot />
-            </div>
-          </div>
-        </main>
+        {/* Center: the page for the current address. The timer, sounds and docks stay mounted when it changes. */}
+        <Routes>
+          <Route path="/" element={<WorkspacePage />} />
+          <Route
+            path="/tasks"
+            element={
+              <PageFrame>
+                <TasksPageSlot />
+              </PageFrame>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <PageFrame>
+                <AnalyticsPageSlot />
+              </PageFrame>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <PageFrame>
+                <AboutPage />
+              </PageFrame>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
       </div>
 
       {/* Bottom: floating tools above the two docks (desktop); tools become bottom sheets on phones */}
@@ -76,7 +125,6 @@ export const Layout: React.FC = () => {
       {/* Global panels and dialogs */}
       <WallpaperPickerSlot />
       <ThemeCustomizerSlot />
-      <AnalyticsSlot />
       <AuthOverlays />
       <ToastViewport />
     </WallpaperLayerSlot>

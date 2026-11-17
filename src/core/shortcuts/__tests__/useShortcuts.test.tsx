@@ -74,6 +74,14 @@ describe('shortcuts outside text fields (AC-08.1)', () => {
     expect(useUiStore.getState().isZen).toBe(true);
   });
 
+  it('F does not enter Zen on pages other than the home page', () => {
+    window.history.pushState({}, '', '/tasks');
+    render(<Harness />);
+    press('f');
+    expect(useUiStore.getState().isZen).toBe(false);
+    window.history.pushState({}, '', '/');
+  });
+
   it('M toggles the master mute', () => {
     render(<Harness />);
     press('m');

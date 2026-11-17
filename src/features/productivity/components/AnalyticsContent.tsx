@@ -50,7 +50,7 @@ export const AnalyticsContent: React.FC = () => {
           role="img"
           aria-label={`Focus minutes from Monday to Sunday: ${week.join(', ')}`}
           viewBox={`0 0 280 ${CHART_HEIGHT + 20}`}
-          className="w-full"
+          className="mx-auto w-full max-w-md"
         >
           {week.map((minutes, index) => {
             const height = minutes === 0 ? 2 : Math.max(4, (minutes / maxDay) * CHART_HEIGHT);

@@ -12,7 +12,8 @@ import { QuoteDisplay as QuotesDisplay } from '@/features/quotes';
 import {
   FocusIntent as ProductivityFocusIntent,
   ToolPanels as ProductivityToolPanels,
-  AnalyticsModal as ProductivityAnalyticsModal,
+  TasksPage as ProductivityTasksPage,
+  AnalyticsPage as ProductivityAnalyticsPage,
 } from '@/features/productivity';
 
 interface ErrorBoundaryProps {
@@ -112,9 +113,15 @@ export const ToolPanelsSlot: React.FC = () => (
   </SlotErrorBoundary>
 );
 
-export const AnalyticsSlot: React.FC = () => (
+export const TasksPageSlot: React.FC = () => (
   <SlotErrorBoundary>
-    <ProductivityAnalyticsModal />
+    <ProductivityTasksPage />
+  </SlotErrorBoundary>
+);
+
+export const AnalyticsPageSlot: React.FC = () => (
+  <SlotErrorBoundary>
+    <ProductivityAnalyticsPage />
   </SlotErrorBoundary>
 );
 
