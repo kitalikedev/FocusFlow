@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { toggleMasterMute } from '@/shared/lib/web-audio';
 import { useTimerStore } from '@/core/timer/useTimerStore';
 import { useUiStore } from '@/core/ui/useUiStore';
+import { isOnAppPage } from '@/core/ui/routes';
 
 const TEXT_FIELD_SELECTOR = 'input, textarea, select, [contenteditable]:not([contenteditable="false"])';
 const INTERACTIVE_SELECTOR = 'button, a[href], summary, [role="button"], [role="menuitem"], [role="tab"]';
@@ -22,6 +23,8 @@ export function isTypingTarget(target: EventTarget | null): boolean {
 }
 
 function handleKeyDown(event: KeyboardEvent): void {
+  // The timer is only on screen in the workspace; the website pages keep the normal keyboard behaviour.
+  if (!isOnAppPage()) return;
   // AC-08.3: Ctrl / Cmd / Alt belong to the browser (Cmd+R reload, Ctrl+F find...).
   if (event.ctrlKey || event.metaKey || event.altKey) return;
   if (event.repeat || event.isComposing) return;
@@ -44,8 +47,7 @@ function handleKeyDown(event: KeyboardEvent): void {
   if (key === 'f') {
     const ui = useUiStore.getState();
     if (event.shiftKey) ui.toggleFullscreen();
-    // Zen hides the navigation, so it only makes sense on the home page where the clock is.
-    else if (window.location.pathname === '/') ui.toggleZen();
+    else ui.toggleZen();
     return;
   }
 

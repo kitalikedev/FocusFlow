@@ -11,7 +11,7 @@ export interface PageShellProps {
   children: React.ReactNode;
 }
 
-/** Common frame of every full page: a titled glass card on top of the wallpaper. */
+/** Common frame of the website pages: a titled glass card. */
 export const PageShell: React.FC<PageShellProps> = ({ title, description, testId, wide, children }) => {
   usePageTitle(title);
 

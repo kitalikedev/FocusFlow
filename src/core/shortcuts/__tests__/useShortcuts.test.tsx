@@ -27,6 +27,8 @@ function press(key: string, init: KeyboardEventInit = {}, target: Element | Wind
 }
 
 beforeEach(() => {
+  // The shortcuts only work in the workspace.
+  window.history.pushState({}, '', '/app');
   vi.useFakeTimers();
   vi.clearAllMocks();
   useTimerStore.getState().reset();
@@ -74,12 +76,17 @@ describe('shortcuts outside text fields (AC-08.1)', () => {
     expect(useUiStore.getState().isZen).toBe(true);
   });
 
-  it('F does not enter Zen on pages other than the home page', () => {
+  it('does nothing on the website pages, where the timer is not on screen', () => {
     window.history.pushState({}, '', '/tasks');
     render(<Harness />);
+    const space = press(' ', { code: 'Space' });
     press('f');
+    press('r');
+    press('m');
+    expect(space.defaultPrevented).toBe(false);
+    expect(useTimerStore.getState().status).toBe('idle');
     expect(useUiStore.getState().isZen).toBe(false);
-    window.history.pushState({}, '', '/');
+    expect(toggleMasterMute).not.toHaveBeenCalled();
   });
 
   it('M toggles the master mute', () => {

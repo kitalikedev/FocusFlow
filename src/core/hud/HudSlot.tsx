@@ -29,7 +29,14 @@ const SyncIndicator: React.FC<{ status: SyncStatus }> = ({ status }) => {
   );
 };
 
-export const HudSlot: React.FC = () => {
+const DEFAULT_BRAND = <span className="font-semibold tracking-wider text-sm opacity-90">FocusFlow</span>;
+
+export interface HudSlotProps {
+  /** Brand shown top left; the app shell passes a link back to the website. */
+  brand?: React.ReactNode;
+}
+
+export const HudSlot: React.FC<HudSlotProps> = ({ brand = DEFAULT_BRAND }) => {
   const {
     sessionsToday,
     streakCount,
@@ -50,9 +57,7 @@ export const HudSlot: React.FC = () => {
       className="w-full flex items-center justify-between px-6 py-4 select-none"
     >
       {/* Brand / Logo */}
-      <div className="flex items-center gap-2">
-        <span className="font-semibold tracking-wider text-sm opacity-90">FocusFlow</span>
-      </div>
+      <div className="flex items-center gap-2">{brand}</div>
 
       {/* Session counter & Streak (the cycle dots live in the clock capsule, AC-30.1) */}
       <div className="flex items-center gap-4">
