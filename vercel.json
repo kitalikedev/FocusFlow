@@ -5,7 +5,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://*.supabase.co https://noembed.com; img-src 'self' data: blob: https://*.supabase.co https://i.ytimg.com; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'self' blob:;"
+          "value": "default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com https://www.googletagmanager.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://*.supabase.co https://noembed.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.sentry.io; img-src 'self' data: blob: https://*.supabase.co https://i.ytimg.com https://*.google-analytics.com https://*.googletagmanager.com; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'self' blob:;"
         },
         {
           "key": "X-Content-Type-Options",

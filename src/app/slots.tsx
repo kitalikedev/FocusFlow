@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { captureError } from '@/shared/lib/monitoring';
 import { HudSlot as CoreHudSlot } from '@/core/hud/HudSlot';
 import { ClockDisplay, ClockSettingsPopover } from '@/features/clock-modes';
 import {
@@ -38,6 +39,7 @@ export class SlotErrorBoundary extends React.Component<ErrorBoundaryProps, Error
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     console.error('Slot Error:', error, errorInfo);
+    captureError(error, { componentStack: errorInfo.componentStack });
   }
 
   render(): React.ReactNode {
