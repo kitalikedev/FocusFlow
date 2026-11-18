@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { act, render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import { ThemesPage } from '../index';
 import { THEME_PRESETS } from '../lib/presets';
 import { useThemeLibraryStore } from '../store/useThemeLibraryStore';
@@ -18,7 +18,8 @@ describe('ThemesPage (FR-27)', () => {
     }
     expect(screen.getByText(`Built-in themes (${THEME_PRESETS.length})`)).toBeInTheDocument();
     expect(screen.getByTestId('more-themes')).toHaveTextContent('More themes coming soon');
-    expect(document.title).toBe('Themes · FocusFlow');
+    // The title is set by an effect that can run just after the page appears.
+    await waitFor(() => expect(document.title).toBe('Themes · FocusFlow'));
   });
 
   it('is preview only: the cards are not buttons', async () => {

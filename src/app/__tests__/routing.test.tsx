@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // The slots pull in every feature (audio, wallpapers...); the routing test only needs a marker for each.
@@ -50,7 +50,8 @@ describe('website pages', () => {
     const [open] = screen.getAllByRole('link', { name: /Open FocusFlow/ });
     expect(open).toHaveAttribute('href', '/app');
     expect(screen.getByTestId('app-shell')).toHaveAttribute('hidden');
-    expect(document.title).toBe('FocusFlow');
+    // Titles are set by an effect that can run just after the page appears.
+    await waitFor(() => expect(document.title).toBe('FocusFlow'));
   });
 
   it.each([
@@ -71,7 +72,7 @@ describe('website pages', () => {
     renderAt('/tracking');
     expect(await screen.findByRole('heading', { level: 1, name: 'Tracking' })).toBeInTheDocument();
     expect(screen.getByTestId('coming-soon')).toHaveTextContent('Coming soon');
-    expect(document.title).toBe('Tracking · FocusFlow');
+    await waitFor(() => expect(document.title).toBe('Tracking · FocusFlow'));
   });
 
   it('shows the About page with the team and a contact link', async () => {
@@ -79,7 +80,7 @@ describe('website pages', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'About FocusFlow' })).toBeInTheDocument();
     expect(screen.getByText('Đàm Huỳnh Hoài Nam')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/kitalikedev/FocusFlow/issues');
-    expect(document.title).toBe('About FocusFlow · FocusFlow');
+    await waitFor(() => expect(document.title).toBe('About FocusFlow · FocusFlow'));
   });
 
   it('sends unknown addresses back to the home page', async () => {
@@ -162,14 +163,14 @@ describe('menu for small screens', () => {
 });
 
 describe('workspace at /app', () => {
-  it('shows the workspace and no website frame', () => {
+  it('shows the workspace and no website frame', async () => {
     renderAt('/app');
     const shell = screen.getByTestId('app-shell');
     expect(shell).not.toHaveAttribute('hidden');
     expect(within(shell).getByTestId('clock')).toBeInTheDocument();
     expect(within(shell).getByTestId('tool-dock')).toBeInTheDocument();
     expect(screen.queryByTestId('site-layout')).not.toBeInTheDocument();
-    expect(document.title).toBe('Workspace · FocusFlow');
+    await waitFor(() => expect(document.title).toBe('Workspace · FocusFlow'));
   });
 
   it('keeps the workspace mounted while a website page is shown so the timer and sounds keep going', async () => {
