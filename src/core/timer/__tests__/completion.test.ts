@@ -2,8 +2,10 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('@/shared/lib/web-audio', () => ({ playChime: vi.fn() }));
 vi.mock('@/core/data/useDataRepository', () => ({ getDataRepository: vi.fn() }));
+vi.mock('@/shared/lib/analytics', () => ({ trackEvent: vi.fn() }));
 
 import { playChime } from '@/shared/lib/web-audio';
+import { trackEvent } from '@/shared/lib/analytics';
 import { getDataRepository } from '@/core/data/useDataRepository';
 import { useFocusSessionsStore } from '@/core/data/useFocusSessionsStore';
 import { useSyncStatusStore } from '@/core/data/useSyncStatusStore';
@@ -102,6 +104,21 @@ describe('onSessionCompleted', () => {
     onSessionCompleted({ sessionType: 'focus', sessionSeconds: 1500 });
     await vi.waitFor(() => expect(useFocusSessionsStore.getState().sessions).toEqual([record]));
     expect(recordFocusSession).toHaveBeenCalledWith(25, null, null);
+  });
+
+  it('tells analytics only the length of a saved focus session, never the goal or the task', async () => {
+    useFocusIntentStore.getState().setIntent('Secret plan', 'task-1');
+    onSessionCompleted({ sessionType: 'focus', sessionSeconds: 1500 });
+    await vi.waitFor(() => expect(trackEvent).toHaveBeenCalledTimes(1));
+    expect(trackEvent).toHaveBeenCalledWith('focus_session_completed', { minutes: 25 });
+  });
+
+  it('sends no analytics event for breaks or when saving fails', async () => {
+    onSessionCompleted({ sessionType: 'short_break', sessionSeconds: 300 });
+    recordFocusSession.mockRejectedValue(new AppError('NETWORK_DISCONNECTED'));
+    onSessionCompleted({ sessionType: 'focus', sessionSeconds: 1500 });
+    await vi.waitFor(() => expect(useToastStore.getState().toasts).toHaveLength(1));
+    expect(trackEvent).not.toHaveBeenCalled();
   });
 
   it('AC-29.2: includes the focus intent and linked task', async () => {

@@ -1,6 +1,7 @@
 import type { SessionType } from '@/shared/types/contracts';
 import { toAppError } from '@/shared/lib/errors';
 import { playChime } from '@/shared/lib/web-audio';
+import { trackEvent } from '@/shared/lib/analytics';
 import { getDataRepository } from '@/core/data/useDataRepository';
 import { useFocusSessionsStore } from '@/core/data/useFocusSessionsStore';
 import { trackWrite } from '@/core/data/useSyncStatusStore';
@@ -45,6 +46,8 @@ async function recordFocusSession(sessionSeconds: number): Promise<void> {
       getDataRepository().recordFocusSession(minutes, title.length > 0 ? title : null, taskId),
     );
     useFocusSessionsStore.getState().add(record);
+    // Only the length is sent, never the goal or the task.
+    trackEvent('focus_session_completed', { minutes });
   } catch (error) {
     useToastStore.getState().showToast(toAppError(error).message, { variant: 'error' });
   }
