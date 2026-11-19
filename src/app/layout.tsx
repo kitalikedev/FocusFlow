@@ -6,6 +6,7 @@ import { usePageTitle } from '@/core/ui/usePageTitle';
 import { isOnAppPage } from '@/core/ui/routes';
 import { QuickControls, ToolDock } from '@/core/hud/Dock';
 import { SiteLayout } from './site/SiteLayout';
+import { HomePage } from './pages/HomePage';
 import {
   WallpaperLayerSlot,
   EffectsLayerSlot,
@@ -23,10 +24,11 @@ import {
   QuoteSlot,
 } from './slots';
 
-// Auth dialogs and the website pages are loaded on demand so they never weigh on the initial bundle.
+// Auth dialogs and the inner website pages are loaded on demand so they never weigh on the initial bundle.
+// The home page is the landing page, so it ships in the main bundle: lazy loading it showed "Loading…" first
+// and then shifted the layout when the page arrived (Lighthouse, issue #30).
 const AuthModal = lazy(() => import('@/core/auth/AuthModal'));
 const GuestMergeDialog = lazy(() => import('@/core/auth/GuestMergeDialog'));
-const HomePage = lazy(() => import('./pages/HomePage'));
 const TrackingPage = lazy(() => import('./pages/TrackingPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 

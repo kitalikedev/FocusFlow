@@ -61,14 +61,14 @@ export const HomePage: React.FC = () => {
 
         <Link
           to={APP_PATH}
-          aria-label="Open the FocusFlow workspace"
           className="block overflow-hidden rounded-2xl border border-white/10 shadow-2xl transition-transform hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 motion-reduce:transition-none"
         >
           <img
             src="/images/app-preview.jpg"
-            alt="The FocusFlow workspace with the Nebula theme and the focus timer"
+            alt="Open the FocusFlow workspace: the Nebula theme and the focus timer"
             width={1440}
             height={900}
+            fetchPriority="high"
             className="h-auto w-full"
           />
         </Link>

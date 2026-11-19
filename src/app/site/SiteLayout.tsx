@@ -115,15 +115,21 @@ const SiteFooter: React.FC = () => (
   </footer>
 );
 
-/** Frame of the website pages (home, tasks, analytics, tracking, about); the workspace lives at /app. */
+/**
+ * Frame of the website pages (home, themes, analytics, tracking, about); the workspace lives at /app.
+ * The page body is locked (`overflow: hidden`) for the full-screen workspace, so the website scrolls inside
+ * this container instead of the browser window.
+ */
 export const SiteLayout: React.FC = () => (
-  <div data-testid="site-layout" className="flex min-h-screen flex-col bg-[#0b0a14] text-white">
-    <SiteHeader />
-    <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
-      <Suspense fallback={<p className="text-center text-xs text-white/60">Loading…</p>}>
-        <Outlet />
-      </Suspense>
-    </main>
-    <SiteFooter />
+  <div data-testid="site-layout" className="h-screen overflow-y-auto bg-[#0b0a14] text-white">
+    <div className="flex min-h-full flex-col">
+      <SiteHeader />
+      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
+        <Suspense fallback={<p className="text-center text-xs text-white/60">Loading…</p>}>
+          <Outlet />
+        </Suspense>
+      </main>
+      <SiteFooter />
+    </div>
   </div>
 );

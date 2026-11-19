@@ -49,10 +49,13 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 ## 4. Trạng thái Kho Lưu Trữ (Git & GitHub)
 
 * **Remote:** `https://github.com/kitalikedev/FocusFlow.git`
-* **`main`:** commit gần nhất `3d69b6b` (squash merge PR #6, Phase 2), trước đó `f718df3` (PR #5, Phase 1) và `8b723b5` (PR #1, Phase 0). Cổng dev cố định: `5180`.
+* **`main`:** commit gần nhất `bac8045` (PR #33). Các mốc chính: PR #1 (Phase 0), #5 (Phase 1), #6 (Phase 2), #9 đến #16 (Phase 3 và hoàn thiện giao diện), #17 (chặn file env, dọn mã), #24 và #27 và #28 (website nhiều trang), #29 (Google Analytics và Sentry), #33 (sửa test tiêu đề trang chạy không ổn định). Cổng dev cố định: `5180`. Production: https://focus-flow-two-wheat.vercel.app.
+* **Quản lý công việc:** mỗi việc là một Issue gắn Milestone và người nhận; PR ghi `Closes #số` để Issue tự đóng khi merge. Milestone 1 (Multi-page routing, hạn 20/11/2026), 2 (Tracking and logging, đã xong), 3 (Seed data and README), 4 (Lighthouse), 5 (Peer review, hạn 26/11/2026). Các PR từ #24 trở đi đã liên kết Issue (#19, #21, #26), các PR trước đó chưa có Issue.
 * **Bảo vệ `main`:** Ruleset "Main Protection" (PR bắt buộc, 1 approval, chỉ Squash, linear history, chặn force push và xóa; admin bypass khi merge PR). Cần xác nhận ruleset đang Active và đã thêm status check `ci`.
-* **Dependabot:** các PR đề xuất nâng `vitest` và `@vitest/coverage-v8` lên 5.x trong khi `vite` giữ 5.x chưa merge; xử lý trong PR chore nâng toolchain riêng.
-* **Keep-alive:** workflow `.github/workflows/keep-alive.yml` đã có trên `main`; cần tạo 2 secret `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` rồi chạy tay một lần (kết quả đúng là `ping() returned: 1`).
+* **Dependabot:** các PR nâng `vite`, `vitest`, `@vitest/coverage-v8` (#2, #3) đang đỏ vì bước nhảy phiên bản lớn, và PR nâng `react-router` lên bản 7 chưa được thử; xử lý trong PR chore nâng toolchain riêng.
+* **Keep-alive:** workflow `.github/workflows/keep-alive.yml` đã có 2 secret `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` và chạy thành công (lần chạy tay ngày 18/11/2026), lịch chạy định kỳ 3 ngày một lần.
+* **CI:** chạy trên mỗi PR và trên `main`: kiểm tra bí mật, ESLint, TypeScript strict, test kèm coverage và build; hiện xanh trên `main`.
+* **Theo dõi và ghi lỗi:** Google Analytics 4 (đã thấy lượt truy cập trong báo cáo Realtime) và Sentry đã được cấu hình qua biến môi trường `VITE_GA_MEASUREMENT_ID`, `VITE_SENTRY_DSN` trên Vercel. Mở `/?sentry_test` để gửi một tin nhắn thử lên Sentry.
 
 ---
 
@@ -61,17 +64,23 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 | Phân vùng | Trạng thái |
 | :--- | :--- |
 | Cấu hình (`package.json`, tsconfig, Vite, Vitest, Tailwind, ESLint, Prettier, `vercel.json`, CI, keep-alive) | Hoàn tất |
-| `src/app/` (App, layout, providers, 11 slot trong `slots.tsx`) | Hoàn tất |
+| `src/app/` (App, layout, providers, slot trong `slots.tsx`, `PageTracker`) | Hoàn tất |
+| Website nhiều trang (`react-router-dom`): `/` giới thiệu, `/app` workspace, `/themes` xem trước 12 theme và theme đã lưu, `/analytics` thống kê từ `focus_sessions`, `/tracking` (Coming soon), `/about` | Hoàn tất; menu cạnh logo, menu 3 gạch trên điện thoại; workspace luôn giữ chạy nền khi chuyển trang nên timer và nhạc không ngắt; địa chỉ không tồn tại (kể cả `/tasks` cũ) về trang chủ |
 | `src/core/theme`, `src/core/ui` (Zustand stores, Toast) | Hoàn tất |
 | `src/core/data` (LocalRepository, SupabaseRepository, migrateGuestData, settings / sessions / sync status stores) | Hoàn tất (Phase 1, 2) |
 | `src/core/auth` (đăng ký, đăng nhập, đăng xuất, Gộp/Hủy dữ liệu guest) | Hoàn tất (Phase 1) |
 | `src/core/timer` (Web Worker, drift-free `Date.now()`, 5 chế độ, nghỉ dài, chuông, ghi `focus_sessions`) | Hoàn tất (Phase 2) |
 | `src/core/shortcuts` (Space, R, F, Shift+F, M) | Hoàn tất (Phase 2) |
 | `src/core/hud` (cycle dots, phiên hôm nay, streak, sync, Fullscreen, menu tài khoản) | Hoàn tất (Phase 2) |
-| `src/shared/lib` (supabase, errors, messages, web-audio) | Hoàn tất |
-| `src/features/*` | **Stub** (chờ Phase 3); `clock-modes` có đồng hồ tối thiểu để dùng thử, gói 3A thay thế |
+| `src/shared/lib` (supabase, errors, messages, web-audio, `analytics`, `monitoring`) | Hoàn tất; GA4 và Sentry tự tắt khi thiếu biến môi trường hoặc trình duyệt bật Do Not Track, không gửi email, tên task, mục tiêu hay nội dung ghi chú |
+| `src/features/clock-modes` | Hoàn tất: 5 chế độ, 3 kiểu đồng hồ, vị trí Mini Corner, popover cài đặt |
+| `src/features/theme-wallpaper` | Hoàn tất: 12 theme (mặc định Nebula), thư viện nền, Customize, hiệu ứng (mưa, tuyết, đom đóm, grain, vignette, scanlines, glow), theme riêng, ảnh tải lên |
+| `src/features/audio` | Hoàn tất: 4 kênh Web Audio (Rain, Brown Noise, Campfire, Lofi), YouTube ẩn có hàng đợi, âm lượng tổng, fade mượt. Thanh Music hiện chưa tác động riêng lên YouTube (chỉ Master) |
+| `src/features/productivity` | Hoàn tất: Tasks và Notepad (panel trong workspace), Focus Intent, trang Analytics |
+| `src/features/quotes` | Hoàn tất: danh ngôn kiểu credits cuộn, mặc định tắt |
+| Bảo mật repo | Hook `.githooks/pre-commit` và `npm run check:secrets` (chạy cả trên CI) chặn file `.env` và khóa bí mật |
 
-Chỉ số sau Phase 2: lint 0/0, typecheck sạch, 34 file / 355 test xanh, branch coverage `src/core` ≥ 85%, initial JS khoảng 127 KB gzip (ngưỡng 200 KB).
+Chỉ số hiện tại: lint 0/0, typecheck sạch, 57 file / 592 test xanh, coverage trên 99%, JS khởi tạo khoảng 54 KB gzip (ngưỡng 200 KB); thư viện Sentry nạp riêng sau khi trang chạy.
 
 ---
 
@@ -80,25 +89,41 @@ Chỉ số sau Phase 2: lint 0/0, typecheck sạch, 34 file / 355 test xanh, bra
 * **Phase 0:** Hoàn tất (PR #1).
 * **Phase 1 (Data, Auth, Guest migration):** Hoàn tất (PR #5). Đã kiểm tay với Supabase thật: đăng ký + migrate, đăng nhập sai mật khẩu, Gộp, Hủy, đăng xuất. Kịch bản mất mạng chưa kiểm tay (có unit test).
 * **Phase 2 (Timer, phím tắt, âm báo, HUD):** Hoàn tất (PR #6), đã kiểm tay (chuông, notification, HUD, `focus_sessions`).
-* **Phase 3 (3A `clock-modes`, 3B `theme-wallpaper`, 3C `audio`, 3D `productivity`):** Đã lập plan (`docs/plans/phase-3.md`); mỗi gói làm trên nhánh `feature/<module>` riêng.
+* **Phase 3 (clock-modes, theme-wallpaper, audio, productivity, quotes):** Hoàn tất, đã merge (PR #9 đến #16) và đã lên production.
+* **Phase 4 (hoàn thiện giao diện, âm thanh, hiệu ứng):** Phần lớn đã xong (PR #10 đến #16); chi tiết trong `docs/plans/phase-4-polish.md`.
+* **Website nhiều trang, theo dõi và ghi lỗi (Milestone 1 và 2):** Phần code đã xong và lên production (PR #24, #27, #28, #29). Còn các việc giấy tờ của Milestone 1 (Issue #22, #23).
 * **P2 (syncQueue, Google OAuth, PiP...) và E2E Playwright:** Chưa bắt đầu.
 
 ---
 
 ## 7. Việc Đang Dang Dở
 
-1. Xác nhận ruleset Active và đã bật Require status checks `ci`.
-2. Tạo secret GitHub cho keep-alive và chạy thử workflow.
-3. Import repo vào Vercel (Node 22.x, 2 biến `VITE_*`), kiểm tra lỗi CSP trên preview (Worker cần `worker-src 'self' blob:`).
-4. Rà soát cài đặt GitHub (Squash only, auto delete head branches, secret scanning), thêm LICENSE, điền About/topics.
+Các Issue đang mở, theo Milestone:
+
+| Milestone | Issue | Việc | Người nhận |
+| :--- | :--- | :--- | :--- |
+| 1 - Multi-page routing (hạn 20/11/2026) | #22 | Vẽ wireframe cho 6 trang (Home, Workspace, Themes, Analytics, Tracking, About) | Nguyễn Anh Dũng, Lê Nguyễn Thảo Anh |
+| 1 - Multi-page routing | #23 | Biên bản họp và phân vai của 5 thành viên | Nguyễn Anh Dũng |
+| 3 - Seed data and README | #20 | Dữ liệu mẫu `supabase/seed.sql` (task, ghi chú, phiên tập trung, theme đã lưu) để trang Analytics và Themes có dữ liệu khi demo | Trần Công Sanh |
+| 3 - Seed data and README | #31 | Báo cáo trong README: sơ đồ ERD, 6 trang kèm ảnh, cách chạy seed, theo dõi và ghi lỗi, lý do dùng Supabase | Nguyễn Anh Dũng |
+| 4 - Lighthouse | #30 | Đo Lighthouse trước và sau khi tối ưu (mobile và desktop), lưu ảnh kết quả | Lê Nguyễn Thảo Anh, Võ Xuân Phú |
+
+Milestone 5 (Peer review, hạn 26/11/2026) chưa có Issue: review 2 nhóm khác, áp dụng góp ý và ghi lại thay đổi, quay video demo tối đa 10 phút.
+
+Việc còn lại ngoài Issue:
+
+1. Chạy `seed.sql` trên Supabase sau khi Issue #20 merge, rồi đăng nhập kiểm tay trang `/analytics` và `/themes`.
+2. Kiểm tay chế độ đăng nhập trên production (đồng bộ, upload nền, lưu theme, task/note, analytics, gộp dữ liệu guest).
+3. Xác nhận CSP (đã mở cho Google Analytics và Sentry) không báo lỗi trên bản production, và Sentry nhận được tin nhắn từ `/?sentry_test`.
 
 ---
 
 ## 8. Việc Cần Làm Tiếp Theo
 
-1. Triển khai Phase 3 theo `docs/plans/phase-3.md` (3A trước), mỗi gói một PR.
-2. PR chore riêng: nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8) và xử lý Dependabot.
-3. Về sau: `syncQueue` (FR-23), Google OAuth (FR-03), E2E Playwright.
+1. Hoàn tất các Issue ở mục 7, ưu tiên #22 và #23 (hạn 20/11/2026).
+2. Cập nhật PRD, ARCHITECTURE, API_DOCS theo bố cục và tính năng hiện tại (website nhiều trang, theo dõi và ghi lỗi).
+3. Cài Node 22 (khớp `.nvmrc` và CI), rồi PR chore nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8) và xử lý các PR Dependabot.
+4. Về sau: `syncQueue` (FR-23), Google OAuth (FR-03), xuất/nhập theme JSON, PiP (FR-28), E2E Playwright.
 
 ---
 
@@ -106,11 +131,13 @@ Chỉ số sau Phase 2: lint 0/0, typecheck sạch, 34 file / 355 test xanh, bra
 
 1. Streak chỉ tính trên 90 ngày dữ liệu gần nhất (giới hạn của `getFocusSessions`).
 2. Chưa có `syncQueue`: người dùng đã đăng nhập mà mất mạng sẽ bị báo lỗi khi lưu, chưa có hàng đợi; tooltip Offline dùng đúng chuỗi của AC-30.2.
-3. CSP trong `vercel.json` chỉ kiểm chứng được trên Vercel preview.
+3. CSP trong `vercel.json` chỉ kiểm chứng được trên Vercel (preview hoặc production).
 4. devDependencies còn lỗ hổng audit (production = 0), xử lý bằng PR nâng toolchain.
 5. Docs còn LaTeX trong ARCHITECTURE và README (thẩm mỹ).
-6. Hai lần `useSettingsStore.update()` chạy song song có thể ghi đè nhau (`LocalRepository.saveSettings` đọc rồi ghi); cần sửa ở core trước gói 3B/3C.
+6. Việc lưu cài đặt đã được xếp hàng chạy lần lượt nên không còn ghi đè nhau.
+7. Thanh Music trong workspace hiện chỉ điều khiển âm lượng chung của trình phát YouTube, chưa có mức riêng.
+8. Các test kiểm tra tiêu đề trang đã đổi sang kiểu chờ (PR #33) vì effect đặt tiêu đề có thể chạy chậm một nhịp trên CI.
 
 ---
 
-*Cập nhật lần cuối: 2026-11-07*
+*Cập nhật lần cuối: 2026-11-19*
