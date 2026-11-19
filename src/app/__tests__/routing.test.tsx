@@ -63,6 +63,12 @@ describe('website pages', () => {
     expect(screen.getByTestId('site-layout')).toBeInTheDocument();
   });
 
+  it('scrolls inside its own container, because the page body is locked for the workspace', async () => {
+    renderAt('/');
+    await screen.findByTestId('home-page');
+    expect(screen.getByTestId('site-layout')).toHaveClass('h-screen', 'overflow-y-auto');
+  });
+
   it('has no separate Tasks page: tasks live in the workspace, so the old address goes home', async () => {
     renderAt('/tasks');
     expect(await screen.findByTestId('home-page')).toBeInTheDocument();
