@@ -31,6 +31,10 @@ export interface AudioState {
   wantsYouTubePlaying: boolean;
   isAddingTrack: boolean;
   trackError: string | null;
+  /** Position and length of the current video in seconds, reported by the player. */
+  progress: { current: number; duration: number };
+  /** A position the user asked to jump to; the player host applies it and clears it. */
+  seekRequest: number | null;
 
   setVolume: (id: string, volume: number) => void;
   setYouTubeVolume: (volume: number) => void;
@@ -48,6 +52,11 @@ export interface AudioState {
   /** Called by the player when a track ends (AC-17.2). */
   handleTrackEnded: () => void;
   togglePauseAll: () => void;
+  /** Called by the player host with the latest position. */
+  setProgress: (current: number, duration: number) => void;
+  /** Jumps to a position of the current video (seek bar). */
+  seek: (seconds: number) => void;
+  clearSeekRequest: () => void;
 }
 
 interface StoredQueue {
@@ -149,6 +158,8 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   wantsYouTubePlaying: false,
   isAddingTrack: false,
   trackError: null,
+  progress: { current: 0, duration: 0 },
+  seekRequest: null,
 
   setVolume: (id, volume) => {
     const level = Math.min(1, Math.max(0, volume));
@@ -231,13 +242,14 @@ export const useAudioStore = create<AudioState>((set, get) => ({
       queue: nextQueue,
       currentIndex: nextIndex,
       wantsYouTubePlaying: nextQueue.length === 0 ? false : get().wantsYouTubePlaying,
+      ...(index === currentIndex ? { progress: { current: 0, duration: 0 }, seekRequest: null } : {}),
     });
     writeQueue(nextQueue, nextIndex);
   },
 
   playAt: (index) => {
     if (index < 0 || index >= get().queue.length) return;
-    set({ currentIndex: index, wantsYouTubePlaying: true });
+    set({ currentIndex: index, wantsYouTubePlaying: true, progress: { current: 0, duration: 0 }, seekRequest: null });
     writeQueue(get().queue, index);
   },
 
@@ -273,6 +285,22 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     set({ isAmbientPaused: false, wantsYouTubePlaying: currentIndex !== -1 });
     setAmbientPaused(false);
   },
+
+  setProgress: (current, duration) => {
+    const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0;
+    const safeCurrent = Number.isFinite(current) && current > 0 ? current : 0;
+    set({ progress: { current: safeDuration > 0 ? Math.min(safeCurrent, safeDuration) : safeCurrent, duration: safeDuration } });
+  },
+
+  seek: (seconds) => {
+    const { currentIndex, progress } = get();
+    // Nothing to seek in: no track, or a live stream / a video whose length is not known yet.
+    if (currentIndex === -1 || progress.duration <= 0) return;
+    const target = Math.min(progress.duration, Math.max(0, seconds));
+    set({ seekRequest: target, progress: { ...progress, current: target } });
+  },
+
+  clearSeekRequest: () => set({ seekRequest: null }),
 }));
 
 // The engine starts in the same paused state as the store, so restored volumes never play on page load.

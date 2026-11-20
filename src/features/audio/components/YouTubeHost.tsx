@@ -5,9 +5,13 @@ import { isMuted, subscribeMute } from '@/shared/lib/web-audio';
 import { loadYouTubeApi, parseYouTubeId, type YouTubeNamespace, type YouTubePlayer } from '../lib/youtube';
 import { useAudioStore } from '../store/useAudioStore';
 
+/** How often the position of the current video is read while it plays. */
+export const PROGRESS_INTERVAL_MS = 500;
+
 /**
  * Invisible YouTube IFrame player (FR-17). It is created on the first play request and follows the store:
- * current track, play / pause, master volume and the global mute (AC-18.1 pauses YouTube).
+ * current track, play / pause, seeking, the Music and master volumes and the global mute (AC-18.1 pauses YouTube).
+ * While a video plays it reports its position back to the store for the seek bar.
  */
 export const YouTubeHost: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -18,6 +22,8 @@ export const YouTubeHost: React.FC = () => {
   const queue = useAudioStore((state) => state.queue);
   const currentIndex = useAudioStore((state) => state.currentIndex);
   const wantsPlaying = useAudioStore((state) => state.wantsYouTubePlaying);
+  const youtubeVolume = useAudioStore((state) => state.youtubeVolume);
+  const seekRequest = useAudioStore((state) => state.seekRequest);
   const masterVolume = useSettingsStore((state) => state.settings.ambientVolumes.master);
   const videoId = currentIndex >= 0 ? parseYouTubeId(queue[currentIndex]?.url ?? '') : null;
 
@@ -85,9 +91,31 @@ export const YouTubeHost: React.FC = () => {
     else player.pauseVideo();
   }, [ready, videoId, wantsPlaying, muted]);
 
+  // The player has no gain node: its own volume is the Music level times the master volume.
   useEffect(() => {
-    if (ready) playerRef.current?.setVolume(Math.round(masterVolume * 100));
-  }, [ready, masterVolume]);
+    if (ready) playerRef.current?.setVolume(Math.round(masterVolume * youtubeVolume * 100));
+  }, [ready, masterVolume, youtubeVolume]);
+
+  // Jump to the position chosen on a seek bar.
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!ready || !player || seekRequest === null) return;
+    player.seekTo(seekRequest, true);
+    useAudioStore.getState().clearSeekRequest();
+  }, [ready, seekRequest]);
+
+  // Report the position while the music plays; nothing runs while it is paused or the tab is hidden.
+  useEffect(() => {
+    const player = playerRef.current;
+    if (!ready || !player || !videoId || !wantsPlaying || muted) return;
+    const report = () => {
+      if (document.visibilityState === 'hidden') return;
+      useAudioStore.getState().setProgress(player.getCurrentTime(), player.getDuration());
+    };
+    report();
+    const timer = setInterval(report, PROGRESS_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [ready, videoId, wantsPlaying, muted]);
 
   return (
     <div
