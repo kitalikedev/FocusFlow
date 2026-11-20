@@ -1,7 +1,9 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { SITE_CONTAINER, SITE_FOCUS } from '@/core/ui/siteStyles';
+import { SitePresetContext, spreadThemeChange } from '@/core/ui/siteTheme';
 import { OpenAppButton } from './OpenAppButton';
 import { useSiteTheme, type SiteTheme } from './useSiteTheme';
 import './site.css';
@@ -24,7 +26,10 @@ const ThemeButton: React.FC<{ theme: SiteTheme; onToggle: () => void }> = ({ the
       type="button"
       data-testid="site-theme-btn"
       aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-      onClick={onToggle}
+      onClick={(event) => {
+        const button = event.currentTarget;
+        spreadThemeChange(button, () => flushSync(onToggle));
+      }}
       className={`group ${ICON_BUTTON}`}
     >
       <Icon
@@ -36,7 +41,10 @@ const ThemeButton: React.FC<{ theme: SiteTheme; onToggle: () => void }> = ({ the
 };
 
 /** Website header: brand with the page links next to it; on tablets and phones the links move into a menu. */
-const SiteHeader: React.FC<{ theme: SiteTheme; onToggleTheme: () => void }> = ({ theme, onToggleTheme }) => {
+const SiteHeader: React.FC<{ theme: SiteTheme; onToggleTheme: () => void }> = ({
+  theme,
+  onToggleTheme,
+}) => {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
   const headerRef = useRef<HTMLElement>(null);
@@ -71,11 +79,16 @@ const SiteHeader: React.FC<{ theme: SiteTheme; onToggleTheme: () => void }> = ({
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-40 border-b border-site-line bg-site-bg transition-colors duration-300"
+      className="sticky top-0 z-40 border-b border-site-line bg-[color-mix(in_oklab,var(--site-bg)_78%,transparent)] backdrop-blur-xl"
     >
-      <div className={`${SITE_CONTAINER} px-4 sm:px-6 flex h-16 items-center justify-between gap-4`}>
+      <div
+        className={`${SITE_CONTAINER} px-4 sm:px-6 flex h-16 items-center justify-between gap-4`}
+      >
         <div className="flex items-center gap-6">
-          <Link to="/" className={`rounded-lg font-display text-xl font-semibold tracking-[-0.01em] ${SITE_FOCUS}`}>
+          <Link
+            to="/"
+            className={`rounded-lg font-display text-xl font-semibold tracking-[-0.01em] ${SITE_FOCUS}`}
+          >
             FocusFlow
           </Link>
           <nav aria-label="Pages" className="hidden lg:block">
@@ -103,7 +116,11 @@ const SiteHeader: React.FC<{ theme: SiteTheme; onToggleTheme: () => void }> = ({
             onClick={() => setMenuOpen((open) => !open)}
             className={`${ICON_BUTTON} lg:hidden`}
           >
-            {isMenuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
+            {isMenuOpen ? (
+              <X className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Menu className="h-5 w-5" aria-hidden="true" />
+            )}
           </button>
         </div>
       </div>
@@ -167,23 +184,37 @@ const SiteFooter: React.FC = () => (
  * this container instead of the browser window.
  */
 export const SiteLayout: React.FC = () => {
-  const { theme, toggleTheme } = useSiteTheme();
+  const { theme, toggleTheme, presetId, setPresetId, preset } = useSiteTheme();
+  const presetContext = useMemo(() => ({ presetId, setPresetId }), [presetId, setPresetId]);
+  const { tokens } = preset.config;
+  const themeVars = {
+    '--theme-bg': tokens.bgSolidColor,
+    '--theme-accent': tokens.colorAccent,
+    '--theme-on-accent': tokens.colorAccentContrast,
+    '--theme-clock': tokens.fontClock,
+  } as React.CSSProperties;
 
   return (
-    <div
-      data-testid="site-layout"
-      data-theme={theme}
-      className="site h-screen overflow-y-auto bg-site-bg text-site-text transition-colors duration-300 motion-reduce:transition-none"
-    >
-      <div className="flex min-h-full flex-col">
-        <SiteHeader theme={theme} onToggleTheme={toggleTheme} />
-        <main className="flex-1 px-4 sm:px-6">
-          <Suspense fallback={<p className="py-12 text-center text-sm text-site-muted">Loading…</p>}>
-            <Outlet />
-          </Suspense>
-        </main>
-        <SiteFooter />
+    <SitePresetContext.Provider value={presetContext}>
+      <div
+        data-testid="site-layout"
+        data-theme={theme}
+        data-preset={presetId}
+        style={themeVars}
+        className="site h-screen overflow-y-auto overflow-x-hidden bg-site-bg font-display text-site-text"
+      >
+        <div className="flex min-h-full flex-col">
+          <SiteHeader theme={theme} onToggleTheme={toggleTheme} />
+          <main className="flex-1 px-4 sm:px-6">
+            <Suspense
+              fallback={<p className="py-12 text-center text-sm text-site-muted">Loading…</p>}
+            >
+              <Outlet />
+            </Suspense>
+          </main>
+          <SiteFooter />
+        </div>
       </div>
-    </div>
+    </SitePresetContext.Provider>
   );
 };

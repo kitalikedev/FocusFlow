@@ -1,10 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { SITE_BUTTON_LINE, SITE_BUTTON_PRIMARY, SITE_FOCUS } from '@/core/ui/siteStyles';
+import { useSitePreset } from '@/core/ui/siteTheme';
 
 const MODES = [
-  { id: 'pomodoro', label: 'Pomodoro', minutes: 25, note: 'Focus for 25 min, then take a 5 min break' },
+  {
+    id: 'pomodoro',
+    label: 'Pomodoro',
+    minutes: 25,
+    note: 'Focus for 25 min, then take a 5 min break',
+  },
   { id: '52-17', label: '52/17', minutes: 52, note: 'Focus for 52 min, then take a 17 min break' },
-  { id: 'deep-work', label: 'Deep Work', minutes: 90, note: 'Focus for 90 min, then take a 20 min break' },
+  {
+    id: 'deep-work',
+    label: 'Deep Work',
+    minutes: 90,
+    note: 'Focus for 90 min, then take a 20 min break',
+  },
 ] as const;
 
 type ModeId = (typeof MODES)[number]['id'];
@@ -15,10 +26,12 @@ function formatClock(seconds: number): string {
 }
 
 /**
- * A small timer on the home page so visitors can try the idea before opening the workspace.
- * It has its own state and never touches the real workspace timer.
+ * The big timer at the top of the home page, drawn in the clock font of the website theme,
+ * so visitors can try the idea before opening the workspace. It has its own state and never touches
+ * the real workspace timer.
  */
 export const DemoTimer: React.FC = () => {
+  const { presetId } = useSitePreset();
   const [modeId, setModeId] = useState<ModeId>('pomodoro');
   const mode = MODES.find((item) => item.id === modeId) ?? MODES[0];
   const [secondsLeft, setSecondsLeft] = useState(mode.minutes * 60);
@@ -49,11 +62,12 @@ export const DemoTimer: React.FC = () => {
   };
 
   return (
-    <div
-      data-testid="demo-timer"
-      className="rounded-2xl border border-site-line bg-site-surface p-5 transition-colors duration-300"
-    >
-      <div role="group" aria-label="Timer mode" className="flex flex-wrap gap-1">
+    <div data-testid="demo-timer" className="flex flex-col items-center text-center">
+      <div
+        role="group"
+        aria-label="Timer mode"
+        className="flex flex-wrap justify-center gap-1 rounded-full border border-site-line bg-site-surface p-1"
+      >
         {MODES.map((item) => {
           const isActive = item.id === modeId;
           return (
@@ -62,8 +76,10 @@ export const DemoTimer: React.FC = () => {
               type="button"
               aria-pressed={isActive}
               onClick={() => pickMode(item.id)}
-              className={`min-h-9 rounded-lg px-3 text-[13px] font-medium transition-colors ${SITE_FOCUS} ${
-                isActive ? 'bg-site-bg text-site-text ring-1 ring-inset ring-site-line' : 'text-site-muted hover:text-site-text'
+              className={`min-h-9 rounded-full px-4 text-[13px] font-medium transition-colors duration-200 ${SITE_FOCUS} ${
+                isActive
+                  ? 'bg-site-accent text-site-on-accent'
+                  : 'text-site-muted hover:text-site-text'
               }`}
             >
               {item.label}
@@ -72,22 +88,32 @@ export const DemoTimer: React.FC = () => {
         })}
       </div>
 
+      {/* Keyed by theme so the new clock font fades in after a theme change. */}
       <p
+        key={presetId}
         data-testid="demo-clock"
         role="timer"
         aria-label={`${mode.label} timer`}
-        className="mb-2 mt-7 font-digits text-[76px] font-bold leading-none tracking-[-0.04em] tabular-nums sm:text-[104px]"
+        className="site-clock site-swap my-3 select-none whitespace-nowrap text-[24vw] font-bold leading-[1] tracking-[-0.03em] text-site-accent sm:text-[168px] lg:text-[208px]"
+        style={{ textShadow: '0 0 90px var(--site-glow)' }}
       >
-        {formatClock(secondsLeft)}
+        {formatClock(secondsLeft)
+          .split('')
+          .map((char, index) => (
+            // Keyed by value: a digit that changes mounts again and drops in.
+            <span key={`${index}-${char}`} className={char === ':' ? 'inline-block' : 'site-tick'}>
+              {char}
+            </span>
+          ))}
       </p>
-      <p className="mb-5 text-[13px] text-site-muted">{mode.note}</p>
+      <p className="mb-6 text-[15px] text-site-muted">{mode.note}</p>
 
       <div className="flex gap-2">
         <button
           type="button"
           onClick={() => setRunning((running) => !running)}
           disabled={secondsLeft === 0}
-          className={`${SITE_BUTTON_PRIMARY} min-w-[108px] disabled:opacity-50`}
+          className={`${SITE_BUTTON_PRIMARY} min-w-[120px] disabled:opacity-50`}
         >
           {isRunning ? 'Pause' : 'Start'}
         </button>

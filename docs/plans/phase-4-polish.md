@@ -96,3 +96,20 @@ Quy tắc chung: mỗi việc chỉ sửa trong thư mục được nêu; không
 ### Ngoài các việc trên
 
 Nâng toolchain (O7), FR-23 (offline sync), FR-28 (PiP), huy hiệu cục bộ (FR-31 phần achievement), Google OAuth, E2E.
+
+## 7. Giao diện website mặc theme
+
+Bản thiết kế lại các trang website (`/`, `/themes`, `/analytics`, `/tracking`, `/about`) sau PR #42. Workspace `/app` không đổi.
+
+| # | Nội dung | Vị trí |
+| :--- | :--- | :--- |
+| W1 | Website "mặc" một theme dựng sẵn: `SiteLayout` đặt `--theme-bg`, `--theme-accent`, `--theme-on-accent`, `--theme-clock` từ token của theme; mọi màu `site-*` trộn từ đó bằng `color-mix`, light mode làm tối màu nhấn để chữ vẫn dễ đọc | `src/app/site/site.css`, `SiteLayout.tsx` |
+| W2 | Chọn theme bằng 12 chấm màu ở trang chủ hoặc ô ở `/themes`; lựa chọn lưu ở `localStorage` (`focusflow-site-preset`) và chia sẻ qua `SitePresetContext`; không đổi theme của workspace | `src/core/ui/siteTheme.ts`, `src/app/site/ThemeSwitcher.tsx`, `useSiteTheme.ts` |
+| W3 | Đổi theme hoặc light/dark thì màu mới lan ra thành hình tròn từ nút vừa bấm (View Transitions API); trình duyệt không hỗ trợ hoặc bật giảm chuyển động thì đổi ngay | `spreadThemeChange` trong `siteTheme.ts` |
+| W4 | Ảnh workspace thật: 12 ảnh theo theme, 3 kiểu đồng hồ, Sounds, Tasks và Notes, thư viện theme, 3 hiệu ứng; WebP 1440 px và bản 720 px cho điện thoại, có `width`/`height`; chỉ ảnh đầu trang tải ngay, còn lại `loading="lazy"` | `public/images/home/` |
+| W5 | Ảnh tự chuyển mỗi 5 giây: ảnh sau mờ dần vào kèm zoom nhẹ, chấm tiến trình, dừng khi rê chuột hoặc focus bàn phím; chỉ giữ ảnh hiện tại và ảnh trước trong trang | `src/app/site/Slideshow.tsx` |
+| W8 | Khối "Make it fully yours with your own picture or GIF" ngay dưới ảnh demo: ảnh workspace dùng một hình trắng đen tải lên làm nền, kèm ảnh gốc nhỏ nghiêng ở góc (`custom-picture`, `custom-original`); nêu giới hạn JPG, PNG, WebP, GIF tối đa 5 MB | `HomePage.tsx`, `public/images/home/` |
+| W6 | Animation: chữ tiêu đề hiện lần lượt khi mở trang, các khối trượt vào khi cuộn tới, chữ số đồng hồ thử rơi vào khi đổi, font đồng hồ mờ chuyển khi đổi theme, hàng ảnh theme chạy ngang, khung ảnh nâng lên và phát sáng theo màu theme khi rê chuột; tất cả tắt khi `prefers-reduced-motion` | `site.css`, `src/core/ui/Reveal.tsx` |
+| W7 | Test: chọn theme đổi cả website và được nhớ, ảnh workspace theo theme, trang Themes đổi theme website mà không đổi theme workspace | `src/app/__tests__/routing.test.tsx`, `ThemesPage.test.tsx` |
+
+Ảnh được chụp từ bản chạy ở máy, chế độ khách với dữ liệu mẫu (không có dữ liệu thật). Khi giao diện workspace đổi thì chụp lại cho khớp.

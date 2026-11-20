@@ -1,7 +1,9 @@
 /*
- * Colors and fonts of the website pages (home, themes, analytics, tracking, about).
- * The workspace at /app keeps its own theme tokens from index.css.
- * Both fonts are self-hosted in public/fonts, so no font CDN is needed (CSP font-src 'self').
+ * Colors, fonts and motion of the website pages (home, themes, analytics, tracking, about).
+ * The website wears one of the built-in themes: SiteLayout sets --theme-bg, --theme-accent, --theme-on-accent
+ * and --theme-clock on the .site element, and every site color below is mixed from them.
+ * The workspace at /app keeps its own theme tokens.
+ * All fonts are self-hosted in public/fonts (CSP font-src 'self'); a font file loads only when a theme uses it.
  */
 @font-face {
   font-family: 'Outfit';
@@ -17,26 +19,241 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Space Mono';
+  src: url('/fonts/space-mono.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/playfair-display.woff2') format('woff2');
+  font-weight: 400 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Silkscreen';
+  src: url('/fonts/silkscreen.woff2') format('woff2');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 .site {
-  --site-bg: #0e0e10;
-  --site-surface: #16161a;
-  --site-line: #2a2a30;
-  --site-text: #ededef;
-  --site-muted: #a1a1aa;
-  --site-accent: #c4b5fd;
-  --site-on-accent: #18122e;
-  --site-bar: #3a3646;
+  --theme-bg: #0b0814;
+  --theme-accent: #a78bfa;
+  --theme-on-accent: #0b0814;
+  --theme-clock: 'Outfit', system-ui, sans-serif;
+
+  --site-bg: var(--theme-bg);
+  --site-surface: color-mix(in oklab, var(--theme-bg) 92%, #ffffff);
+  --site-line: color-mix(in oklab, var(--theme-bg) 82%, #ffffff);
+  --site-text: #f3f2f6;
+  --site-muted: color-mix(in oklab, #f3f2f6 64%, var(--theme-bg));
+  --site-accent: var(--theme-accent);
+  --site-on-accent: var(--theme-on-accent);
+  --site-bar: color-mix(in oklab, var(--theme-accent) 28%, var(--theme-bg));
+  --site-glow: color-mix(in oklab, var(--theme-accent) 35%, transparent);
   color-scheme: dark;
 }
 
 .site[data-theme='light'] {
-  --site-bg: #f6f5f1;
+  --site-bg: color-mix(in oklab, var(--theme-accent) 5%, #f7f6f2);
   --site-surface: #ffffff;
-  --site-line: #e2dfd7;
-  --site-text: #18181b;
+  --site-line: color-mix(in oklab, var(--theme-accent) 14%, #e3e0d8);
+  --site-text: #16151a;
   --site-muted: #57534e;
-  --site-accent: #5b45c7;
+  /* Theme accents are made for dark wallpapers; darken them so text and buttons stay readable on light. */
+  --site-accent: color-mix(in oklab, var(--theme-accent) 58%, #000000);
   --site-on-accent: #ffffff;
-  --site-bar: #d6d1e6;
+  --site-bar: color-mix(in oklab, var(--theme-accent) 30%, #ffffff);
+  --site-glow: color-mix(in oklab, var(--theme-accent) 30%, transparent);
   color-scheme: light;
+}
+
+/* The clock font of the current theme. */
+.site-clock {
+  font-family: var(--theme-clock);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- motion */
+
+/* Hero words rise one after another when the page opens. */
+@keyframes site-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.site-rise {
+  display: inline-block;
+  animation: site-rise 800ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* Sections and pictures slide in the first time they scroll into view (see Reveal.tsx). */
+.site-reveal {
+  opacity: 0;
+  transform: translateY(40px) scale(0.98);
+  transition:
+    opacity 800ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 90ms);
+}
+
+.site-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* A digit of the demo clock drops in each time it changes. */
+@keyframes site-tick {
+  from {
+    opacity: 0;
+    transform: translateY(-0.35em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.site-tick {
+  display: inline-block;
+  animation: site-tick 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The new clock font fades in after a theme change. */
+@keyframes site-swap {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+.site-swap {
+  animation: site-swap 650ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Slideshow: the next picture fades in over the last one with a slow zoom out. */
+@keyframes site-slide-in {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.site-slide-in {
+  animation: site-slide-in 1200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Fill of the active slideshow dot; it lasts as long as the slide. */
+@keyframes site-progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.site-progress {
+  animation: site-progress linear both;
+}
+
+/* Endless row of theme pictures; it stops while the pointer is on it. */
+@keyframes site-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.site-marquee {
+  animation: site-marquee 70s linear infinite;
+}
+
+.site-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Picture frames lift and glow in the theme color on hover. */
+.site-lift {
+  transition:
+    transform 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 400ms ease;
+}
+
+.site-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 60px -20px var(--site-glow);
+}
+
+/* Changing the theme spreads the new colors as a circle from the button that was clicked (View Transitions). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(root) {
+  animation: site-spread 750ms cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+@keyframes site-spread {
+  from {
+    clip-path: circle(0 at var(--spread-x, 50%) var(--spread-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--spread-x, 50%) var(--spread-y, 50%));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-rise,
+  .site-tick,
+  .site-swap,
+  .site-marquee,
+  .site-slide-in,
+  .site-progress,
+  ::view-transition-new(root) {
+    animation: none;
+  }
+
+  .site-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .site-lift,
+  .site-lift:hover {
+    transform: none;
+    transition: none;
+  }
 }

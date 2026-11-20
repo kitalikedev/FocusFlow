@@ -6,7 +6,9 @@ import { MemoryRouter } from 'react-router-dom';
 // The slots pull in every feature (audio, wallpapers...); the routing test only needs a marker for each.
 vi.mock('../slots', () => {
   const stub = (testId: string): React.FC<{ children?: React.ReactNode }> => {
-    const Stub: React.FC<{ children?: React.ReactNode }> = ({ children }) => <div data-testid={testId}>{children}</div>;
+    const Stub: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
+      <div data-testid={testId}>{children}</div>
+    );
     return Stub;
   };
   return {
@@ -30,12 +32,13 @@ vi.mock('../slots', () => {
 import { Layout } from '../layout';
 import { useAuthStore } from '@/core/auth/useAuthStore';
 import { SITE_THEME_KEY } from '../site/useSiteTheme';
+import { SITE_PRESET_KEY } from '@/core/ui/siteTheme';
 
 function renderAt(path: string) {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <Layout />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
@@ -47,12 +50,28 @@ beforeEach(() => {
 describe('website pages', () => {
   it('shows the home page with a way into the workspace', async () => {
     renderAt('/');
-    expect(await screen.findByRole('heading', { level: 1, name: 'A calm place to get more done' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'A calm place to get more done' })
+    ).toBeInTheDocument();
     const [open] = screen.getAllByRole('link', { name: /Open FocusFlow/ });
     expect(open).toHaveAttribute('href', '/app');
     expect(screen.getByTestId('app-shell')).toHaveAttribute('hidden');
     // Titles are set by an effect that can run just after the page appears.
     await waitFor(() => expect(document.title).toBe('FocusFlow'));
+  });
+
+  it('shows the workspace with your own picture as the wallpaper', async () => {
+    renderAt('/');
+    const block = within(
+      await screen.findByRole('region', {
+        name: 'Make it fully yours with your own picture or GIF',
+      })
+    );
+    expect(block.getByRole('img', { name: /black and white drawing uploaded/ })).toHaveAttribute(
+      'loading',
+      'lazy'
+    );
+    expect(block.getByText('Your picture')).toBeInTheDocument();
   });
 
   it.each([
@@ -84,18 +103,26 @@ describe('website pages', () => {
 
   it('shows the About page with the team', async () => {
     renderAt('/about');
-    expect(await screen.findByRole('heading', { level: 1, name: 'About FocusFlow' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Đàm Huỳnh Hoài Nam/ })).toHaveAttribute('href', 'https://github.com/kitalikedev');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'About FocusFlow' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Đàm Huỳnh Hoài Nam/ })).toHaveAttribute(
+      'href',
+      'https://github.com/kitalikedev'
+    );
     await waitFor(() => expect(document.title).toBe('About FocusFlow · FocusFlow'));
   });
 
   it('has the contact details only on the home page, with a footer link to them from every page', async () => {
     renderAt('/');
     const contact = within(await screen.findByRole('region', { name: 'Contact us' }));
-    expect(contact.getByRole('link', { name: /damnam2456@gmail.com/ })).toHaveAttribute('href', 'mailto:damnam2456@gmail.com');
+    expect(contact.getByRole('link', { name: /damnam2456@gmail.com/ })).toHaveAttribute(
+      'href',
+      'mailto:damnam2456@gmail.com'
+    );
     expect(contact.getByRole('link', { name: /Open an issue on GitHub/ })).toHaveAttribute(
       'href',
-      'https://github.com/kitalikedev/FocusFlow/issues',
+      'https://github.com/kitalikedev/FocusFlow/issues'
     );
     cleanup();
 
@@ -103,7 +130,10 @@ describe('website pages', () => {
     await screen.findByTestId('about-page');
     expect(screen.queryByRole('region', { name: 'Contact us' })).not.toBeInTheDocument();
     const footer = screen.getByRole('navigation', { name: 'Footer' });
-    expect(within(footer).getByRole('link', { name: 'Contact' })).toHaveAttribute('href', '/#contact');
+    expect(within(footer).getByRole('link', { name: 'Contact' })).toHaveAttribute(
+      'href',
+      '/#contact'
+    );
   });
 
   it('sends unknown addresses back to the home page', async () => {
@@ -115,12 +145,11 @@ describe('website pages', () => {
     renderAt('/tracking');
     await screen.findByTestId('tracking-page');
     const nav = screen.getByRole('navigation', { name: 'Pages' });
-    expect(within(nav).getAllByRole('link').map((link) => link.textContent)).toEqual([
-      'Themes',
-      'Analytics',
-      'Tracking',
-      'About',
-    ]);
+    expect(
+      within(nav)
+        .getAllByRole('link')
+        .map((link) => link.textContent)
+    ).toEqual(['Themes', 'Analytics', 'Tracking', 'About']);
     expect(nav.querySelector('[aria-current="page"]')).toHaveTextContent('Tracking');
   });
 
@@ -141,7 +170,37 @@ describe('website pages', () => {
 });
 
 describe('light and dark mode', () => {
-  beforeEach(() => window.localStorage.removeItem(SITE_THEME_KEY));
+  beforeEach(() => {
+    window.localStorage.removeItem(SITE_THEME_KEY);
+    window.localStorage.removeItem(SITE_PRESET_KEY);
+  });
+
+  it('dresses the whole website in the theme picked on the home page and remembers it', async () => {
+    renderAt('/');
+    await screen.findByTestId('home-page');
+    const site = screen.getByTestId('site-layout');
+    expect(site).toHaveAttribute('data-preset', 'nebula');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Retro Terminal' }));
+    expect(site).toHaveAttribute('data-preset', 'retro-terminal');
+    expect(screen.getByRole('button', { name: 'Retro Terminal' })).toHaveAttribute(
+      'aria-pressed',
+      'true'
+    );
+    expect(site.style.getPropertyValue('--theme-accent')).not.toBe('');
+    expect(window.localStorage.getItem(SITE_PRESET_KEY)).toBe('retro-terminal');
+    // The workspace picture follows the website theme.
+    expect(
+      within(screen.getByTestId('theme-slideshow')).getByRole('img', {
+        name: /Retro Terminal theme/,
+      })
+    ).toBeInTheDocument();
+
+    cleanup();
+    renderAt('/about');
+    await screen.findByTestId('about-page');
+    expect(screen.getByTestId('site-layout')).toHaveAttribute('data-preset', 'retro-terminal');
+  });
 
   it('switches the website between dark and light and remembers the choice', async () => {
     renderAt('/');
@@ -174,13 +233,11 @@ describe('menu for small screens', () => {
     fireEvent.click(button);
     expect(button).toHaveAttribute('aria-expanded', 'true');
     // The four pages plus the "Open FocusFlow" button that only the menu shows on phones.
-    expect(within(screen.getByTestId('site-menu')).getAllByRole('link').map((link) => link.textContent)).toEqual([
-      'Themes',
-      'Analytics',
-      'Tracking',
-      'About',
-      'Open FocusFlow',
-    ]);
+    expect(
+      within(screen.getByTestId('site-menu'))
+        .getAllByRole('link')
+        .map((link) => link.textContent)
+    ).toEqual(['Themes', 'Analytics', 'Tracking', 'About', 'Open FocusFlow']);
 
     fireEvent.click(button);
     expect(screen.queryByTestId('site-menu')).not.toBeInTheDocument();
@@ -194,7 +251,9 @@ describe('menu for small screens', () => {
     expect(screen.queryByTestId('site-menu')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId('site-menu-btn'));
-    fireEvent.click(within(screen.getByTestId('site-menu')).getByRole('link', { name: 'Tracking' }));
+    fireEvent.click(
+      within(screen.getByTestId('site-menu')).getByRole('link', { name: 'Tracking' })
+    );
     expect(await screen.findByTestId('tracking-page')).toBeInTheDocument();
     expect(screen.queryByTestId('site-menu')).not.toBeInTheDocument();
   });
