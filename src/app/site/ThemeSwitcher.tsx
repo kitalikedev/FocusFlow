@@ -17,7 +17,7 @@ export const ThemeSwitcher: React.FC<{ className?: string }> = ({ className = ''
       <div
         role="group"
         aria-label="Website theme"
-        className="flex flex-wrap justify-center gap-2.5"
+        className="flex flex-wrap justify-center gap-3 rounded-[28px] border border-site-line bg-site-surface p-2.5"
       >
         {THEME_PRESETS.map((preset) => {
           const isActive = preset.id === presetId;
@@ -35,13 +35,25 @@ export const ThemeSwitcher: React.FC<{ className?: string }> = ({ className = ''
                   flushSync(() => setPresetId(preset.id))
                 );
               }}
-              className={`relative h-8 w-8 rounded-full border-2 transition-transform duration-300 hover:scale-125 motion-reduce:transition-none ${SITE_FOCUS} ${
-                isActive ? 'scale-110 border-site-text' : 'border-transparent'
+              className={`group/dot relative flex h-10 w-10 items-center justify-center rounded-full border border-white/15 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 motion-reduce:transition-none ${SITE_FOCUS} ${
+                isActive
+                  ? 'shadow-[0_0_0_2px_var(--site-bg),0_0_0_4px_var(--site-accent)]'
+                  : 'hover:shadow-[0_0_0_2px_var(--site-bg),0_0_0_3px_var(--site-line)]'
               }`}
-              style={{
-                background: `linear-gradient(135deg, ${preset.config.tokens.bgSolidColor} 50%, ${preset.config.tokens.colorAccent} 50%)`,
-              }}
-            />
+              style={{ backgroundColor: preset.config.tokens.bgSolidColor }}
+            >
+              {/* The theme color as a glowing dot on the theme background. */}
+              <span
+                aria-hidden="true"
+                className={`rounded-full transition-[width,height] duration-300 motion-reduce:transition-none ${
+                  isActive ? 'h-5 w-5' : 'h-3.5 w-3.5 group-hover/dot:h-5 group-hover/dot:w-5'
+                }`}
+                style={{
+                  backgroundColor: preset.config.tokens.colorAccent,
+                  boxShadow: `0 0 12px ${preset.config.tokens.colorAccent}`,
+                }}
+              />
+            </button>
           );
         })}
       </div>

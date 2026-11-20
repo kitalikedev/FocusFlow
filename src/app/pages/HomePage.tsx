@@ -300,6 +300,7 @@ export const HomePage: React.FC = () => {
                     <Slideshow
                       label={feature.title}
                       slides={feature.slides}
+                      variant="single"
                       interval={SLIDE_INTERVAL}
                       sizes={FEATURE_SIZES}
                     />
