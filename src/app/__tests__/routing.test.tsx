@@ -60,6 +60,22 @@ describe('website pages', () => {
     await waitFor(() => expect(document.title).toBe('FocusFlow'));
   });
 
+  it('moves the workspace pictures with the arrows and shows the neighbours on both sides', async () => {
+    window.localStorage.removeItem(SITE_PRESET_KEY);
+    renderAt('/');
+    const slideshow = within(await screen.findByTestId('theme-slideshow'));
+    expect(slideshow.getByRole('img', { name: /Nebula theme/ })).toBeInTheDocument();
+    // The current picture plus one on each side.
+    expect(screen.getByTestId('theme-slideshow').querySelectorAll('img')).toHaveLength(3);
+
+    fireEvent.click(slideshow.getByRole('button', { name: 'Next picture' }));
+    expect(slideshow.getByRole('img', { name: /Obsidian Minimal theme/ })).toBeInTheDocument();
+
+    fireEvent.click(slideshow.getByRole('button', { name: 'Previous picture' }));
+    fireEvent.click(slideshow.getByRole('button', { name: 'Previous picture' }));
+    expect(slideshow.getByRole('img', { name: /Vaporwave theme/ })).toBeInTheDocument();
+  });
+
   it('shows the workspace with your own picture as the wallpaper', async () => {
     renderAt('/');
     const block = within(

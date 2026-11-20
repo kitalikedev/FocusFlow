@@ -38,7 +38,13 @@ describe('ThemesPage (FR-27)', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Themes' })).toBeInTheDocument();
     for (const preset of THEME_PRESETS) {
-      expect(screen.getByTestId(`theme-preview-${preset.id}`)).toHaveTextContent(preset.name);
+      const tile = screen.getByTestId(`theme-preview-${preset.id}`);
+      expect(tile).toHaveTextContent(preset.name);
+      // Each built-in theme shows a screenshot of the workspace in that theme.
+      expect(tile.querySelector('img')).toHaveAttribute(
+        'src',
+        `/images/home/theme-${preset.id}-720.webp`
+      );
     }
     expect(screen.getByText(`Built-in themes (${THEME_PRESETS.length})`)).toBeInTheDocument();
     expect(screen.getByTestId('more-themes')).toHaveTextContent('More themes coming soon');

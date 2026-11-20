@@ -18,10 +18,19 @@ interface ThemeTileProps {
   config: ThemeConfig;
   isSelected: boolean;
   onSelect: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  /** Screenshot of the workspace in this theme (built-in themes only), in public/images/home. */
+  image?: string;
 }
 
-/** One theme drawn with its own colors and clock font. */
-const ThemeTile: React.FC<ThemeTileProps> = ({ testId, name, config, isSelected, onSelect }) => (
+/** One theme: a screenshot of the workspace in it, or for saved themes its colors and clock font. */
+const ThemeTile: React.FC<ThemeTileProps> = ({
+  testId,
+  name,
+  config,
+  isSelected,
+  onSelect,
+  image,
+}) => (
   <button
     type="button"
     data-testid={testId}
@@ -31,19 +40,33 @@ const ThemeTile: React.FC<ThemeTileProps> = ({ testId, name, config, isSelected,
       isSelected ? 'border-site-accent ring-2 ring-inset ring-site-accent' : 'border-site-line'
     }`}
   >
-    <span
-      aria-hidden="true"
-      className="flex h-[150px] w-full items-center justify-center text-[34px] font-bold tracking-[-0.02em]"
-      style={{
-        backgroundColor: config.tokens.bgSolidColor,
-        color: config.tokens.colorAccent,
-        fontFamily: config.tokens.fontClock,
-      }}
-    >
-      <span className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transition-none">
-        25:00
+    {image ? (
+      <span className="block aspect-[16/10] w-full overflow-hidden">
+        <img
+          src={`/images/home/${image}-720.webp`}
+          alt=""
+          width={720}
+          height={450}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.06] motion-reduce:transition-none"
+        />
       </span>
-    </span>
+    ) : (
+      <span
+        aria-hidden="true"
+        className="flex aspect-[16/10] w-full items-center justify-center text-[34px] font-bold tracking-[-0.02em]"
+        style={{
+          backgroundColor: config.tokens.bgSolidColor,
+          color: config.tokens.colorAccent,
+          fontFamily: config.tokens.fontClock,
+        }}
+      >
+        <span className="transition-transform duration-300 group-hover:scale-110 motion-reduce:transition-none">
+          25:00
+        </span>
+      </span>
+    )}
     <span className="flex items-center justify-between gap-2 border-t border-site-line px-3.5 py-3 text-sm font-medium">
       <span className="truncate">{name}</span>
       <span
@@ -143,6 +166,7 @@ export const ThemesPage: React.FC = () => {
                 testId={`theme-preview-${preset.id}`}
                 name={preset.name}
                 config={preset.config}
+                image={`theme-${preset.id}`}
                 isSelected={!saved && preset.id === presetId}
                 onSelect={selectPreset(preset.id)}
               />
