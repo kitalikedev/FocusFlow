@@ -1,0 +1,42 @@
+/*
+ * Colors and fonts of the website pages (home, themes, analytics, tracking, about).
+ * The workspace at /app keeps its own theme tokens from index.css.
+ * Both fonts are self-hosted in public/fonts, so no font CDN is needed (CSP font-src 'self').
+ */
+@font-face {
+  font-family: 'Outfit';
+  src: url('/fonts/outfit.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono.woff2') format('woff2');
+  font-weight: 100 800;
+  font-display: swap;
+}
+
+.site {
+  --site-bg: #0e0e10;
+  --site-surface: #16161a;
+  --site-line: #2a2a30;
+  --site-text: #ededef;
+  --site-muted: #a1a1aa;
+  --site-accent: #c4b5fd;
+  --site-on-accent: #18122e;
+  --site-bar: #3a3646;
+  color-scheme: dark;
+}
+
+.site[data-theme='light'] {
+  --site-bg: #f6f5f1;
+  --site-surface: #ffffff;
+  --site-line: #e2dfd7;
+  --site-text: #18181b;
+  --site-muted: #57534e;
+  --site-accent: #5b45c7;
+  --site-on-accent: #ffffff;
+  --site-bar: #d6d1e6;
+  color-scheme: light;
+}

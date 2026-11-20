@@ -11,6 +11,17 @@ export default {
           contrast: 'var(--color-accent-contrast)',
         },
         panel: 'var(--panel-bg)',
+        // Website pages (light and dark), defined in src/app/site/site.css
+        site: {
+          bg: 'var(--site-bg)',
+          surface: 'var(--site-surface)',
+          line: 'var(--site-line)',
+          text: 'var(--site-text)',
+          muted: 'var(--site-muted)',
+          accent: 'var(--site-accent)',
+          'on-accent': 'var(--site-on-accent)',
+          bar: 'var(--site-bar)',
+        },
         capsule: {
           bg: 'var(--capsule-bg)',
           border: 'var(--capsule-border-color)',
@@ -75,6 +86,8 @@ export default {
       },
       fontFamily: {
         clock: ['var(--font-clock)', 'Inter', '-apple-system', 'sans-serif'],
+        display: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+        digits: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
     },
   },

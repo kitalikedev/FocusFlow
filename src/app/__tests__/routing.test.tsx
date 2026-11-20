@@ -29,6 +29,7 @@ vi.mock('../slots', () => {
 
 import { Layout } from '../layout';
 import { useAuthStore } from '@/core/auth/useAuthStore';
+import { SITE_THEME_KEY } from '../site/useSiteTheme';
 
 function renderAt(path: string) {
   return render(
@@ -81,12 +82,28 @@ describe('website pages', () => {
     await waitFor(() => expect(document.title).toBe('Tracking · FocusFlow'));
   });
 
-  it('shows the About page with the team and a contact link', async () => {
+  it('shows the About page with the team', async () => {
     renderAt('/about');
     expect(await screen.findByRole('heading', { level: 1, name: 'About FocusFlow' })).toBeInTheDocument();
-    expect(screen.getByText('Đàm Huỳnh Hoài Nam')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/kitalikedev/FocusFlow/issues');
+    expect(screen.getByRole('link', { name: /Đàm Huỳnh Hoài Nam/ })).toHaveAttribute('href', 'https://github.com/kitalikedev');
     await waitFor(() => expect(document.title).toBe('About FocusFlow · FocusFlow'));
+  });
+
+  it('has the contact details only on the home page, with a footer link to them from every page', async () => {
+    renderAt('/');
+    const contact = within(await screen.findByRole('region', { name: 'Contact us' }));
+    expect(contact.getByRole('link', { name: /damnam2456@gmail.com/ })).toHaveAttribute('href', 'mailto:damnam2456@gmail.com');
+    expect(contact.getByRole('link', { name: /Open an issue on GitHub/ })).toHaveAttribute(
+      'href',
+      'https://github.com/kitalikedev/FocusFlow/issues',
+    );
+    cleanup();
+
+    renderAt('/about');
+    await screen.findByTestId('about-page');
+    expect(screen.queryByRole('region', { name: 'Contact us' })).not.toBeInTheDocument();
+    const footer = screen.getByRole('navigation', { name: 'Footer' });
+    expect(within(footer).getByRole('link', { name: 'Contact' })).toHaveAttribute('href', '/#contact');
   });
 
   it('sends unknown addresses back to the home page', async () => {
@@ -120,6 +137,29 @@ describe('website pages', () => {
 
     fireEvent.click(screen.getByRole('link', { name: 'FocusFlow' }));
     expect(await screen.findByTestId('home-page')).toBeInTheDocument();
+  });
+});
+
+describe('light and dark mode', () => {
+  beforeEach(() => window.localStorage.removeItem(SITE_THEME_KEY));
+
+  it('switches the website between dark and light and remembers the choice', async () => {
+    renderAt('/');
+    await screen.findByTestId('home-page');
+    const site = screen.getByTestId('site-layout');
+    const button = screen.getByTestId('site-theme-btn');
+    expect(site).toHaveAttribute('data-theme', 'dark');
+    expect(button).toHaveAccessibleName('Switch to light mode');
+
+    fireEvent.click(button);
+    expect(site).toHaveAttribute('data-theme', 'light');
+    expect(button).toHaveAccessibleName('Switch to dark mode');
+    expect(window.localStorage.getItem(SITE_THEME_KEY)).toBe('light');
+
+    cleanup();
+    renderAt('/about');
+    await screen.findByTestId('about-page');
+    expect(screen.getByTestId('site-layout')).toHaveAttribute('data-theme', 'light');
   });
 });
 
