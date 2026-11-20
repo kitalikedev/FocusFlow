@@ -8,10 +8,9 @@ export const AnalyticsPage: React.FC = () => (
   <PageShell
     title="Focus Analytics"
     testId="analytics-page"
-    wide
-    description="Your focus minutes, daily streak and recent sessions."
+    description="Your focus minutes, daily streak and recent sessions. Sign in to keep them on every device."
   >
-    <Suspense fallback={<p className="p-5 text-xs text-white/50">Loading…</p>}>
+    <Suspense fallback={<p className="py-6 text-sm text-site-muted">Loading…</p>}>
       <AnalyticsContent />
     </Suspense>
   </PageShell>

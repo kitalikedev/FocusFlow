@@ -1,8 +1,14 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import React from 'react';
+import { act, fireEvent, render as baseRender, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { ThemesPage } from '../index';
 import { THEME_PRESETS } from '../lib/presets';
 import { useThemeLibraryStore } from '../store/useThemeLibraryStore';
+import { useThemeStore } from '@/core/theme/useThemeStore';
+
+// The page links back to the workspace and the contact section, so it needs a router.
+const render = (ui: React.ReactElement) => baseRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 beforeEach(() => {
   useThemeLibraryStore.setState({ customWallpapers: [], savedThemes: [], isUploading: false });
@@ -22,10 +28,18 @@ describe('ThemesPage (FR-27)', () => {
     await waitFor(() => expect(document.title).toBe('Themes · FocusFlow'));
   });
 
-  it('is preview only: the cards are not buttons', async () => {
+  it('previews the theme you pick without changing the workspace theme', async () => {
     render(<ThemesPage />);
     await screen.findByTestId('themes-page');
-    expect(within(screen.getByTestId('themes-page')).queryAllByRole('button')).toHaveLength(0);
+    const before = useThemeStore.getState();
+    expect(screen.getByTestId('theme-preview-name')).toHaveTextContent(THEME_PRESETS[0].name);
+
+    const last = THEME_PRESETS[THEME_PRESETS.length - 1];
+    fireEvent.click(screen.getByTestId(`theme-preview-${last.id}`));
+    expect(screen.getByTestId(`theme-preview-${last.id}`)).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId(`theme-preview-${THEME_PRESETS[0].id}`)).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('theme-preview-name')).toHaveTextContent(last.name);
+    expect(useThemeStore.getState()).toBe(before);
   });
 
   it('shows the themes the user saved only when there are some', async () => {

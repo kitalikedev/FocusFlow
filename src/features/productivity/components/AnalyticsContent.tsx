@@ -1,16 +1,19 @@
 import React, { useMemo } from 'react';
-import { Flame } from 'lucide-react';
 import { computeStreak, countToday } from '@/core/hud/stats';
 import { useFocusSessionsStore } from '@/core/data/useFocusSessionsStore';
 import { formatMinutes, minutesByIntent, WEEKDAY_LABELS, weekMinutes } from '../lib/analytics';
 
 const CHART_HEIGHT = 120;
+const H2 = 'font-display text-[22px] font-medium tracking-[-0.01em]';
 
-const Stat: React.FC<{ label: string; value: string; testId: string }> = ({ label, value, testId }) => (
-  <div className="flex flex-col gap-1 rounded-xl bg-white/5 px-3 py-2.5">
-    <span className="text-[11px] uppercase tracking-wider text-white/50">{label}</span>
-    <span data-testid={testId} className="text-lg font-semibold">
-      {value}
+const Stat: React.FC<{ label: string; testId: string; children: React.ReactNode }> = ({ label, testId, children }) => (
+  <div className="border-t border-site-line py-6 first:border-t-0 sm:border-l sm:border-t-0 sm:px-6 sm:first:border-l-0 sm:first:pl-0">
+    <span className="text-sm text-site-muted">{label}</span>
+    <span
+      data-testid={testId}
+      className="mt-2 block font-digits text-4xl font-bold tracking-[-0.04em] tabular-nums sm:text-5xl"
+    >
+      {children}
     </span>
   </div>
 );
@@ -28,33 +31,34 @@ export const AnalyticsContent: React.FC = () => {
   const maxIntent = intents[0]?.minutes ?? 1;
 
   return (
-    <div className="flex flex-col gap-5 p-5">
-      <div className="grid grid-cols-3 gap-2">
-        <Stat label="This week" value={formatMinutes(weekTotal)} testId="week-total" />
-        <Stat label="Today" value={`${today} sessions`} testId="today-count" />
-        <div className="flex flex-col gap-1 rounded-xl bg-white/5 px-3 py-2.5">
-          <span className="text-[11px] uppercase tracking-wider text-white/50">Streak</span>
-          <span data-testid="current-streak" className="flex items-center gap-1 text-lg font-semibold">
-            <Flame className="h-4 w-4 text-accent" aria-hidden="true" />
-            {streak} {streak === 1 ? 'Day' : 'Days'}
-          </span>
-        </div>
+    <div className="flex flex-col">
+      <div className="grid border-y border-site-line sm:grid-cols-3">
+        <Stat label="This week" testId="week-total">
+          {formatMinutes(weekTotal)}
+        </Stat>
+        <Stat label="Today" testId="today-count">
+          {today} sessions
+        </Stat>
+        <Stat label="Streak" testId="current-streak">
+          {streak} {streak === 1 ? 'Day' : 'Days'}
+        </Stat>
       </div>
 
-      <section aria-labelledby="week-chart-title">
-        <h3 id="week-chart-title" className="mb-2 text-xs font-medium uppercase tracking-wider text-white/50">
+      <section aria-labelledby="week-chart-title" className="border-b border-site-line py-10">
+        <h2 id="week-chart-title" className={H2}>
           Focus minutes this week
-        </h3>
+        </h2>
         <svg
           data-testid="week-chart"
           role="img"
           aria-label={`Focus minutes from Monday to Sunday: ${week.join(', ')}`}
           viewBox={`0 0 280 ${CHART_HEIGHT + 20}`}
-          className="mx-auto w-full max-w-md"
+          className="mt-8 w-full max-w-xl text-site-muted"
         >
           {week.map((minutes, index) => {
             const height = minutes === 0 ? 2 : Math.max(4, (minutes / maxDay) * CHART_HEIGHT);
             const x = index * 40 + 8;
+            const isToday = index === todayIndex;
             return (
               <g key={WEEKDAY_LABELS[index]}>
                 <rect
@@ -64,15 +68,15 @@ export const AnalyticsContent: React.FC = () => {
                   y={CHART_HEIGHT - height}
                   width={24}
                   height={height}
-                  rx={4}
-                  fill="var(--color-accent)"
-                  opacity={index === todayIndex ? 1 : 0.45}
-                  className="animate-bar-grow"
+                  rx={3}
+                  className={`animate-bar-grow transition-colors motion-reduce:animate-none ${
+                    isToday ? 'fill-site-accent' : 'fill-site-bar hover:fill-site-text'
+                  }`}
                   style={{ transformBox: 'fill-box', transformOrigin: 'bottom', animationDelay: `${index * 50}ms` }}
                 >
                   <title>{`${WEEKDAY_LABELS[index]}: ${formatMinutes(minutes)}`}</title>
                 </rect>
-                <text x={x + 12} y={CHART_HEIGHT + 15} textAnchor="middle" fontSize="10" fill="currentColor" opacity={0.6}>
+                <text x={x + 12} y={CHART_HEIGHT + 15} textAnchor="middle" fontSize="7.5" fill="currentColor">
                   {WEEKDAY_LABELS[index]}
                 </text>
               </g>
@@ -82,20 +86,22 @@ export const AnalyticsContent: React.FC = () => {
       </section>
 
       {intents.length > 0 && (
-        <section aria-labelledby="intent-title">
-          <h3 id="intent-title" className="mb-2 text-xs font-medium uppercase tracking-wider text-white/50">
+        <section aria-labelledby="intent-title" className="border-b border-site-line py-10">
+          <h2 id="intent-title" className={H2}>
             By focus intent
-          </h3>
-          <ul className="flex flex-col gap-2">
+          </h2>
+          <ul className="mt-6 flex max-w-2xl flex-col gap-4">
             {intents.map((intent) => (
-              <li key={intent.title} className="flex flex-col gap-1">
-                <div className="flex justify-between gap-2 text-xs">
-                  <span className="truncate text-white/85">{intent.title}</span>
-                  <span className="shrink-0 text-white/60">{formatMinutes(intent.minutes)}</span>
+              <li key={intent.title} className="flex flex-col gap-1.5">
+                <div className="flex justify-between gap-3 text-[15px]">
+                  <span className="truncate">{intent.title}</span>
+                  <span className="shrink-0 font-digits text-sm tabular-nums text-site-muted">
+                    {formatMinutes(intent.minutes)}
+                  </span>
                 </div>
-                <div className="h-1.5 rounded-full bg-white/10">
+                <div className="h-1.5 rounded-full bg-site-line">
                   <div
-                    className="h-1.5 rounded-full bg-accent"
+                    className="h-1.5 rounded-full bg-site-accent"
                     style={{ width: `${Math.max(4, (intent.minutes / maxIntent) * 100)}%` }}
                   />
                 </div>
@@ -105,26 +111,31 @@ export const AnalyticsContent: React.FC = () => {
         </section>
       )}
 
-      <section aria-labelledby="history-title">
-        <h3 id="history-title" className="mb-2 text-xs font-medium uppercase tracking-wider text-white/50">
+      <section aria-labelledby="history-title" className="py-10">
+        <h2 id="history-title" className={H2}>
           Recent sessions
-        </h3>
+        </h2>
         {sessions.length === 0 ? (
-          <p className="text-xs text-white/50">Finish a focus session to see it here.</p>
+          <p className="mt-4 text-site-muted">Finish a focus session in the workspace to see it here.</p>
         ) : (
-          <ul data-testid="session-history" className="flex flex-col divide-y divide-white/5">
+          <ul data-testid="session-history" className="mt-4 flex flex-col">
             {sessions.slice(0, 10).map((session) => (
-              <li key={session.id} className="flex items-center justify-between gap-3 py-2 text-xs">
-                <span className="truncate text-white/85">{session.intentTitle || 'Focus session'}</span>
-                <span className="shrink-0 text-white/50">
-                  {formatMinutes(session.durationMinutes)} ·{' '}
-                  {new Date(session.completedAt).toLocaleString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+              <li
+                key={session.id}
+                className="flex items-baseline justify-between gap-4 border-b border-site-line py-4 transition-[padding] duration-200 last:border-b-0 hover:pl-2 motion-reduce:transition-none"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate">{session.intentTitle || 'Focus session'}</span>
+                  <span className="text-[13px] text-site-muted">
+                    {new Date(session.completedAt).toLocaleString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
                 </span>
+                <span className="shrink-0 font-digits text-sm tabular-nums">{formatMinutes(session.durationMinutes)}</span>
               </li>
             ))}
           </ul>
