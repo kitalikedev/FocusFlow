@@ -124,7 +124,7 @@ export const ThemesPage: React.FC = () => {
               key={sitePreset.id}
               src={`/images/home/theme-${sitePreset.id}.webp`}
               srcSet={`/images/home/theme-${sitePreset.id}-720.webp 720w, /images/home/theme-${sitePreset.id}.webp 1440w`}
-              sizes="(min-width: 1200px) 1160px, 100vw"
+              sizes="(min-width: 1200px) 1160px, calc(100vw - 32px)"
               alt={`The FocusFlow workspace with the ${sitePreset.name} theme`}
               width={1440}
               height={900}

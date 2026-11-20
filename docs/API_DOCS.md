@@ -3,7 +3,7 @@
 **Phiên bản:** 1.1  
 **Trạng thái:** Chốt đặc tả kỹ thuật (Approved for Implementation)  
 **Tác giả:** API / Integration Architect  
-**Căn cứ đặc tả:** `docs/PRD.md` (v1.2.1), `docs/ARCHITECTURE.md` (v1.2.1), `docs/ERD.md` (v1.2)  
+**Căn cứ đặc tả:** `docs/PRD.md` (v1.2.2), `docs/ARCHITECTURE.md` (v1.2.1), `docs/ERD.md` (v1.2)  
 
 ---
 
@@ -839,7 +839,7 @@ Các dịch vụ bên thứ ba được tích hợp hoàn toàn phía trình duy
 Khi người dùng dán đường dẫn YouTube vào hàng đợi nhạc Lo-fi (`useAudioStore`), client gọi dịch vụ oEmbed công khai của `noembed.com` để lấy tiêu đề video mà không cần đăng ký YouTube Data API Key.
 
 * **URL Gọi Mẫu:**
-  `GET https://noembed.com/embed?url=https://www.youtube.com/watch?v=jfKfPfyJRdk`
+  `GET https://noembed.com/embed?url=https://www.youtube.com/watch?v=rFZHOHl-L8A`
 * **Response Mẫu (200 OK):**
   ```json
   {

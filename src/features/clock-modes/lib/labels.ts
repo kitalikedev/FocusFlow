@@ -27,5 +27,11 @@ export const POSITION_OPTIONS: { value: ClockPosition; label: string }[] = [
   { value: 'mini_corner', label: 'Mini Corner' },
 ];
 
+/** How the clock looks in Zen mode: the whole capsule, or only the running time. */
+export const ZEN_LOOK_OPTIONS: { timeOnly: boolean; label: string }[] = [
+  { timeOnly: false, label: 'Whole clock' },
+  { timeOnly: true, label: 'Only the time' },
+];
+
 export const CONTROL_BUTTON_CLASS =
   'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300';

@@ -117,3 +117,7 @@ npx lighthouse http://localhost:4173 --preset=desktop --output=html --output=jso
 ## 7. Kết luận
 
 Website đã đạt chất lượng tốt: mọi hạng mục chính từ 80 trở lên, Best Practices luôn 100. Điểm yếu cần cải thiện nhất là Performance trên Mobile (trang chủ 80, Analytics 83). Việc 1 và 2 trong mục 5 chỉ cần sửa vài dòng và sẽ nâng điểm Accessibility và SEO rõ rệt. Các đề xuất còn lại có thể làm trong các PR riêng.
+
+## 8. Các lần đo sau
+
+Lần đo v2 (PR #45, ảnh `docs/images/lighthouse/v2-*.png`), lần đo lại sạch bằng Lighthouse CLI và các bản sửa tiếp theo (LCP đồng hồ, layout shift trang Analytics, `sizes` của ảnh, nhãn nút Login) nằm trong [`Lighthouse_v2_report.md`](Lighthouse_v2_report.md), mục 11. Ảnh `before-*.png` ở trên giữ nguyên là kết quả của lần đo đầu tiên này.

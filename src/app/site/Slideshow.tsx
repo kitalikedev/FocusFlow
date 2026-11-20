@@ -26,10 +26,15 @@ interface SlideshowProps {
   interval?: number;
   /** The first picture is the main picture of the page: load it first. */
   isPriority?: boolean;
-  /** Width the picture takes on the page, for the browser to pick the 720 or 1440 px file. */
+  /**
+   * Width the picture takes on the page, for the browser to pick the 720 or 1440 px file. The carousel default
+   * matches its middle picture (86 % of the page, 74 % from 1024 px, at most 860 px).
+   */
   sizes?: string;
   testId?: string;
 }
+
+const CAROUSEL_SIZES = '(min-width: 1200px) 860px, (min-width: 1024px) 74vw, 86vw';
 
 /** Distance in pixels a swipe must cover to change the slide. */
 const SWIPE_DISTANCE = 50;
@@ -58,7 +63,7 @@ export const Slideshow: React.FC<SlideshowProps> = ({
   onIndexChange,
   interval = 5000,
   isPriority = false,
-  sizes = '(min-width: 1200px) 1160px, 100vw',
+  sizes = variant === 'carousel' ? CAROUSEL_SIZES : '100vw',
   testId,
 }) => {
   const count = slides.length;

@@ -15,6 +15,7 @@ import { useSettingsStore } from '@/core/data/useSettingsStore';
 import { useTimerStore } from '@/core/timer/useTimerStore';
 import { useUiStore } from '@/core/ui/useUiStore';
 import { ClockDisplay, ClockSettingsPopover } from '../index';
+import { ZEN_TIME_ONLY_KEY, useZenTimeOnly } from '../hooks/useZenTimeOnly';
 import { NARROW_SCREEN_QUERY } from '@/core/ui/useMediaQuery';
 import { mockMediaQueries, resetStores } from './testUtils';
 
@@ -140,6 +141,36 @@ describe('ClockDisplay', () => {
     expect(controls.className).toContain('pointer-events-none');
     expect(controls.className).toContain('duration-300');
     expect(controls).toHaveAttribute('inert');
+  });
+
+  it('Zen with "Only the time" also hides the clock frame and the ring, and keeps the digits', () => {
+    act(() => useZenTimeOnly.getState().setTimeOnly(true));
+    setPreferences({ clockVisualMode: 'circular_ring' });
+    render(<ClockDisplay />);
+    const capsule = screen.getByTestId('clock-capsule');
+    // Outside Zen the choice changes nothing.
+    expect(capsule).not.toHaveAttribute('data-bare');
+    expect(screen.getByTestId('clock-ring')).toHaveClass('opacity-100');
+
+    act(() => useUiStore.setState({ isZen: true }));
+    expect(capsule).toHaveAttribute('data-bare', 'true');
+    expect(capsule.style.backgroundColor).toBe('transparent');
+    expect(capsule.style.borderColor).toBe('transparent');
+    expect(screen.getByTestId('clock-ring')).toHaveClass('opacity-0');
+    expect(screen.getByTestId('clock-time')).toBeVisible();
+    act(() => useZenTimeOnly.getState().setTimeOnly(false));
+  });
+
+  it('the Zen look is picked in the timer settings and remembered on this device', () => {
+    useUiStore.setState({ isClockSettingsOpen: true });
+    render(<ClockSettingsPopover />);
+    expect(screen.getByTestId('zen-look-clock')).toHaveAttribute('aria-pressed', 'true');
+    fireEvent.click(screen.getByTestId('zen-look-time'));
+    expect(screen.getByTestId('zen-look-time')).toHaveAttribute('aria-pressed', 'true');
+    expect(useZenTimeOnly.getState().timeOnly).toBe(true);
+    expect(localStorage.getItem(ZEN_TIME_ONLY_KEY)).toBe('true');
+    fireEvent.click(screen.getByTestId('zen-look-clock'));
+    expect(localStorage.getItem(ZEN_TIME_ONLY_KEY)).toBe('false');
   });
 
   it('Zen also hides the controls of the Mini Corner capsule', () => {

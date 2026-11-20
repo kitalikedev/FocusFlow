@@ -31,7 +31,6 @@ export const AccountMenu: React.FC = () => {
         data-testid="login-btn"
         disabled={!isConfigured}
         title={isConfigured ? 'Sign in to sync your data' : AUTH_MESSAGES.cloudUnavailable}
-        aria-label="Open sign in"
         onClick={() => openAuthModal('signIn')}
         className={BUTTON_CLASS}
       >

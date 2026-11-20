@@ -3,7 +3,7 @@
 **Phiên bản:** 1.2  
 **Trạng thái:** Chốt thiết kế (Approved for Implementation)  
 **Tác giả:** Database Architect  
-**Căn cứ đặc tả:** `docs/PRD.md` (v1.2.1) & `docs/ARCHITECTURE.md` (v1.1)  
+**Căn cứ đặc tả:** `docs/PRD.md` (v1.2.2) & `docs/ARCHITECTURE.md` (v1.1)  
 **Tệp migration đính kèm:** `supabase/migrations/20261105000000_init_schema.sql`  
 
 ---

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Cloud, CloudOff, Flame, Maximize2, Minimize2, RefreshCw } from 'lucide-react';
 import type { SyncStatus } from '../data/useSyncStatusStore';
+import { zenHiddenProps } from '../ui/zen';
 import { useHud } from './useHud';
 import { AccountMenu } from './AccountMenu';
 
@@ -47,14 +48,11 @@ export const HudSlot: React.FC<HudSlotProps> = ({ brand = DEFAULT_BRAND }) => {
     toggleFullscreen,
   } = useHud();
 
-  if (isZen) {
-    return null;
-  }
-
+  // Zen fades the header out but keeps its place, so the clock below it does not move (AC-11.2).
   return (
     <header
       data-testid="hud-header"
-      className="w-full flex items-center justify-between px-6 py-4 select-none"
+      {...zenHiddenProps(isZen, 'w-full flex items-center justify-between px-6 py-4 select-none')}
     >
       {/* Brand / Logo */}
       <div className="flex items-center gap-2">{brand}</div>

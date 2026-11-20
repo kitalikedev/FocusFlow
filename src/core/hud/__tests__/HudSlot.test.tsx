@@ -92,10 +92,22 @@ describe('HudSlot', () => {
     expect(screen.getByTestId('account-btn')).toBeInTheDocument();
   });
 
-  it('renders nothing when isZen is true', () => {
+  it('fades out in Zen mode but keeps its height, so the clock does not jump (AC-11.2)', () => {
     useUiStore.setState({ isZen: true });
-    const { container } = render(<HudSlot />);
-    expect(container.firstChild).toBeNull();
+    render(<HudSlot />);
+    const header = screen.getByTestId('hud-header');
+    expect(header).toHaveClass('opacity-0', 'pointer-events-none');
+    expect(header).toHaveAttribute('aria-hidden', 'true');
+    expect(header).toHaveAttribute('inert');
+
+    act(() => useUiStore.setState({ isZen: false }));
+    expect(header).toHaveClass('opacity-100');
+    expect(header).not.toHaveAttribute('inert');
+  });
+
+  it('names the login button by its visible text', () => {
+    render(<HudSlot />);
+    expect(screen.getByRole('button', { name: 'Login' })).toBeInTheDocument();
   });
 });
 

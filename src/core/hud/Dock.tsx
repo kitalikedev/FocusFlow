@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ToolPanel } from '@/shared/types/contracts';
 import { useUiStore } from '../ui/useUiStore';
 import { NARROW_SCREEN_QUERY, useMediaQuery } from '../ui/useMediaQuery';
+import { zenHiddenProps } from '../ui/zen';
 
 const ANALYTICS_PATH = '/analytics';
 
@@ -56,13 +57,11 @@ export const ToolDock: React.FC = () => {
   const isNarrow = useMediaQuery(NARROW_SCREEN_QUERY);
   const open: Record<ToolPanel, boolean> = { tasks: isTasksOpen, note: isNoteOpen, mixer: isMixerOpen };
 
-  if (isZen) return null;
-
   return (
     <nav
       data-testid="tool-dock"
       aria-label="Tools"
-      className="flex items-center gap-1 rounded-2xl border p-1"
+      {...zenHiddenProps(isZen, 'flex items-center gap-1 rounded-2xl border p-1')}
       style={DOCK_STYLE}
     >
       {TOOLS.map(({ panel, label, testId, Icon }) => (
@@ -87,13 +86,11 @@ export const QuickControls: React.FC = () => {
   const toggleZen = useUiStore((state) => state.toggleZen);
   const navigate = useNavigate();
 
-  if (isZen) return null;
-
   return (
     <nav
       data-testid="quick-controls"
       aria-label="Quick controls"
-      className="flex items-center gap-1 rounded-2xl border p-1"
+      {...zenHiddenProps(isZen, 'flex items-center gap-1 rounded-2xl border p-1')}
       style={DOCK_STYLE}
     >
       <DockButton

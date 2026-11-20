@@ -29,6 +29,7 @@ vi.mock('@/shared/lib/web-audio', () => ({
 import { ControlBar, SoundPanel } from '../index';
 import { DEFAULT_YOUTUBE_VOLUME, LEVELS_STORAGE_KEY, QUEUE_STORAGE_KEY, readDeviceLevels, readStoredQueue, useAudioStore } from '../store/useAudioStore';
 import { resetAmbientEngine, setAmbientPaused } from '../lib/ambientEngine';
+import { LOFI_RADIO, RETIRED_STREAMS } from '../lib/lofiRadio';
 import { useUiStore } from '@/core/ui/useUiStore';
 import { useSettingsStore } from '@/core/data/useSettingsStore';
 import { setMasterVolume, toggleMasterMute } from '@/shared/lib/web-audio';
@@ -56,6 +57,7 @@ beforeEach(() => {
     wantsYouTubePlaying: false,
     isAddingTrack: false,
     trackError: null,
+    pausedByPauseAll: null,
   });
   useUiStore.setState({ isMixerOpen: true, isZen: false });
 });
@@ -111,6 +113,8 @@ describe('SoundPanel', () => {
     expect(screen.getByPlaceholderText('Paste a YouTube link')).toHaveValue('');
     expect(readStoredQueue().queue).toHaveLength(1);
     expect(JSON.parse(localStorage.getItem(QUEUE_STORAGE_KEY) ?? '{}').currentIndex).toBe(0);
+    // An old Lofi Girl link no longer plays on other sites: it is saved as the stream that replaced it.
+    expect(useAudioStore.getState().queue[0].url).toBe('https://www.youtube.com/watch?v=rFZHOHl-L8A');
   });
 
   it('rejects links that are not YouTube videos', async () => {
@@ -206,6 +210,35 @@ describe('useAudioStore queue rules', () => {
     expect(useAudioStore.getState()).toMatchObject({ currentIndex: -1, wantsYouTubePlaying: false });
   });
 
+  it('moves saved tracks of a retired lofi stream to the stream that replaced it', () => {
+    localStorage.setItem(
+      QUEUE_STORAGE_KEY,
+      JSON.stringify({
+        queue: [
+          { id: 'a', title: 'lofi girl', url: 'https://www.youtube.com/watch?v=jfKfPfyJRdk' },
+          { id: 'b', title: 'sleep', url: 'https://youtu.be/rUxyKA_-grg' },
+          { id: 'c', title: 'other', url: 'https://www.youtube.com/watch?v=abcdefghij1' },
+        ],
+        currentIndex: 1,
+      })
+    );
+    expect(readStoredQueue()).toEqual({
+      queue: [
+        { id: 'a', title: 'lofi girl', url: 'https://www.youtube.com/watch?v=rFZHOHl-L8A' },
+        { id: 'b', title: 'sleep', url: 'https://www.youtube.com/watch?v=JD-kMIpDfnY' },
+        { id: 'c', title: 'other', url: 'https://www.youtube.com/watch?v=abcdefghij1' },
+      ],
+      currentIndex: 1,
+    });
+  });
+
+  it('never offers a retired stream as a lofi radio station', () => {
+    const retired = Object.keys(RETIRED_STREAMS);
+    LOFI_RADIO.forEach((station) => {
+      expect(retired.some((id) => station.url.endsWith(id))).toBe(false);
+    });
+  });
+
   it('ignores corrupted stored queues', () => {
     localStorage.setItem(QUEUE_STORAGE_KEY, '{"queue":[{"id":1},{"id":"a","title":"x","url":"https://evil.test"}],"currentIndex":9}');
     expect(readStoredQueue()).toEqual({ queue: [], currentIndex: -1 });
@@ -231,6 +264,43 @@ describe('ControlBar (FR-18)', () => {
 
     fireEvent.click(screen.getByTestId('pause-all-btn'));
     expect(useAudioStore.getState()).toMatchObject({ isAmbientPaused: false, wantsYouTubePlaying: true });
+  });
+
+  it('"pause all" brings back only what it paused: music alone stays music alone', () => {
+    act(() => useAudioStore.getState().setVolume('rain', 0.5));
+    act(() => useAudioStore.getState().toggleAmbient()); // rain set up but paused
+    act(() => useAudioStore.setState({ queue: [track(1)], currentIndex: 0 }));
+    act(() => useAudioStore.getState().toggleYouTube()); // music on its own
+    expect(useAudioStore.getState()).toMatchObject({ isAmbientPaused: true, wantsYouTubePlaying: true });
+
+    render(<ControlBar />);
+    fireEvent.click(screen.getByTestId('pause-all-btn'));
+    expect(useAudioStore.getState()).toMatchObject({ isAmbientPaused: true, wantsYouTubePlaying: false });
+    fireEvent.click(screen.getByTestId('pause-all-btn'));
+    expect(useAudioStore.getState()).toMatchObject({ isAmbientPaused: true, wantsYouTubePlaying: true });
+  });
+
+  it('without anything to bring back, the bar button plays the ambient sounds only, never the music', () => {
+    act(() => useAudioStore.getState().setVolume('rain', 0.5));
+    act(() => useAudioStore.getState().toggleAmbient());
+    act(() => useAudioStore.setState({ queue: [track(1)], currentIndex: 0, wantsYouTubePlaying: false }));
+    render(<ControlBar />);
+    fireEvent.click(screen.getByTestId('pause-all-btn'));
+    expect(useAudioStore.getState()).toMatchObject({ isAmbientPaused: false, wantsYouTubePlaying: false });
+  });
+
+  it('playing music never starts the ambient sounds, and the other way round', () => {
+    act(() => useAudioStore.getState().setVolume('rain', 0.5));
+    act(() => useAudioStore.getState().toggleAmbient());
+    act(() => useAudioStore.setState({ queue: [track(1)], currentIndex: 0 }));
+
+    act(() => useAudioStore.getState().toggleYouTube());
+    act(() => useAudioStore.getState().playAt(0));
+    expect(useAudioStore.getState().isAmbientPaused).toBe(true);
+
+    act(() => useAudioStore.getState().toggleYouTube());
+    act(() => useAudioStore.getState().toggleAmbient());
+    expect(useAudioStore.getState()).toMatchObject({ isAmbientPaused: false, wantsYouTubePlaying: false });
   });
 
   it('AC-18.1: the speaker button mutes and shows the crossed speaker', () => {
