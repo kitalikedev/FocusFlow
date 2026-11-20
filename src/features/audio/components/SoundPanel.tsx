@@ -9,6 +9,7 @@ import { useMuted } from '../hooks/useAudioSync';
 import { CHANNEL_DEFS } from '../lib/channelDefs';
 import { LOFI_RADIO } from '../lib/lofiRadio';
 import { useAudioStore } from '../store/useAudioStore';
+import { SeekBar } from './MusicController';
 
 const ICON_BUTTON =
   'rounded-lg p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40';
@@ -206,6 +207,7 @@ const YouTubeQueue: React.FC = () => {
           </button>
         </div>
       )}
+      {current && <SeekBar testId="panel-seek" />}
 
       <SliderRow
         id="youtube-volume"

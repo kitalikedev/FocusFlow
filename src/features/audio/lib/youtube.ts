@@ -31,6 +31,20 @@ export function watchUrl(videoId: string): string {
   return `https://www.youtube.com/watch?v=${videoId}`;
 }
 
+/** Small cover image of a video (i.ytimg.com is allowed by the CSP). */
+export function thumbnailUrl(videoId: string): string {
+  return `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
+}
+
+/** 83 → "1:23", 3725 → "1:02:05". Negative or unknown values show as "0:00". */
+export function formatTime(seconds: number): string {
+  const total = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const secs = String(total % 60).padStart(2, '0');
+  return hours > 0 ? `${hours}:${String(minutes).padStart(2, '0')}:${secs}` : `${minutes}:${secs}`;
+}
+
 /** AC-17.1: real title from noembed; falls back to a neutral label when the lookup fails or times out. */
 export async function fetchVideoTitle(videoId: string, fetcher: typeof fetch = fetch): Promise<string> {
   const controller = new AbortController();
@@ -57,6 +71,11 @@ export interface YouTubePlayer {
   playVideo(): void;
   pauseVideo(): void;
   setVolume(volume: number): void;
+  /** Seconds played in the current video. */
+  getCurrentTime(): number;
+  /** Length of the current video in seconds; 0 while unknown or for a live stream. */
+  getDuration(): number;
+  seekTo(seconds: number, allowSeekAhead: boolean): void;
   destroy(): void;
 }
 
