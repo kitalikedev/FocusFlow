@@ -9,6 +9,7 @@ const player = {
   setVolume: vi.fn(),
   getCurrentTime: vi.fn(() => 42),
   getDuration: vi.fn(() => 180),
+  getVideoData: vi.fn((): { isLive?: boolean } => ({})),
   seekTo: vi.fn(),
   destroy: vi.fn(),
 };
@@ -53,6 +54,7 @@ beforeEach(() => {
   Object.values(player).forEach((fn) => fn.mockClear());
   player.getCurrentTime.mockReturnValue(42);
   player.getDuration.mockReturnValue(180);
+  player.getVideoData.mockReturnValue({});
   localStorage.clear();
   setMaster(1);
   useAudioStore.setState({
@@ -106,6 +108,22 @@ describe('YouTubeHost progress and seeking', () => {
     await waitFor(() => expect(useAudioStore.getState().progress.current).toBe(43), {
       timeout: PROGRESS_INTERVAL_MS * 4,
     });
+  });
+
+  it('shows a live stream as Live: its on-air time is not a length to seek in', async () => {
+    player.getVideoData.mockReturnValue({ isLive: true });
+    player.getDuration.mockReturnValue(15_000_000);
+    player.getCurrentTime.mockReturnValue(14_990_000);
+    render(<YouTubeHost />);
+    await waitFor(() => expect(player.getVideoData).toHaveBeenCalled());
+    expect(useAudioStore.getState().progress).toEqual({ current: 0, duration: 0 });
+  });
+
+  it('also treats an impossibly long video as live when YouTube does not say so', async () => {
+    player.getDuration.mockReturnValue(15_000_000);
+    render(<YouTubeHost />);
+    await waitFor(() => expect(player.getDuration).toHaveBeenCalled());
+    expect(useAudioStore.getState().progress).toEqual({ current: 0, duration: 0 });
   });
 
   it('stops reporting while the music is paused', async () => {

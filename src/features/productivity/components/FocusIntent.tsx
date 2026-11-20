@@ -68,7 +68,7 @@ export const FocusIntent: React.FC = () => {
     <div
       data-testid="focus-intent"
       ref={pickerRef}
-      {...zenHiddenProps(isZen, 'relative flex w-full max-w-md items-center gap-2')}
+      {...zenHiddenProps(isZen, 'relative flex w-[min(28rem,calc(100vw-2rem))] items-center gap-2')}
     >
       <label htmlFor="focus-intent-input" className="sr-only">
         Focus intent

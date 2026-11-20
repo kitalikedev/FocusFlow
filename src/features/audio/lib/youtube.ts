@@ -63,6 +63,14 @@ export async function fetchVideoTitle(videoId: string, fetcher: typeof fetch = f
   }
 }
 
+/** A live stream reports how long it has been on air as its length, so anything past this is shown as "Live". */
+export const LIVE_DURATION_SECONDS = 12 * 3600;
+
+/** True when the player is on a live stream: YouTube says so, or the "length" is far beyond any normal video. */
+export function isLiveStream(player: Pick<YouTubePlayer, 'getDuration' | 'getVideoData'>): boolean {
+  return player.getVideoData?.()?.isLive === true || player.getDuration() > LIVE_DURATION_SECONDS;
+}
+
 // --- Minimal typing of the IFrame API surface we use -------------------------------------------------
 
 export interface YouTubePlayer {
@@ -75,6 +83,8 @@ export interface YouTubePlayer {
   getCurrentTime(): number;
   /** Length of the current video in seconds; 0 while unknown or for a live stream. */
   getDuration(): number;
+  /** Details of the current video; `isLive` is true for a live stream. */
+  getVideoData?(): { isLive?: boolean } | undefined;
   seekTo(seconds: number, allowSeekAhead: boolean): void;
   destroy(): void;
 }
