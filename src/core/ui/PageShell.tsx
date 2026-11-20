@@ -15,15 +15,26 @@ export const PageShell: React.FC<PageShellProps> = ({ title, description, testId
   usePageTitle(title);
 
   return (
-    <section data-testid={testId} aria-labelledby={`${testId}-title`} className={`${SITE_CONTAINER} pb-24`}>
+    <section
+      data-testid={testId}
+      aria-labelledby={`${testId}-title`}
+      className={`${SITE_CONTAINER} pb-24`}
+    >
       <header className="grid gap-5 py-12 sm:py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:items-end lg:gap-12">
         <h1
           id={`${testId}-title`}
-          className="font-display text-[40px] font-semibold leading-none tracking-[-0.03em] sm:text-[56px]"
+          className="site-rise font-display text-[44px] font-semibold leading-none tracking-[-0.035em] sm:text-[64px]"
         >
           {title}
         </h1>
-        {description && <p className="max-w-xl text-[17px] leading-relaxed text-site-muted">{description}</p>}
+        {description && (
+          <p
+            className="site-rise max-w-xl text-[17px] leading-relaxed text-site-muted"
+            style={{ '--i': 2 } as React.CSSProperties}
+          >
+            {description}
+          </p>
+        )}
       </header>
       {children}
     </section>
