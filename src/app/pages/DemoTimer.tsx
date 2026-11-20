@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { SITE_BUTTON_LINE, SITE_BUTTON_PRIMARY, SITE_FOCUS } from '@/core/ui/siteStyles';
 import { useSitePreset } from '@/core/ui/siteTheme';
 
@@ -36,6 +36,13 @@ export const DemoTimer: React.FC = () => {
   const mode = MODES.find((item) => item.id === modeId) ?? MODES[0];
   const [secondsLeft, setSecondsLeft] = useState(mode.minutes * 60);
   const [isRunning, setRunning] = useState(false);
+  // The clock is the largest thing on the first screen: it shows at once when the page opens (LCP, issue #30)
+  // and only animates when a digit or the theme changes afterwards.
+  const hasMounted = useRef(false);
+  useEffect(() => {
+    hasMounted.current = true;
+  }, []);
+  const animate = hasMounted.current;
 
   useEffect(() => {
     if (!isRunning) return;
@@ -94,14 +101,17 @@ export const DemoTimer: React.FC = () => {
         data-testid="demo-clock"
         role="timer"
         aria-label={`${mode.label} timer`}
-        className="site-clock site-swap my-3 select-none whitespace-nowrap text-[24vw] font-bold leading-[1] tracking-[-0.03em] text-site-accent sm:text-[168px] lg:text-[208px]"
+        className={`site-clock ${animate ? 'site-swap' : ''} my-3 select-none whitespace-nowrap text-[24vw] font-bold leading-[1] tracking-[-0.03em] text-site-accent sm:text-[168px] lg:text-[208px]`}
         style={{ textShadow: '0 0 90px var(--site-glow)' }}
       >
         {formatClock(secondsLeft)
           .split('')
           .map((char, index) => (
             // Keyed by value: a digit that changes mounts again and drops in.
-            <span key={`${index}-${char}`} className={char === ':' ? 'inline-block' : 'site-tick'}>
+            <span
+              key={`${index}-${char}`}
+              className={char !== ':' && animate ? 'site-tick' : 'inline-block'}
+            >
               {char}
             </span>
           ))}

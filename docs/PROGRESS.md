@@ -18,7 +18,7 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 
 | Tên Tài liệu | Đường dẫn | Phiên bản | Tình trạng | Ghi chú & Phạm vi |
 | :--- | :--- | :--- | :--- | :--- |
-| **PRD** | [`docs/PRD.md`](PRD.md) | `v1.2.1` | **Đã chốt** (Ready for Implementation) | 31 Yêu cầu chức năng (FR-01 đến FR-31), tiêu chuẩn UX/UI đơn sắc tối giản, ma trận AC Given/When/Then, NFRs. |
+| **PRD** | [`docs/PRD.md`](PRD.md) | `v1.2.2` | **Đã chốt** (Ready for Implementation) | 31 Yêu cầu chức năng (FR-01 đến FR-31), tiêu chuẩn UX/UI đơn sắc tối giản, ma trận AC Given/When/Then, NFRs. |
 | **Architecture** | [`docs/ARCHITECTURE.md`](ARCHITECTURE.md) | `v1.2.1` | **Đã chốt** (Approved for Implementation) | Kiến trúc SPA, slot-based UI composition, ranh giới ESLint overrides, state machine timer, phân kỳ 4 Phase. |
 | **ERD** | [`docs/ERD.md`](ERD.md) | `v1.2` | **Đã chốt** (Approved for Implementation) | Schema 6 bảng PostgreSQL, quan hệ thực thể, hàm trigger quota/LWW, phân quyền RLS, kịch bản test SQL. |
 | **API Docs** | [`docs/API_DOCS.md`](API_DOCS.md) | `v1.1` | **Đã chốt** (Approved for Implementation) | Hợp đồng DataRepository, Supabase PostgREST 6 bảng, Auth, Storage bucket, RPC keep-alive `ping`, mô hình lỗi `AppError`. |
@@ -49,7 +49,7 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 ## 4. Trạng thái Kho Lưu Trữ (Git & GitHub)
 
 * **Remote:** `https://github.com/kitalikedev/FocusFlow.git`
-* **`main`:** commit gần nhất `471c219` (PR #43). Các mốc chính: PR #1 (Phase 0), #5 (Phase 1), #6 (Phase 2), #9 đến #16 (Phase 3 và hoàn thiện giao diện), #17 (chặn file env, dọn mã), #24 và #27 và #28 (website nhiều trang), #29 (Google Analytics và Sentry), #33 (sửa test tiêu đề trang chạy không ổn định), #35 (báo cáo Lighthouse lần đo trước), #36 (sửa lỗi Lighthouse ở trang chủ), #38 (dữ liệu mẫu `seed.sql`), #39 (wireframe), #41 (điều khiển nhạc YouTube), #42 (giao diện mới cho các trang website), #43 (website mặc theme và ảnh workspace). Cổng dev cố định: `5180`. Production: https://focus-flow-two-wheat.vercel.app.
+* **`main`:** commit gần nhất `24317c8` (PR #45). Các mốc chính: PR #1 (Phase 0), #5 (Phase 1), #6 (Phase 2), #9 đến #16 (Phase 3 và hoàn thiện giao diện), #17 (chặn file env, dọn mã), #24 và #27 và #28 (website nhiều trang), #29 (Google Analytics và Sentry), #33 (sửa test tiêu đề trang chạy không ổn định), #35 (báo cáo Lighthouse lần đo trước), #36 (sửa lỗi Lighthouse ở trang chủ), #38 (dữ liệu mẫu `seed.sql`), #39 (wireframe), #41 (điều khiển nhạc YouTube), #42 (giao diện mới cho các trang website), #43 (website mặc theme và ảnh workspace), #44 (carousel ảnh demo, chấm chọn theme mới, ảnh theme trên trang Themes), #45 (báo cáo Lighthouse v2). Nhánh `fix/audio-zen-lighthouse` (chưa mở PR): sửa lofi radio, tách nhạc khỏi ambient, Zen không giật và tùy chọn chỉ còn thời gian, các bản sửa Lighthouse. Cổng dev cố định: `5180`. Production: https://focus-flow-two-wheat.vercel.app.
 * **Quản lý công việc:** mỗi việc là một Issue gắn Milestone và người nhận; PR ghi `Closes #số` để Issue tự đóng khi merge. Milestone 1 (Multi-page routing, hạn 20/11/2026), 2 (Tracking and logging, đã xong), 3 (Seed data and README), 4 (Lighthouse), 5 (Peer review, hạn 26/11/2026). Các PR từ #24 trở đi đã liên kết Issue (#19, #20, #21, #22, #26, #34), các PR trước đó chưa có Issue.
 * **Bảo vệ `main`:** Ruleset "Main Protection" (PR bắt buộc, 1 approval, chỉ Squash, linear history, chặn force push và xóa; admin bypass khi merge PR). Cần xác nhận ruleset đang Active và đã thêm status check `ci`.
 * **Dependabot:** các PR nâng `vite`, `vitest`, `@vitest/coverage-v8` (#2, #3) đang đỏ vì bước nhảy phiên bản lớn, và PR nâng `react-router` lên bản 7 chưa được thử; xử lý trong PR chore nâng toolchain riêng.
@@ -67,21 +67,21 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 | `src/app/` (App, layout, providers, slot trong `slots.tsx`, `PageTracker`) | Hoàn tất |
 | Website nhiều trang (`react-router-dom`): `/` giới thiệu, `/app` workspace, `/themes` xem trước 12 theme và theme đã lưu, `/analytics` thống kê từ `focus_sessions`, `/tracking` (Coming soon), `/about` | Hoàn tất; menu cạnh logo, menu 3 gạch trên điện thoại; workspace luôn giữ chạy nền khi chuyển trang nên timer và nhạc không ngắt; địa chỉ không tồn tại (kể cả `/tasks` cũ) về trang chủ |
 | Giao diện website (`src/app/site`, `src/app/pages`) | Website "mặc" một trong 12 theme: chọn chấm màu ở trang chủ hoặc ô ở `/themes` thì màu, font đồng hồ và ảnh workspace của cả website đổi theo (lan màu hình tròn, lưu ở `focusflow-site-preset`, không đổi theme trong workspace). Có light/dark, đồng hồ thử ở trang chủ, ảnh chụp workspace dạng carousel (xem trước hai bên, nút mũi tên, vuốt, tự chuyển mỗi 5 giây) (`public/images/home`, WebP 1440 và 720 px), khối giới thiệu dùng ảnh hoặc GIF riêng làm hình nền, các khối hiện dần khi cuộn; mọi animation tắt khi bật giảm chuyển động |
-| `src/core/theme`, `src/core/ui` (Zustand stores, Toast) | Hoàn tất |
+| `src/core/theme`, `src/core/ui` (Zustand stores, Toast) | Hoàn tất; `zen.ts` cho các thanh điều khiển mờ đi trong Zen mà vẫn giữ chỗ, nên đồng hồ không nhảy khi vào hoặc thoát Zen |
 | `src/core/data` (LocalRepository, SupabaseRepository, migrateGuestData, settings / sessions / sync status stores) | Hoàn tất (Phase 1, 2) |
 | `src/core/auth` (đăng ký, đăng nhập, đăng xuất, Gộp/Hủy dữ liệu guest) | Hoàn tất (Phase 1) |
 | `src/core/timer` (Web Worker, drift-free `Date.now()`, 5 chế độ, nghỉ dài, chuông, ghi `focus_sessions`) | Hoàn tất (Phase 2) |
 | `src/core/shortcuts` (Space, R, F, Shift+F, M) | Hoàn tất (Phase 2) |
 | `src/core/hud` (cycle dots, phiên hôm nay, streak, sync, Fullscreen, menu tài khoản) | Hoàn tất (Phase 2) |
 | `src/shared/lib` (supabase, errors, messages, web-audio, `analytics`, `monitoring`) | Hoàn tất; GA4 và Sentry tự tắt khi thiếu biến môi trường hoặc trình duyệt bật Do Not Track, không gửi email, tên task, mục tiêu hay nội dung ghi chú |
-| `src/features/clock-modes` | Hoàn tất: 5 chế độ, 3 kiểu đồng hồ, vị trí Mini Corner, popover cài đặt |
+| `src/features/clock-modes` | Hoàn tất: 5 chế độ, 3 kiểu đồng hồ, vị trí Mini Corner, popover cài đặt; mục "Zen mode" chọn giữ cả khung đồng hồ hoặc chỉ còn thời gian (lưu trên thiết bị, `focusflow_zen_time_only`) |
 | `src/features/theme-wallpaper` | Hoàn tất: 12 theme (mặc định Nebula), thư viện nền, Customize, hiệu ứng (mưa, tuyết, đom đóm, grain, vignette, scanlines, glow), theme riêng, ảnh tải lên |
-| `src/features/audio` | Hoàn tất: 4 kênh Web Audio (Rain, Brown Noise, Campfire, Lofi), YouTube ẩn có hàng đợi, âm lượng tổng, fade mượt; điều khiển nhạc YouTube có thanh vị trí bài và thanh Music chỉnh riêng âm lượng YouTube (PR #41) |
+| `src/features/audio` | Hoàn tất: 4 kênh Web Audio (Rain, Brown Noise, Campfire, Lofi), YouTube ẩn có hàng đợi, âm lượng tổng, fade mượt; điều khiển nhạc YouTube có thanh vị trí bài và thanh Music chỉnh riêng âm lượng YouTube (PR #41); Lofi radio 4 đài, link stream cũ tự đổi sang link mới; nhạc và ambient bật tắt độc lập, "pause all" chỉ phát lại đúng thứ nó đã dừng |
 | `src/features/productivity` | Hoàn tất: Tasks và Notepad (panel trong workspace), Focus Intent, trang Analytics |
 | `src/features/quotes` | Hoàn tất: danh ngôn kiểu credits cuộn, mặc định tắt |
 | Bảo mật repo | Hook `.githooks/pre-commit` và `npm run check:secrets` (chạy cả trên CI) chặn file `.env` và khóa bí mật |
 
-Chỉ số hiện tại: lint 0/0, typecheck sạch, 60 file / 629 test xanh, build xanh; file JS chính `index` khoảng 61 KB gzip (ngưỡng 200 KB); thư viện Sentry nạp riêng sau khi trang chạy. Coverage chưa đo lại sau giao diện website mới.
+Chỉ số hiện tại: lint 0/0, typecheck sạch, 60 file / 637 test xanh, build xanh; file JS chính `index` khoảng 65 KB gzip (ngưỡng 200 KB); thư viện Sentry nạp riêng sau khi trang chạy. Coverage chưa đo lại sau giao diện website mới.
 
 ---
 
@@ -93,7 +93,8 @@ Chỉ số hiện tại: lint 0/0, typecheck sạch, 60 file / 629 test xanh, bu
 * **Phase 3 (clock-modes, theme-wallpaper, audio, productivity, quotes):** Hoàn tất, đã merge (PR #9 đến #16) và đã lên production.
 * **Phase 4 (hoàn thiện giao diện, âm thanh, hiệu ứng):** Phần lớn đã xong (PR #10 đến #16); chi tiết trong `docs/plans/phase-4-polish.md`.
 * **Website nhiều trang, theo dõi và ghi lỗi (Milestone 1 và 2):** Phần code đã xong và lên production (PR #24, #27, #28, #29), wireframe đã có (PR #39). Còn biên bản họp (Issue #23).
-* **Giao diện website:** Bản thiết kế lại đầu tiên đã merge (PR #42). Bản website mặc theme, ảnh workspace và animation đã merge (PR #43). Đợt chỉnh carousel, chấm theme và ảnh trên trang Themes đang ở nhánh `feature/site-carousel`.
+* **Giao diện website:** Bản thiết kế lại đầu tiên đã merge (PR #42). Bản website mặc theme, ảnh workspace và animation đã merge (PR #43). Carousel, chấm theme và ảnh trên trang Themes đã merge (PR #44).
+* **Sửa âm thanh, Zen và Lighthouse:** đang ở nhánh `fix/audio-zen-lighthouse`; chi tiết trong `docs/plans/phase-4-polish.md` mục 8.
 * **P2 (syncQueue, Google OAuth, PiP...) và E2E Playwright:** Chưa bắt đầu.
 
 ---
@@ -106,7 +107,7 @@ Các Issue đang mở, theo Milestone:
 | :--- | :--- | :--- | :--- |
 | 1 - Multi-page routing (hạn 20/11/2026) | #23 | Biên bản họp và phân vai của 5 thành viên | Nguyễn Anh Dũng |
 | 3 - Seed data and README | #31 | Báo cáo trong README: sơ đồ ERD, 6 trang kèm ảnh, cách chạy seed, theo dõi và ghi lỗi, lý do dùng Supabase | Nguyễn Anh Dũng |
-| 4 - Lighthouse | #30 | Đo Lighthouse trước và sau khi tối ưu (mobile và desktop), lưu ảnh kết quả. Đã có lần đo trước (PR #35) và bản sửa (PR #36); còn đo lại sau khi giao diện website mới merge, rồi thêm bảng so sánh vào `docs/lighthouse-report.md` | Lê Nguyễn Thảo Anh, Võ Xuân Phú |
+| 4 - Lighthouse | #30 | Đo Lighthouse trước và sau khi tối ưu (mobile và desktop), lưu ảnh kết quả. Đã có lần đo đầu (PR #35), bản sửa (PR #36), báo cáo v2 (PR #45, ảnh `v2-*.png`). Đo lại sạch bằng Lighthouse CLI: production đạt Performance 92 đến 100, các hạng mục khác 100; nhánh `fix/audio-zen-lighthouse` sửa thêm LCP, CLS trang Analytics và ảnh (báo cáo v2 mục 11). Còn: sau khi merge, đo lại trên production rồi đóng Issue | Lê Nguyễn Thảo Anh, Võ Xuân Phú |
 
 Milestone 5 (Peer review, hạn 26/11/2026) chưa có Issue: review 2 nhóm khác, áp dụng góp ý và ghi lại thay đổi, quay video demo tối đa 10 phút.
 
@@ -120,7 +121,7 @@ Việc còn lại ngoài Issue:
 
 ## 8. Việc Cần Làm Tiếp Theo
 
-1. Merge nhánh `feature/site-carousel`, rồi đo lại Lighthouse cho Issue #30.
+1. Mở PR cho nhánh `fix/audio-zen-lighthouse` (ghi `Refs #30`), merge, rồi đo lại Lighthouse trên production theo `docs/Lighthouse_v2_report.md` mục 11.1 và đóng Issue #30.
 2. Hoàn tất các Issue còn lại ở mục 7, ưu tiên #23 (hạn 20/11/2026) và #31.
 3. Cập nhật PRD, ARCHITECTURE, API_DOCS theo bố cục và tính năng hiện tại (website nhiều trang, theo dõi và ghi lỗi).
 4. Cài Node 22 (khớp `.nvmrc` và CI), rồi PR chore nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8) và xử lý các PR Dependabot.
@@ -138,7 +139,8 @@ Việc còn lại ngoài Issue:
 6. Việc lưu cài đặt đã được xếp hàng chạy lần lượt nên không còn ghi đè nhau.
 7. Các test kiểm tra tiêu đề trang đã đổi sang kiểu chờ (PR #33) vì effect đặt tiêu đề có thể chạy chậm một nhịp trên CI.
 8. Ảnh trong `public/images/home` là ảnh chụp workspace thật; khi đổi giao diện workspace cần chụp lại cho khớp. Hiệu ứng lan màu khi đổi theme dùng View Transitions API, trình duyệt chưa hỗ trợ thì đổi ngay không có hiệu ứng.
+9. Stream 24/7 trên YouTube đổi link mỗi khi kênh khởi động lại; khi một đài trong Lofi radio báo lỗi "cannot be played", thay link trong `src/features/audio/lib/lofiRadio.ts` và thêm id cũ vào `RETIRED_STREAMS`.
 
 ---
 
-*Cập nhật lần cuối: 2026-11-20*
+*Cập nhật lần cuối: 2026-11-21*

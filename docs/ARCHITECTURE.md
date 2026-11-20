@@ -3,7 +3,7 @@
 **Phiên bản:** 1.2.1  
 **Trạng thái:** Chốt thiết kế (Approved for Implementation)  
 **Tác giả:** Senior Software Architect  
-**Căn cứ đặc tả:** `docs/PRD.md` (v1.2.1) & `docs/ERD.md` (v1.2)  
+**Căn cứ đặc tả:** `docs/PRD.md` (v1.2.2) & `docs/ERD.md` (v1.2)  
 
 ---
 
@@ -170,6 +170,7 @@ FocusFlow/
 │   │   │   └── __tests__/         # Test contrast, clamp, token mapping
 │   │   ├── ui/                    # Quản lý trạng thái hiển thị UI tập trung
 │   │   │   ├── useUiStore.ts      # Zustand store: Zen, Fullscreen, mở/đóng modal, drawer tab
+│   │   │   ├── zen.ts             # zenHiddenProps: Zen làm mờ thanh điều khiển nhưng giữ chỗ (AC-11.2)
 │   │   │   └── __tests__/
 │   │   ├── hud/                   # FR-30 (Thanh trạng thái & điều khiển nhanh)
 │   │   │   ├── useHud.ts          # Selector hook: cycle dots, streak, sync status

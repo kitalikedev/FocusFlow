@@ -1,6 +1,7 @@
 import React from 'react';
 import { Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import { useUiStore } from '@/core/ui/useUiStore';
+import { zenHiddenProps } from '@/core/ui/zen';
 import { toggleMasterMute } from '@/shared/lib/web-audio';
 import { useMuted, useVolumeHydration } from '../hooks/useAudioSync';
 import { AMBIENT_CHANNELS } from '../lib/ambientEngine';
@@ -40,12 +41,15 @@ export const ControlBar: React.FC = () => {
   return (
     <>
       <YouTubeHost />
-      {hasAudio && !isZen && (
+      {hasAudio && (
         <div
           data-testid="control-bar"
-          className={`flex min-w-0 items-center gap-1 rounded-2xl border p-1 max-sm:hidden ${
-            track ? 'w-[min(34rem,56vw)]' : 'max-w-[50vw]'
-          }`}
+          {...zenHiddenProps(
+            isZen,
+            `flex min-w-0 items-center gap-1 rounded-2xl border p-1 max-sm:hidden ${
+              track ? 'w-[min(34rem,56vw)]' : 'max-w-[50vw]'
+            }`
+          )}
           style={{
             backgroundColor: 'var(--capsule-bg)',
             backdropFilter: 'blur(var(--capsule-blur))',

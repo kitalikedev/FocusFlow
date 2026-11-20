@@ -11,24 +11,29 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
+const exitButton = () => screen.queryByRole('button', { name: 'Exit Zen' });
+
 describe('ExitZenButton (AC-11.2)', () => {
-  it('stays hidden until the mouse moves, then hides again after 3 seconds', () => {
+  it('stays hidden until the mouse moves, then fades out again after 3 seconds', () => {
     render(<ExitZenButton />);
-    expect(screen.queryByTestId('exit-zen-btn')).not.toBeInTheDocument();
+    expect(exitButton()).not.toBeInTheDocument();
+    expect(screen.getByTestId('exit-zen-btn')).toHaveClass('opacity-0', 'pointer-events-none');
 
     fireEvent.mouseMove(window);
-    expect(screen.getByTestId('exit-zen-btn')).toBeInTheDocument();
+    expect(exitButton()).toBeInTheDocument();
+    expect(screen.getByTestId('exit-zen-btn')).toHaveClass('opacity-100');
 
     act(() => {
       vi.advanceTimersByTime(EXIT_ZEN_HIDE_DELAY_MS);
     });
-    expect(screen.queryByTestId('exit-zen-btn')).not.toBeInTheDocument();
+    expect(exitButton()).not.toBeInTheDocument();
+    expect(screen.getByTestId('exit-zen-btn')).toHaveClass('opacity-0');
   });
 
   it('appears on touch and leaves Zen when clicked', () => {
     render(<ExitZenButton />);
     fireEvent.touchStart(window);
-    fireEvent.click(screen.getByTestId('exit-zen-btn'));
+    fireEvent.click(screen.getByRole('button', { name: 'Exit Zen' }));
     expect(useUiStore.getState().isZen).toBe(false);
     expect(screen.queryByTestId('exit-zen-btn')).not.toBeInTheDocument();
   });
@@ -43,7 +48,7 @@ describe('ExitZenButton (AC-11.2)', () => {
     act(() => {
       vi.advanceTimersByTime(EXIT_ZEN_HIDE_DELAY_MS - 500);
     });
-    expect(screen.getByTestId('exit-zen-btn')).toBeInTheDocument();
+    expect(exitButton()).toBeInTheDocument();
   });
 
   it('ignores mouse movement outside Zen mode', () => {

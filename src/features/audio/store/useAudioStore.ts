@@ -3,6 +3,7 @@ import type { YouTubeTrack } from '@/shared/types/contracts';
 import { useSettingsStore } from '@/core/data/useSettingsStore';
 import { CHANNEL_DEFS } from '../lib/channelDefs';
 import { setChannelVolume, setAmbientPaused } from '../lib/ambientEngine';
+import { liveStreamId } from '../lib/lofiRadio';
 import { fetchVideoTitle, parseYouTubeId, watchUrl } from '../lib/youtube';
 
 export const QUEUE_STORAGE_KEY = 'focusflow_youtube_queue';
@@ -35,6 +36,11 @@ export interface AudioState {
   progress: { current: number; duration: number };
   /** A position the user asked to jump to; the player host applies it and clears it. */
   seekRequest: number | null;
+  /**
+   * What "pause all" stopped, so pressing it again brings back exactly that and nothing more. Music and ambient
+   * sounds are started on their own: playing music never starts the ambient sounds, and the other way round.
+   */
+  pausedByPauseAll: { ambient: boolean; music: boolean } | null;
 
   setVolume: (id: string, volume: number) => void;
   setYouTubeVolume: (volume: number) => void;
@@ -75,10 +81,17 @@ function isTrack(value: unknown): value is YouTubeTrack {
   );
 }
 
+/** A saved track that points at a retired lofi stream is moved to the stream that replaced it. */
+function withLiveStream(track: YouTubeTrack): YouTubeTrack {
+  const videoId = parseYouTubeId(track.url);
+  if (!videoId || liveStreamId(videoId) === videoId) return track;
+  return { ...track, url: watchUrl(liveStreamId(videoId)) };
+}
+
 export function readStoredQueue(): StoredQueue {
   try {
     const raw = JSON.parse(localStorage.getItem(QUEUE_STORAGE_KEY) ?? 'null') as Partial<StoredQueue> | null;
-    const queue = Array.isArray(raw?.queue) ? raw.queue.filter(isTrack).slice(0, QUEUE_MAX) : [];
+    const queue = Array.isArray(raw?.queue) ? raw.queue.filter(isTrack).slice(0, QUEUE_MAX).map(withLiveStream) : [];
     const index = typeof raw?.currentIndex === 'number' ? raw.currentIndex : -1;
     return { queue, currentIndex: index >= 0 && index < queue.length ? index : queue.length > 0 ? 0 : -1 };
   } catch {
@@ -160,6 +173,7 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   trackError: null,
   progress: { current: 0, duration: 0 },
   seekRequest: null,
+  pausedByPauseAll: null,
 
   setVolume: (id, volume) => {
     const level = Math.min(1, Math.max(0, volume));
@@ -168,7 +182,7 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     setChannelVolume(id, level);
     // Moving a slider up is an explicit "play" gesture.
     if (level > 0 && get().isAmbientPaused) {
-      set({ isAmbientPaused: false });
+      set({ isAmbientPaused: false, pausedByPauseAll: null });
       setAmbientPaused(false);
     }
     if (SETTINGS_CHANNELS.includes(id)) persistVolumes(volumes);
@@ -192,7 +206,7 @@ export const useAudioStore = create<AudioState>((set, get) => ({
 
   toggleAmbient: () => {
     const isAmbientPaused = !get().isAmbientPaused;
-    set({ isAmbientPaused });
+    set({ isAmbientPaused, pausedByPauseAll: null });
     setAmbientPaused(isAmbientPaused);
   },
 
@@ -207,8 +221,9 @@ export const useAudioStore = create<AudioState>((set, get) => ({
       return false;
     }
     set({ isAddingTrack: true, trackError: null });
-    const title = await fetchVideoTitle(videoId);
-    const track: YouTubeTrack = { id: crypto.randomUUID(), url: watchUrl(videoId), title };
+    const playableId = liveStreamId(videoId);
+    const title = await fetchVideoTitle(playableId);
+    const track: YouTubeTrack = { id: crypto.randomUUID(), url: watchUrl(playableId), title };
     const queue = [...get().queue, track];
     const currentIndex = get().currentIndex === -1 ? 0 : get().currentIndex;
     set({ queue, currentIndex, isAddingTrack: false });
@@ -249,7 +264,13 @@ export const useAudioStore = create<AudioState>((set, get) => ({
 
   playAt: (index) => {
     if (index < 0 || index >= get().queue.length) return;
-    set({ currentIndex: index, wantsYouTubePlaying: true, progress: { current: 0, duration: 0 }, seekRequest: null });
+    set({
+      currentIndex: index,
+      wantsYouTubePlaying: true,
+      progress: { current: 0, duration: 0 },
+      seekRequest: null,
+      pausedByPauseAll: null,
+    });
     writeQueue(get().queue, index);
   },
 
@@ -265,7 +286,7 @@ export const useAudioStore = create<AudioState>((set, get) => ({
 
   toggleYouTube: () => {
     if (get().currentIndex === -1) return;
-    set({ wantsYouTubePlaying: !get().wantsYouTubePlaying });
+    set({ wantsYouTubePlaying: !get().wantsYouTubePlaying, pausedByPauseAll: null });
   },
 
   handleTrackEnded: () => {
@@ -275,15 +296,24 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   },
 
   togglePauseAll: () => {
-    const { isAmbientPaused, volumes, wantsYouTubePlaying, currentIndex } = get();
-    const ambientAudible = !isAmbientPaused && Object.values(volumes).some((level) => level > 0);
+    const { isAmbientPaused, volumes, wantsYouTubePlaying, currentIndex, pausedByPauseAll } = get();
+    const hasAmbient = Object.values(volumes).some((level) => level > 0);
+    const ambientAudible = !isAmbientPaused && hasAmbient;
     if (ambientAudible || wantsYouTubePlaying) {
-      set({ isAmbientPaused: true, wantsYouTubePlaying: false });
+      set({
+        isAmbientPaused: true,
+        wantsYouTubePlaying: false,
+        pausedByPauseAll: { ambient: ambientAudible, music: wantsYouTubePlaying },
+      });
       setAmbientPaused(true);
       return;
     }
-    set({ isAmbientPaused: false, wantsYouTubePlaying: currentIndex !== -1 });
-    setAmbientPaused(false);
+    // Bring back what "pause all" stopped. Without that memory the button plays the ambient sounds only:
+    // the music has its own play button right next to it.
+    const resume = pausedByPauseAll ?? { ambient: hasAmbient, music: false };
+    const music = resume.music && currentIndex !== -1;
+    set({ isAmbientPaused: !resume.ambient, wantsYouTubePlaying: music, pausedByPauseAll: null });
+    setAmbientPaused(!resume.ambient);
   },
 
   setProgress: (current, duration) => {

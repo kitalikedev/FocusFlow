@@ -3,7 +3,8 @@ import { X } from 'lucide-react';
 import { useTimerStore } from '@/core/timer/useTimerStore';
 import { useUiStore } from '@/core/ui/useUiStore';
 import { useClockPreferences } from '../hooks/useClockPreferences';
-import { CONTROL_BUTTON_CLASS, POSITION_OPTIONS, VISUAL_MODE_OPTIONS } from '../lib/labels';
+import { useZenTimeOnly } from '../hooks/useZenTimeOnly';
+import { CONTROL_BUTTON_CLASS, POSITION_OPTIONS, VISUAL_MODE_OPTIONS, ZEN_LOOK_OPTIONS } from '../lib/labels';
 import {
   INTERVAL_ERROR,
   INTERVAL_MAX,
@@ -73,6 +74,8 @@ const SettingsPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const firstInput = useRef<HTMLInputElement>(null);
   const timer = useTimerStore.getState();
   const { visualMode, position, setVisualMode, setPosition } = useClockPreferences();
+  const zenTimeOnly = useZenTimeOnly((state) => state.timeOnly);
+  const setZenTimeOnly = useZenTimeOnly((state) => state.setTimeOnly);
 
   const [minutes, setMinutes] = useState<Record<DurationField, string>>({
     focus: String(Math.round(timer.durations.focus / 60)),
@@ -228,6 +231,27 @@ const SettingsPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             ))}
           </div>
           <p className="text-xs text-white/40">Mini Corner applies on screens wider than 640px.</p>
+        </fieldset>
+
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-2 text-xs uppercase tracking-widest text-white/50">Zen mode</legend>
+          <div className="flex flex-wrap gap-1">
+            {ZEN_LOOK_OPTIONS.map((option) => (
+              <button
+                key={option.label}
+                type="button"
+                data-testid={`zen-look-${option.timeOnly ? 'time' : 'clock'}`}
+                aria-pressed={zenTimeOnly === option.timeOnly}
+                onClick={() => setZenTimeOnly(option.timeOnly)}
+                className={`${CONTROL_BUTTON_CLASS} ${zenTimeOnly === option.timeOnly ? 'bg-white/15 text-white' : ''}`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-white/40">
+            Only the time also hides the clock frame and the ring in Zen (key F).
+          </p>
         </fieldset>
 
         <button

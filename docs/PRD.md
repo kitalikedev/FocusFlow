@@ -1,6 +1,6 @@
 # Product Requirement Document (PRD) — FocusFlow
 
-**Phiên bản:** 1.2.1  
+**Phiên bản:** 1.2.2  
 **Tình trạng:** Sẵn sàng thực thi (Ready for Implementation)  
 **Tác giả:** Product Manager & Lead UX Designer  
 **Mục tiêu hệ thống:** Custom Focus Timer & Aesthetic Workspace Web Application  
@@ -252,7 +252,11 @@ Sản phẩm tham chiếu chức năng tiện ích từ hai web focus timer đi�
   * **AC-11.2 (Zen Mode):**  
     * **Given:** Người dùng đang ở chế độ xem chuẩn.  
     * **When:** Bấm nút Zen Mode hoặc nhấn phím `F`.  
-    * **Then:** Toàn bộ thanh header, thanh dock điều khiển dưới đáy, bảng task, notepad đều chuyển sang `opacity: 0` và `pointer-events: none` trong 300ms; chỉ còn lại đồng hồ và hình nền. Di chuyển chuột hoặc chạm màn hình sẽ làm xuất hiện nút "Exit Zen" ở góc trên cùng.
+    * **Then:** Toàn bộ thanh header, thanh dock điều khiển dưới đáy, bảng task, notepad đều chuyển sang `opacity: 0` và `pointer-events: none` trong 300ms; chỉ còn lại đồng hồ và hình nền. Di chuyển chuột hoặc chạm màn hình sẽ làm xuất hiện nút "Exit Zen" ở góc trên cùng (mờ dần vào, tự mờ đi sau 3 giây không cử động). Các thanh bị ẩn vẫn giữ chỗ trong bố cục, nên khi vào hoặc thoát Zen đồng hồ đứng yên, không nhảy vị trí; thoát Zen thì các thanh mờ dần hiện lại trong 300ms.
+  * **AC-11.3 (Zen chỉ còn thời gian):**  
+    * **Given:** Trong Timer Settings, mục "Zen mode" đang chọn "Only the time" (mặc định là "Whole clock"; lựa chọn lưu trên thiết bị, khóa `focusflow_zen_time_only`).  
+    * **When:** Người dùng vào Zen Mode.  
+    * **Then:** Ngoài các thanh điều khiển, khung đồng hồ (nền kính, viền, bóng) và vòng tiến trình của kiểu Circular Ring cũng mờ đi trong 300ms; chỉ còn các chữ số thời gian đang chạy trên hình nền. Thoát Zen thì khung hiện lại như cũ.
 
 #### FR-12: Popover Tùy Chỉnh Thông Số Đồng Hồ (Timer Settings Popover)
 * **Mô tả:** Hộp thoại popover mở nhanh ngay cạnh đồng hồ cho phép điều chỉnh số phút của Focus, Short Break, Long Break mà không cần chuyển trang.
@@ -438,13 +442,17 @@ Sản phẩm tham chiếu chức năng tiện ích từ hai web focus timer đi�
 * **Mức độ ưu tiên:** P1
 * **Acceptance Criteria:**
   * **AC-17.1 (Thêm bài hát và lấy tiêu đề):**  
-    * **Given:** Người dùng dán đường dẫn YouTube hợp lệ (ví dụ: `https://www.youtube.com/watch?v=jfKfPfyJRdk`) vào ô "Add YouTube Track".  
+    * **Given:** Người dùng dán đường dẫn YouTube hợp lệ (ví dụ: `https://www.youtube.com/watch?v=rFZHOHl-L8A`) vào ô "Add YouTube Track".  
     * **When:** Bấm nút Enter hoặc Add.  
     * **Then:** Hệ thống gửi GET request tới `https://noembed.com/embed?url={URL}`, trích xuất trường `title`, và thêm item vào danh sách Queue với tên bài thực tế trong vòng 1000ms.
   * **AC-17.2 (Chuyển bài tự động):**  
     * **Given:** Hàng chờ có 3 bài hát và bài số 1 đang phát.  
     * **When:** YouTube Player kích hoạt sự kiện `YT.PlayerState.ENDED`.  
     * **Then:** Trình phát tự động chuyển sang bài số 2 trong danh sách hàng đợi và cập nhật UI bài đang phát.
+  * **AC-17.3 (Lofi radio luôn phát được):**  
+    * **Given:** Một kênh YouTube khởi động lại stream 24/7 của mình nên link cũ không còn nhúng được (YouTube báo lỗi 150).  
+    * **When:** Người dùng bấm một đài trong mục "Lofi radio", hoặc mở lại hàng chờ đã lưu có link cũ, hoặc dán link cũ.  
+    * **Then:** Hệ thống dùng link stream mới (bảng `RETIRED_STREAMS` trong `lofiRadio.ts` ánh xạ id cũ sang id mới), nhạc phát được ngay mà không cần xóa và thêm lại bài.
 
 #### FR-18: Thanh Điều Khiển Cố Định Dưới Đáy (Fixed Bottom Control Bar)
 * **Mô tả:** Thanh điều khiển cố định sát cạnh dưới màn hình, tích hợp master volume, nút toggle play/pause nhanh toàn bộ âm thanh, nút mở mixer, và trạng thái bài hát đang phát.
@@ -454,6 +462,10 @@ Sản phẩm tham chiếu chức năng tiện ích từ hai web focus timer đi�
     * **Given:** Có âm thanh Web Audio và YouTube đang phát.  
     * **When:** Click nút Speaker/Mute trên thanh Control Bar hoặc nhấn phím `M`.  
     * **Then:** Toàn bộ âm thanh im lặng ngay lập tức (`gainNode.gain.value = 0` và YouTube pause); icon chuyển thành loa gạch chéo (`VolumeX`). Click lần nữa khôi phục mức âm lượng trước đó.
+  * **AC-18.2 (Nhạc và âm thanh nền độc lập):**  
+    * **Given:** Đã có bài YouTube trong hàng chờ và đã đặt âm lượng cho ít nhất một kênh ambient (Rain, Brown Noise, Campfire, Lofi).  
+    * **When:** Người dùng bấm phát nhạc (nút của trình phát nhạc hoặc một bài trong hàng chờ), rồi dùng nút "pause all" trên Control Bar để dừng và phát lại.  
+    * **Then:** Phát nhạc không bao giờ bật các kênh ambient và ngược lại. "Pause all" dừng mọi thứ đang phát và nhớ những gì nó đã dừng; bấm lại thì chỉ phát lại đúng những thứ đó. Nếu không có gì để phát lại thì nút chỉ bật các kênh ambient, nhạc có nút phát riêng ngay bên cạnh.
 
 ---
 

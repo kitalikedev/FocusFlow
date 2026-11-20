@@ -58,10 +58,14 @@ describe('ToolDock', () => {
     expect(useUiStore.getState()).toMatchObject({ isTasksOpen: false, isMixerOpen: true });
   });
 
-  it('hides itself in Zen mode', () => {
+  it('fades out in Zen mode but keeps its place (AC-11.2)', () => {
     useUiStore.setState({ isZen: true });
     render(<ToolDock />);
-    expect(screen.queryByTestId('tool-dock')).not.toBeInTheDocument();
+    const dock = screen.getByTestId('tool-dock');
+    expect(dock).toHaveClass('opacity-0', 'pointer-events-none');
+    expect(dock).toHaveAttribute('aria-hidden', 'true');
+    expect(dock).toHaveAttribute('inert');
+    expect(screen.queryByRole('button', { name: 'Tasks' })).not.toBeInTheDocument();
   });
 });
 
@@ -83,10 +87,13 @@ describe('QuickControls', () => {
     expect(screen.getByTestId('location')).toHaveTextContent(/^\/analytics$/);
   });
 
-  it('hides itself in Zen mode', () => {
+  it('fades out in Zen mode but keeps its place (AC-11.2)', () => {
     useUiStore.setState({ isZen: true });
     renderQuickControls();
-    expect(screen.queryByTestId('quick-controls')).not.toBeInTheDocument();
+    const controls = screen.getByTestId('quick-controls');
+    expect(controls).toHaveClass('opacity-0');
+    expect(controls).toHaveAttribute('inert');
+    expect(screen.queryByRole('button', { name: 'Zen mode (F)' })).not.toBeInTheDocument();
   });
 });
 

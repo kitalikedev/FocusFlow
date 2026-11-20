@@ -3,6 +3,7 @@ import { ListChecks, X } from 'lucide-react';
 import { LIMITS } from '@/core/data/defaults';
 import { useFocusIntentStore } from '@/core/timer/useFocusIntentStore';
 import { useUiStore } from '@/core/ui/useUiStore';
+import { zenHiddenProps } from '@/core/ui/zen';
 import { useTasksStore } from '../store/useTasksStore';
 
 export const INTENT_DRAFT_KEY = 'focusflow_focus_intent';
@@ -60,12 +61,15 @@ export const FocusIntent: React.FC = () => {
     };
   }, [isPickerOpen]);
 
-  if (isZen) return null;
-
   const openTasks = tasks.filter((task) => !task.isCompleted && !task.id.startsWith('temp-')).slice(0, 8);
 
   return (
-    <div data-testid="focus-intent" ref={pickerRef} className="relative flex w-full max-w-md items-center gap-2">
+    // Zen fades it out but keeps its place, so the clock under it does not move (AC-11.2).
+    <div
+      data-testid="focus-intent"
+      ref={pickerRef}
+      {...zenHiddenProps(isZen, 'relative flex w-full max-w-md items-center gap-2')}
+    >
       <label htmlFor="focus-intent-input" className="sr-only">
         Focus intent
       </label>
@@ -100,7 +104,7 @@ export const FocusIntent: React.FC = () => {
       >
         <ListChecks className="h-4 w-4" aria-hidden="true" />
       </button>
-      {isPickerOpen && (
+      {isPickerOpen && !isZen && (
         <div
           id={listId}
           role="listbox"

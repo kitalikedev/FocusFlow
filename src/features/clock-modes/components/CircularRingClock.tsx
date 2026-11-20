@@ -16,8 +16,8 @@ export function ringOffset(remainingSeconds: number, totalSeconds: number): numb
 }
 
 export const CircularRingClock: React.FC<
-  Pick<InternalClockProps, 'remainingSeconds' | 'totalSeconds' | 'sessionType'>
-> = ({ remainingSeconds, totalSeconds, sessionType }) => {
+  Pick<InternalClockProps, 'remainingSeconds' | 'totalSeconds' | 'sessionType'> & { hideRing?: boolean }
+> = ({ remainingSeconds, totalSeconds, sessionType, hideRing = false }) => {
   const showRing = sessionType !== 'stopwatch' && totalSeconds > 0;
 
   return (
@@ -28,7 +28,9 @@ export const CircularRingClock: React.FC<
           width={SIZE}
           height={SIZE}
           viewBox={`0 0 ${SIZE} ${SIZE}`}
-          className="absolute inset-0 -rotate-90"
+          className={`absolute inset-0 -rotate-90 transition-opacity duration-300 motion-reduce:transition-none ${
+            hideRing ? 'opacity-0' : 'opacity-100'
+          }`}
           aria-hidden="true"
         >
           <circle cx={SIZE / 2} cy={SIZE / 2} r={RADIUS} fill="none" strokeWidth={STROKE} className="stroke-white/10" />

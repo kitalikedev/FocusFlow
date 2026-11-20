@@ -114,3 +114,14 @@ Bản thiết kế lại các trang website (`/`, `/themes`, `/analytics`, `/tra
 | W7 | Test: chọn theme đổi cả website và được nhớ, ảnh workspace theo theme, trang Themes đổi theme website mà không đổi theme workspace | `src/app/__tests__/routing.test.tsx`, `ThemesPage.test.tsx` |
 
 Ảnh được chụp từ bản chạy ở máy, chế độ khách với dữ liệu mẫu (không có dữ liệu thật). Khi giao diện workspace đổi thì chụp lại cho khớp.
+
+## 8. Sửa âm thanh, Zen và Lighthouse (nhánh `fix/audio-zen-lighthouse`)
+
+| # | Vấn đề | Sửa | Vị trí |
+| :--- | :--- | :--- | :--- |
+| Z1 | Hai đài Lofi Girl trong mục Lofi radio không phát: kênh đã khởi động lại stream nên link cũ báo lỗi 150 (không cho nhúng), app tự bỏ qua sang bài sau | Đổi sang link stream mới, thêm đài jazz lofi; bảng `RETIRED_STREAMS` đổi id cũ sang id mới khi đọc hàng chờ đã lưu và khi dán link cũ (AC-17.3). Kênh Lofi tự sinh bằng Web Audio vẫn chạy bình thường | `src/features/audio/lib/lofiRadio.ts`, `store/useAudioStore.ts` |
+| Z2 | Bấm lại "pause all" trên Control Bar bật cả nhạc lẫn ambient, dù trước đó chỉ phát nhạc | "Pause all" nhớ những gì nó đã dừng (`pausedByPauseAll`) và chỉ phát lại đúng những thứ đó; không có gì để phát lại thì chỉ bật ambient; nút nhạc, nút ambient và thanh trượt xóa trí nhớ này (AC-18.2) | `useAudioStore.ts` |
+| Z3 | Bấm Exit Zen bị giật: header, ô Focus Intent, hai dock và Control Bar bị gỡ khỏi trang trong Zen, thoát Zen thì hiện lại đột ngột và đẩy đồng hồ xuống | Các phần đó giữ chỗ, chỉ mờ dần (`opacity`, `pointer-events: none`, `inert`, `aria-hidden`) theo đúng AC-11.2; nút Exit Zen cũng mờ dần thay vì bật tắt | `src/core/ui/zen.ts`, `HudSlot.tsx`, `Dock.tsx`, `FocusIntent.tsx`, `ControlBar.tsx`, `ExitZenButton.tsx` |
+| Z4 | Muốn Zen chỉ còn thời gian | Mục "Zen mode" trong Timer Settings: "Whole clock" hoặc "Only the time". Chọn "Only the time" thì trong Zen khung đồng hồ (nền, viền, bóng) và vòng của kiểu Circular Ring cũng mờ đi; lưu trên thiết bị ở `focusflow_zen_time_only` (AC-11.3) | `src/features/clock-modes/hooks/useZenTimeOnly.ts`, `ClockSettingsPopover.tsx`, `ClockDisplay.tsx`, `CircularRingClock.tsx` |
+| Z5 | Lighthouse: LCP đồng hồ, CLS trang Analytics, `sizes` ảnh, nhãn nút Login | Chi tiết và số đo trước/sau trong `docs/Lighthouse_v2_report.md` mục 11 | Xem báo cáo |
+| Z6 | Test | Header và dock mờ nhưng giữ chỗ trong Zen, Exit Zen mờ dần, Zen chỉ còn thời gian, đổi stream cũ sang mới, "pause all" chỉ phát lại đúng thứ đã dừng, nhạc không bật ambient | `HudSlot.test.tsx`, `Dock.test.tsx`, `ExitZenButton.test.tsx`, `ClockDisplay.test.tsx`, `SoundPanel.test.tsx` |

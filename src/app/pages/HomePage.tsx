@@ -142,14 +142,24 @@ const SECTION = 'py-20 sm:py-28';
 const H2 =
   'font-display text-[34px] font-semibold leading-[1.05] tracking-[-0.03em] sm:text-[48px]';
 const LEAD = 'max-w-xl text-[17px] leading-relaxed text-site-muted';
-const FEATURE_SIZES = '(min-width: 1024px) 640px, 100vw';
+/**
+ * Width a feature picture takes on the page, so phones get the 720 px file. Under 1024 px the picture spans the
+ * page minus its 16 px side gutters; above it, it shares the row with the text.
+ */
+const FEATURE_SIZES = '(min-width: 1024px) 640px, calc(100vw - 32px)';
+/** The own-picture block adds the padding of its card (24 px) and of the picture column (24 px). */
+const OWN_PICTURE_SIZES = '(min-width: 1024px) 640px, calc(100vw - 104px)';
 
-const FeaturePicture: React.FC<{ name: string; alt: string }> = ({ name, alt }) => (
+const FeaturePicture: React.FC<{ name: string; alt: string; sizes?: string }> = ({
+  name,
+  alt,
+  sizes = FEATURE_SIZES,
+}) => (
   <div className="site-lift overflow-hidden rounded-2xl border border-site-line bg-site-surface">
     <img
       src={`/images/home/${name}.webp`}
       srcSet={`/images/home/${name}-720.webp 720w, /images/home/${name}.webp 1440w`}
-      sizes={FEATURE_SIZES}
+      sizes={sizes}
       alt={alt}
       width={1440}
       height={900}
@@ -258,10 +268,13 @@ export const HomePage: React.FC = () => {
             <FeaturePicture
               name="custom-picture"
               alt="The workspace with a black and white drawing uploaded as the wallpaper"
+              sizes={OWN_PICTURE_SIZES}
             />
             <figure className="site-lift absolute bottom-0 left-0 w-[42%] -rotate-3 overflow-hidden rounded-xl border-4 border-site-surface shadow-2xl">
               <img
                 src="/images/home/custom-original.webp"
+                srcSet="/images/home/custom-original-320.webp 320w, /images/home/custom-original.webp 640w"
+                sizes="(min-width: 1024px) 280px, 36vw"
                 alt="The picture before upload: a black and white drawing of a girl with long hair"
                 width={640}
                 height={360}

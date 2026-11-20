@@ -30,6 +30,7 @@ beforeEach(() => {
     wantsYouTubePlaying: false,
     progress: { current: 83, duration: 225 },
     seekRequest: null,
+    pausedByPauseAll: null,
   });
   useUiStore.setState({ isMixerOpen: false, isZen: false });
 });
