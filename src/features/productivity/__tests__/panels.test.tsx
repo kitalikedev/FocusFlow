@@ -149,6 +149,11 @@ describe('Notepad (FR-20)', () => {
 });
 
 describe('FocusIntent (FR-29)', () => {
+  it('keeps its own width, so it stays readable when the clock moves to the corner', () => {
+    render(<FocusIntent />);
+    expect(screen.getByTestId('focus-intent').className).toContain('w-[min(28rem,calc(100vw-2rem))]');
+  });
+
   it('AC-29.1: picks a task, and AC-29.3 keeps the text when the task is deleted', async () => {
     const created = await getLocalRepository().createTask('Viết báo cáo tài chính');
     useTasksStore.setState({ tasks: [created], status: 'ready' });

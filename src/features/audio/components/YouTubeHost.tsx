@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useSettingsStore } from '@/core/data/useSettingsStore';
 import { useToastStore } from '@/core/ui/useToastStore';
 import { isMuted, subscribeMute } from '@/shared/lib/web-audio';
-import { loadYouTubeApi, parseYouTubeId, type YouTubeNamespace, type YouTubePlayer } from '../lib/youtube';
+import { isLiveStream, loadYouTubeApi, parseYouTubeId, type YouTubeNamespace, type YouTubePlayer } from '../lib/youtube';
 import { useAudioStore } from '../store/useAudioStore';
 
 /** How often the position of the current video is read while it plays. */
@@ -110,7 +110,9 @@ export const YouTubeHost: React.FC = () => {
     if (!ready || !player || !videoId || !wantsPlaying || muted) return;
     const report = () => {
       if (document.visibilityState === 'hidden') return;
-      useAudioStore.getState().setProgress(player.getCurrentTime(), player.getDuration());
+      // A live stream has no position to seek to: 0 and 0 make the seek bar show "0:00 … Live", not its hours on air.
+      const isLive = isLiveStream(player);
+      useAudioStore.getState().setProgress(isLive ? 0 : player.getCurrentTime(), isLive ? 0 : player.getDuration());
     };
     report();
     const timer = setInterval(report, PROGRESS_INTERVAL_MS);
