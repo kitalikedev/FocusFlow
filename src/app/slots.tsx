@@ -10,7 +10,7 @@ import {
   ThemeCustomizerModal as ThemeThemeCustomizerModal,
   ThemesPage as ThemeThemesPage,
 } from '@/features/theme-wallpaper';
-import { ControlBar as AudioControlBar, SoundPanel as AudioSoundPanel } from '@/features/audio';
+import { ControlBar as AudioControlBar, MiniPlayer as AudioMiniPlayer, SoundPanel as AudioSoundPanel } from '@/features/audio';
 import { QuoteDisplay as QuotesDisplay } from '@/features/quotes';
 import {
   FocusIntent as ProductivityFocusIntent,
@@ -111,6 +111,13 @@ export const ThemeCustomizerSlot: React.FC = () => (
 export const ControlBarSlot: React.FC = () => (
   <SlotErrorBoundary>
     <AudioControlBar />
+  </SlotErrorBoundary>
+);
+
+/** Small music player shown on the website pages, where the workspace controls are not visible. */
+export const MiniPlayerSlot: React.FC = () => (
+  <SlotErrorBoundary>
+    <AudioMiniPlayer />
   </SlotErrorBoundary>
 );
 

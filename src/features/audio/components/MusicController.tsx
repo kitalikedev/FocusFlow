@@ -12,8 +12,25 @@ const RANGE_CLASS = 'h-1 w-full cursor-pointer accent-[var(--color-accent)] disa
 /** Position of the current video with a slider to jump in it; live streams show "Live" instead. */
 export const SeekBar: React.FC<{ testId?: string }> = ({ testId = 'seek-bar' }) => {
   const progress = useAudioStore((state) => state.progress);
+  const isLive = useAudioStore((state) => state.isLive);
+  const listenedSeconds = useAudioStore((state) => state.listenedSeconds);
   const seek = useAudioStore((state) => state.seek);
   const canSeek = progress.duration > 0;
+
+  // A live stream cannot be seeked: show that it is live and for how long it has been playing.
+  if (isLive) {
+    return (
+      <div
+        data-testid={`${testId}-live`}
+        aria-label={`Live stream, listened for ${formatTime(listenedSeconds)}`}
+        className="flex min-w-0 items-center gap-1.5 text-[11px] tabular-nums text-white/55"
+      >
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-red-400" aria-hidden="true" />
+        <span className="font-semibold uppercase tracking-wide text-white/80">Live</span>
+        <span data-testid={`${testId}-listened`}>{formatTime(listenedSeconds)} listened</span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-w-0 items-center gap-2 text-[11px] tabular-nums text-white/55">

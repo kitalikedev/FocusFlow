@@ -22,6 +22,7 @@ vi.mock('../slots', () => {
     ThemeCustomizerSlot: stub('theme-customizer'),
     ControlBarSlot: stub('control-bar'),
     SoundPanelSlot: stub('sound-panel'),
+    MiniPlayerSlot: stub('mini-player'),
     ToolPanelsSlot: stub('tool-panels'),
     ThemesPageSlot: stub('themes-page'),
     AnalyticsPageSlot: stub('analytics-page'),

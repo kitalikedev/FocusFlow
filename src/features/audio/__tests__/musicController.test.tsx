@@ -29,6 +29,8 @@ beforeEach(() => {
     currentIndex: 1,
     wantsYouTubePlaying: false,
     progress: { current: 83, duration: 225 },
+    isLive: false,
+    listenedSeconds: 0,
     seekRequest: null,
     pausedByPauseAll: null,
   });
@@ -118,6 +120,23 @@ describe('SeekBar', () => {
     expect(screen.getByTestId('seek-bar')).toBeDisabled();
     expect(screen.getByTestId('seek-bar-duration')).toHaveTextContent('Live');
     expect(screen.getByTestId('seek-bar')).toHaveAttribute('aria-valuetext', 'Live');
+  });
+});
+
+describe('SeekBar on a live stream', () => {
+  it('shows Live and how long it has been listened to, without a seek slider', () => {
+    useAudioStore.setState({ progress: { current: 0, duration: 0 }, isLive: true, listenedSeconds: 65 });
+    render(<SeekBar />);
+    expect(screen.getByTestId('seek-bar-live')).toHaveTextContent('Live');
+    expect(screen.getByTestId('seek-bar-listened')).toHaveTextContent('1:05 listened');
+    expect(screen.queryByTestId('seek-bar')).not.toBeInTheDocument();
+  });
+
+  it('goes back to the seek slider for a normal video', () => {
+    useAudioStore.setState({ isLive: false });
+    render(<SeekBar />);
+    expect(screen.getByTestId('seek-bar')).toBeInTheDocument();
+    expect(screen.queryByTestId('seek-bar-live')).not.toBeInTheDocument();
   });
 });
 

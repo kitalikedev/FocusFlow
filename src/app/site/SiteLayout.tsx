@@ -4,6 +4,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import { SITE_CONTAINER, SITE_FOCUS } from '@/core/ui/siteStyles';
 import { SitePresetContext, spreadThemeChange } from '@/core/ui/siteTheme';
+import { MiniPlayerSlot } from '../slots';
 import { OpenAppButton } from './OpenAppButton';
 import { useSiteTheme, type SiteTheme } from './useSiteTheme';
 import './site.css';
@@ -214,6 +215,7 @@ export const SiteLayout: React.FC = () => {
           </main>
           <SiteFooter />
         </div>
+        <MiniPlayerSlot />
       </div>
     </SitePresetContext.Provider>
   );

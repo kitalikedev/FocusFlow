@@ -48,7 +48,7 @@ function offsetOf(slideIndex: number, index: number, count: number): number {
   return ((((slideIndex - index) % count) + count + half) % count) - half;
 }
 
-const ARROW = `absolute top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-site-line bg-site-bg text-site-text shadow-lg transition-[transform,background-color,color] duration-200 hover:scale-110 hover:bg-site-accent hover:text-site-on-accent active:scale-95 motion-reduce:transition-none ${SITE_FOCUS}`;
+const ARROW = `absolute top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-site-line bg-site-bg text-site-text shadow-lg transition-[transform,background-color,color] duration-200 hover:scale-110 hover:bg-site-accent hover:text-site-on-accent motion-reduce:transition-none ${SITE_FOCUS}`;
 
 /**
  * Workspace screenshots that move on their own every few seconds, with arrows, dots, swipe and the arrow keys.
