@@ -49,7 +49,7 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 ## 4. Trạng thái Kho Lưu Trữ (Git & GitHub)
 
 * **Remote:** `https://github.com/kitalikedev/FocusFlow.git`
-* **`main`:** commit gần nhất `c005cac` (báo cáo dự án trong README, báo cáo sprint, self-report và ghi chú đánh giá chéo). Các mốc chính: PR #1 (Phase 0), #5 (Phase 1), #6 (Phase 2), #9 đến #16 (Phase 3 và hoàn thiện giao diện), #17 (chặn file env, dọn mã), #24 và #27 và #28 (website nhiều trang), #29 (Google Analytics và Sentry), #33 (sửa test tiêu đề trang chạy không ổn định), #35 (báo cáo Lighthouse lần đo trước), #36 (sửa lỗi Lighthouse ở trang chủ), #38 (dữ liệu mẫu `seed.sql`), #39 (wireframe), #41 (điều khiển nhạc YouTube), #42 (giao diện mới cho các trang website), #43 (website mặc theme và ảnh workspace), #44 (carousel ảnh demo, chấm chọn theme mới, ảnh theme trên trang Themes), #45 (báo cáo Lighthouse v2), #46 (sửa lofi radio, tách nhạc khỏi ambient, Zen không giật và tùy chọn chỉ còn thời gian, sửa Lighthouse), #47 (hiện Live cho stream trực tiếp, ô mục tiêu đủ rộng khi đồng hồ ở góc). Chưa merge: nhánh `docs/report-update` (README rút gọn, tách chi tiết sang `docs/FEATURES.md`, `SYSTEM_DESIGN.md`, `PROJECT_MANAGEMENT.md`, `MONITORING.md`, gộp báo cáo sprint thành `docs/reports/sprints.md`, thêm file self-report từng người) và nhánh `fix/peer-feedback` (sửa theo góp ý của nhóm Đạt, xem `docs/PEER_REVIEW.md`). Cổng dev cố định: `5180`. Production: https://focus-flow-two-wheat.vercel.app.
+* **`main`:** commit gần nhất `c005cac` (báo cáo dự án trong README, báo cáo sprint, self-report và ghi chú đánh giá chéo). Các mốc chính: PR #1 (Phase 0), #5 (Phase 1), #6 (Phase 2), #9 đến #16 (Phase 3 và hoàn thiện giao diện), #17 (chặn file env, dọn mã), #24 và #27 và #28 (website nhiều trang), #29 (Google Analytics và Sentry), #33 (sửa test tiêu đề trang chạy không ổn định), #35 (báo cáo Lighthouse lần đo trước), #36 (sửa lỗi Lighthouse ở trang chủ), #38 (dữ liệu mẫu `seed.sql`), #39 (wireframe), #41 (điều khiển nhạc YouTube), #42 (giao diện mới cho các trang website), #43 (website mặc theme và ảnh workspace), #44 (carousel ảnh demo, chấm chọn theme mới, ảnh theme trên trang Themes), #45 (báo cáo Lighthouse v2), #46 (sửa lofi radio, tách nhạc khỏi ambient, Zen không giật và tùy chọn chỉ còn thời gian, sửa Lighthouse), #47 (hiện Live cho stream trực tiếp, ô mục tiêu đủ rộng khi đồng hồ ở góc). Chưa merge: nhánh `docs/report-update` (README rút gọn, tách chi tiết sang `docs/FEATURES.md`, `SYSTEM_DESIGN.md`, `PROJECT_MANAGEMENT.md`, `MONITORING.md`, gộp báo cáo sprint thành `docs/reports/sprints.md`, thêm file self-report từng người). Việc sửa theo góp ý của nhóm Đạt (xem `docs/PEER_REVIEW.md`) giao cho Võ Xuân Phú, làm trong PR riêng (nhánh `fix/peer-feedback`, chưa mở). Cổng dev cố định: `5180`. Production: https://focus-flow-two-wheat.vercel.app.
 * **Quản lý công việc:** mỗi việc là một Issue gắn Milestone và người nhận; PR ghi `Closes #số` để Issue tự đóng khi merge. Milestone 1 (Multi-page routing, hạn 20/11/2026), 2 (Tracking and logging, đã xong), 3 (Seed data and README), 4 (Lighthouse), 5 (Peer review, hạn 26/11/2026). Các PR từ #24 trở đi đã liên kết Issue (#19, #20, #21, #22, #26, #34), các PR trước đó chưa có Issue.
 * **Bảo vệ `main`:** Ruleset "Main Protection" (PR bắt buộc, 1 approval, chỉ Squash, linear history, chặn force push và xóa; admin bypass khi merge PR). Cần xác nhận ruleset đang Active và đã thêm status check `ci`.
 * **Dependabot:** các PR nâng `vite`, `vitest`, `@vitest/coverage-v8` (#2, #3) đang đỏ vì bước nhảy phiên bản lớn, và PR nâng `react-router` lên bản 7 chưa được thử; xử lý trong PR chore nâng toolchain riêng.
@@ -81,7 +81,7 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 | `src/features/quotes` | Hoàn tất: danh ngôn kiểu credits cuộn, mặc định tắt |
 | Bảo mật repo | Hook `.githooks/pre-commit` và `npm run check:secrets` (chạy cả trên CI) chặn file `.env` và khóa bí mật |
 
-Chỉ số hiện tại: lint 0/0, typecheck sạch, 60 file / 640 test xanh (nhánh `fix/peer-feedback`: 62 file / 653 test), build xanh; file JS chính `index` khoảng 65 KB gzip (ngưỡng 200 KB); thư viện Sentry nạp riêng sau khi trang chạy. Coverage chưa đo lại sau giao diện website mới.
+Chỉ số hiện tại: lint 0/0, typecheck sạch, 60 file / 640 test xanh (sau khi sửa theo góp ý của nhóm Đạt: 62 file / 653 test), build xanh; file JS chính `index` khoảng 65 KB gzip (ngưỡng 200 KB); thư viện Sentry nạp riêng sau khi trang chạy. Coverage chưa đo lại sau giao diện website mới.
 
 ---
 
@@ -113,7 +113,7 @@ Milestone 5 (Peer review, hạn 26/11/2026), chưa có Issue:
 
 | Việc | Trạng thái |
 | :--- | :--- |
-| Góp ý nhận được (Task 5b) | Nhóm Đạt (ứng dụng quản lý chi tiêu) gửi 6 góp ý ngày 21/11. Quyết định: làm 4 (nút nhảy khi bấm ở carousel và Exit Zen, hiện thời gian đã nghe cho stream trực tiếp, thanh nhạc nhỏ ở trang website), không làm tốc độ lofi và danh sách yêu thích (lý do trong `docs/PEER_REVIEW.md`). Code đã xong ở nhánh `fix/peer-feedback` (62 file, 653 test đạt), chờ commit và PR; sau đó điền số PR vào `docs/PEER_REVIEW.md` |
+| Góp ý nhận được (Task 5b) | Nhóm Đạt (ứng dụng quản lý chi tiêu) gửi 6 góp ý ngày 21/11. Quyết định: làm 4 (nút nhảy khi bấm ở carousel và Exit Zen, hiện thời gian đã nghe cho stream trực tiếp, thanh nhạc nhỏ ở trang website), không làm tốc độ lofi và danh sách yêu thích (lý do trong `docs/PEER_REVIEW.md`). Giao cho Võ Xuân Phú làm trong PR riêng (nhánh `fix/peer-feedback`); khi xong là 62 file, 653 test đạt. Sau khi merge, điền số PR vào `docs/PEER_REVIEW.md` và `docs/plans/phase-4-polish.md` |
 | Đánh giá cho nhóm khác (Task 5a) | Chưa làm: cả nhóm đánh giá UI/UX của ít nhất 2 nhóm khác và điền Phần A của `docs/PEER_REVIEW.md` |
 | Self-report 5 sprint | Mỗi thành viên có sẵn một file trong `docs/reports/self-reports/` (tên gồm mã số sinh viên) và tự viết; thiếu hoặc trễ bị trừ 10 % điểm nhóm |
 | Video demo (tối đa 10 phút, 720p) | Chưa quay |
@@ -128,7 +128,7 @@ Việc còn lại ngoài Issue:
 
 ## 8. Việc Cần Làm Tiếp Theo
 
-1. Commit nhánh `fix/peer-feedback` và mở PR (ghi vào `docs/PEER_REVIEW.md` số PR), bổ sung PRD cho thanh nhạc ở trang website.
+1. Phú làm PR sửa theo góp ý của nhóm Đạt (nhánh `fix/peer-feedback`, ghi `Closes #số` của Issue), rồi điền số PR vào `docs/PEER_REVIEW.md`; bổ sung PRD cho thanh nhạc ở trang website.
 2. Mở PR cho nhánh `docs/report-update` (ghi `Refs #31`), merge.
 3. Đo lại Lighthouse trên production theo `docs/Lighthouse_v2_report.md` mục 11.1, cập nhật bảng trong README và đóng Issue #30.
 4. Dán biên bản họp vào Issue #23 và đóng Issue.

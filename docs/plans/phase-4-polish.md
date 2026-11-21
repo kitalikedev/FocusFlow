@@ -130,7 +130,7 @@ Bản thiết kế lại các trang website (`/`, `/themes`, `/analytics`, `/tra
 
 ## 9. Sửa theo góp ý đánh giá chéo (nhánh `fix/peer-feedback`)
 
-Nguồn: file đánh giá của nhóm Đạt, 21/11/2026, ghi đầy đủ trong `docs/PEER_REVIEW.md` Phần B.
+Nguồn: file đánh giá của nhóm Đạt, 21/11/2026, ghi đầy đủ trong `docs/PEER_REVIEW.md` Phần B. Người thực hiện: Võ Xuân Phú, trong một PR riêng.
 
 | # | Góp ý | Quyết định | Nguyên nhân và cách sửa | Vị trí |
 | :--- | :--- | :--- | :--- | :--- |
