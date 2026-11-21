@@ -78,7 +78,7 @@ Mình là Phú, phụ trách phần giao diện âm thanh và kiểm tra hiệu 
 
 ### 3. Tự đánh giá đóng góp
 
-- Mức độ đóng góp (1 – 5): 5
+- Mức độ đóng góp (1 – 5): 3,5
 - Nhận xét: Sprint này mình không nộp code; đóng góp chủ yếu là kiểm thử và góp ý. Mình nhận đây là sprint đóng góp ít nhất và đã bù lại ở hai sprint sau.
 
 ---
