@@ -71,10 +71,10 @@ _Cấu trúc giống A.1._
 
 ### B.1 Ai đã đánh giá nhóm chúng tôi
 
-| Nhóm | Ngày | Đường dẫn bài đánh giá |
-| :--- | :--- | :--- |
-| Nhóm của Đạt | 21/11/2026 | Góp ý qua tin nhắn |
-| | | |
+| Nhóm | Người đánh giá | Dự án của nhóm | Thiết bị | Ngày | Đường dẫn bài đánh giá |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Nhóm của Đạt | Đạt | Ứng dụng quản lý chi tiêu | Laptop của bạn Đạt | 21/11/2026 | File `review-sương-sương.pdf` (2 trang, 6 góp ý, kèm ảnh chụp) |
+| | | | | | |
 
 ### B.2 Quyết định
 
@@ -82,10 +82,12 @@ Cả nhóm đọc từng góp ý cùng nhau và quyết định có thay đổi 
 
 | # | Góp ý | Từ nhóm | Quyết định | Đã thay đổi gì (pull request) hoặc lý do không làm |
 | :-: | :--- | :--- | :---: | :--- |
-| 1 | Bật Zen mode (phím F) rồi bấm nút "Exit Zen" mãi không thoát được, nút cứ nhảy liên tục | Nhóm của Đạt | Đang sửa | **Nguyên nhân:** mọi nút đều co lại 5 % khi bấm (`transform: scale(0.95)`). Nút "Exit Zen" được canh giữa màn hình cũng bằng `transform`, nên lúc nhấn chuột xuống nút mất phần canh giữa và nhảy sang phải nửa bề rộng của nó. Con trỏ rơi ra ngoài nút, lúc nhả chuột cú bấm không trúng nút nữa. **Cách sửa:** canh giữa nút mà không dùng `transform`, thêm test cho trường hợp này. Pull request: ____ |
-| 2 | | | | |
-| 3 | | | | |
-| 4 | | | | |
+| 1 | Nhấn mũi tên trái/phải của carousel ở trang chủ thì nút "đi xuống", lệch chuột là không bấm được; nên để kiểu nhấp nháy khi nhấn | Nhóm của Đạt | Sẽ làm | **Nguyên nhân:** mọi nút khi bấm đều bị quy tắc chung `transform: scale(0.95)` thay thế toàn bộ `transform`, làm mất phần `translate` đang giữ nút ở giữa (nút carousel canh giữa theo chiều dọc), nên nút tụt xuống rồi con trỏ rơi ra ngoài nút. **Cách sửa:** dùng thuộc tính `scale` riêng (cùng phương án với góp ý 3) để hiệu ứng co nhẹ khi nhấn không còn đụng vào vị trí nút. Pull request: ____ |
+| 2 | Mở nhạc lofi mà không biết đã chạy được bao lâu; thanh "0:00 … Live" chỉ để làm cảnh | Nhóm của Đạt | Sẽ làm | **Nguyên nhân:** với stream trực tiếp, YouTube trả về thời lượng là số giờ stream đã phát nên nhóm đã đổi thành "0:00 … Live" (PR #47), nhưng thanh đó không có thông tin gì cho người nghe. **Cách sửa:** với stream trực tiếp, hiện chữ Live kèm **thời gian đã nghe** (đếm từ lúc bấm phát, dừng khi tạm dừng); ẩn thanh tua vì không tua được. Hiện thêm ảnh bìa trong danh sách phát. Pull request: ____ |
+| 3 | Bật Zen (phím F) rồi bấm nút "Exit Zen" mãi không thoát được, nút nhảy liên tục | Nhóm của Đạt | Sẽ làm | **Nguyên nhân:** cùng nguyên nhân với góp ý 1. Nút "Exit Zen" được canh giữa bằng `-translate-x-1/2`; lúc nhấn chuột xuống, quy tắc co nút làm mất phần canh giữa nên nút nhảy sang phải khoảng 50 px, con trỏ rơi ra ngoài nút và cú bấm không trúng. Đã tái hiện trên trình duyệt. **Cách sửa:** một thay đổi CSS chung cho cả 2 góp ý (dùng `scale` thay cho `transform`), thêm test. Pull request: ____ |
+| 4 | Sang trang khác vẫn nghe tiếng nhạc; nếu giữ như vậy thì ít nhất cần nút bật/tắt, chuyển bài, âm lượng ở trang khác, giống Spotify | Nhóm của Đạt | Sẽ làm | Nhạc chạy tiếp là chủ ý (workspace luôn chạy nền để timer và nhạc không ngắt khi xem các trang website), nhưng ở các trang website chưa có cách điều khiển. **Cách sửa:** thêm thanh nhạc nhỏ ở góc dưới các trang website khi có bài đang có trong danh sách phát: tạm dừng/phát, bài trước/sau, âm lượng, tên bài. Cần bổ sung một mục vào PRD. Pull request: ____ |
+| 5 | Nên có chỉnh tốc độ âm thanh cho lofi | Nhóm của Đạt | Không làm lúc này | Nhạc lofi trong app là stream trực tiếp của YouTube (chỉ phát đúng tốc độ thật, không đổi tốc độ được) và âm Lofi tạo bằng Web Audio là vòng lặp cố định; đổi tốc độ không phải tính năng trong PRD. Ghi vào hướng phát triển. |
+| 6 | Với link YouTube: có danh sách link đánh dấu yêu thích hoặc lưu lại, có ảnh bìa thumbnail | Nhóm của Đạt | Làm một phần | **Ảnh bìa:** thêm vào danh sách phát (gộp với góp ý 2). **Danh sách yêu thích:** hiện danh sách phát đã được lưu trên máy của người dùng; yêu thích có đồng bộ giữa các thiết bị cần thêm bảng database và sửa PRD nên để vào hướng phát triển. |
 
 ### B.3 Trước và sau
 

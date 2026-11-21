@@ -125,3 +125,18 @@ Bản thiết kế lại các trang website (`/`, `/themes`, `/analytics`, `/tra
 | Z4 | Muốn Zen chỉ còn thời gian | Mục "Zen mode" trong Timer Settings: "Whole clock" hoặc "Only the time". Chọn "Only the time" thì trong Zen khung đồng hồ (nền, viền, bóng) và vòng của kiểu Circular Ring cũng mờ đi; lưu trên thiết bị ở `focusflow_zen_time_only` (AC-11.3) | `src/features/clock-modes/hooks/useZenTimeOnly.ts`, `ClockSettingsPopover.tsx`, `ClockDisplay.tsx`, `CircularRingClock.tsx` |
 | Z5 | Lighthouse: LCP đồng hồ, CLS trang Analytics, `sizes` ảnh, nhãn nút Login | Chi tiết và số đo trước/sau trong `docs/Lighthouse_v2_report.md` mục 11 | Xem báo cáo |
 | Z6 | Test | Header và dock mờ nhưng giữ chỗ trong Zen, Exit Zen mờ dần, Zen chỉ còn thời gian, đổi stream cũ sang mới, "pause all" chỉ phát lại đúng thứ đã dừng, nhạc không bật ambient | `HudSlot.test.tsx`, `Dock.test.tsx`, `ExitZenButton.test.tsx`, `ClockDisplay.test.tsx`, `SoundPanel.test.tsx` |
+
+---
+
+## 9. Sửa theo góp ý đánh giá chéo (nhánh `fix/peer-feedback`)
+
+Nguồn: file đánh giá của nhóm Đạt, 21/11/2026, ghi đầy đủ trong `docs/PEER_REVIEW.md` Phần B.
+
+| # | Góp ý | Quyết định | Nguyên nhân và cách sửa | Vị trí |
+| :--- | :--- | :--- | :--- | :--- |
+| P1 | Nút mũi tên carousel và nút Exit Zen "đi xuống" khi bấm, lệch chuột là bấm trượt | Làm | Quy tắc chung `transform: scale(0.95)` khi bấm thay toàn bộ `transform`, làm mất phần `translate` đang canh giữa nút. Đổi sang thuộc tính `scale` riêng; bỏ `active:scale-*` riêng ở trang website để không co hai lần | `src/app/index.css`, `Slideshow.tsx`, `siteStyles.ts` |
+| P2 | Lofi không biết đã nghe bao lâu; thanh "0:00 … Live" chỉ để làm cảnh | Làm | Store có thêm `isLive`, `listenedSeconds` (đếm khi đang phát, giữ qua tạm dừng, đặt lại khi đổi bài); thanh tua của stream trực tiếp hiện "LIVE · mm:ss listened"; danh sách phát có ảnh bìa | `useAudioStore.ts`, `YouTubeHost.tsx`, `MusicController.tsx`, `SoundPanel.tsx` |
+| P3 | Sang trang khác vẫn có nhạc nhưng không điều khiển được | Làm | `MiniPlayer` ở các trang website qua `MiniPlayerSlot`: tên bài, bài trước, phát/tạm dừng, bài sau, âm lượng, thời gian đã nghe của stream trực tiếp | `src/features/audio/components/MiniPlayer.tsx`, `src/app/slots.tsx`, `SiteLayout.tsx` |
+| P4 | Chỉnh tốc độ âm thanh cho lofi | Không làm | Stream trực tiếp của YouTube chỉ phát đúng tốc độ thật, âm Lofi tạo bằng Web Audio là vòng lặp cố định, và đổi tốc độ không có trong PRD | Hướng phát triển |
+| P5 | Danh sách link YouTube yêu thích | Làm một phần | Ảnh bìa đã thêm (P2); yêu thích đồng bộ cần bảng database mới và sửa PRD, để về sau | Hướng phát triển |
+| P6 | Test | Làm | Nút không nhảy khi bấm (kiểm tra CSS), thời gian đã nghe của stream trực tiếp, thanh tua Live, thanh nhạc nhỏ (hiện, phát/tạm dừng, bài trước/sau, âm lượng, Live), ảnh bìa trong danh sách phát | `pressEffect.test.ts`, `miniPlayer.test.tsx`, `youtubeHost.test.tsx`, `musicController.test.tsx`, `routing.test.tsx` |
