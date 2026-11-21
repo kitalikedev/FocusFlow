@@ -34,6 +34,10 @@ export interface AudioState {
   trackError: string | null;
   /** Position and length of the current video in seconds, reported by the player. */
   progress: { current: number; duration: number };
+  /** True while the current video is a live stream (no length to seek in). */
+  isLive: boolean;
+  /** Seconds the user has listened to the current live stream (counted while it plays). */
+  listenedSeconds: number;
   /** A position the user asked to jump to; the player host applies it and clears it. */
   seekRequest: number | null;
   /**
@@ -60,6 +64,8 @@ export interface AudioState {
   togglePauseAll: () => void;
   /** Called by the player host with the latest position. */
   setProgress: (current: number, duration: number) => void;
+  /** Called by the player host: whether the track is a live stream and how long it has been listened to. */
+  setLive: (isLive: boolean, listenedSeconds: number) => void;
   /** Jumps to a position of the current video (seek bar). */
   seek: (seconds: number) => void;
   clearSeekRequest: () => void;
@@ -172,6 +178,8 @@ export const useAudioStore = create<AudioState>((set, get) => ({
   isAddingTrack: false,
   trackError: null,
   progress: { current: 0, duration: 0 },
+  isLive: false,
+  listenedSeconds: 0,
   seekRequest: null,
   pausedByPauseAll: null,
 
@@ -257,7 +265,7 @@ export const useAudioStore = create<AudioState>((set, get) => ({
       queue: nextQueue,
       currentIndex: nextIndex,
       wantsYouTubePlaying: nextQueue.length === 0 ? false : get().wantsYouTubePlaying,
-      ...(index === currentIndex ? { progress: { current: 0, duration: 0 }, seekRequest: null } : {}),
+      ...(index === currentIndex ? { progress: { current: 0, duration: 0 }, isLive: false, listenedSeconds: 0, seekRequest: null } : {}),
     });
     writeQueue(nextQueue, nextIndex);
   },
@@ -268,6 +276,8 @@ export const useAudioStore = create<AudioState>((set, get) => ({
       currentIndex: index,
       wantsYouTubePlaying: true,
       progress: { current: 0, duration: 0 },
+      isLive: false,
+      listenedSeconds: 0,
       seekRequest: null,
       pausedByPauseAll: null,
     });
@@ -320,6 +330,11 @@ export const useAudioStore = create<AudioState>((set, get) => ({
     const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 0;
     const safeCurrent = Number.isFinite(current) && current > 0 ? current : 0;
     set({ progress: { current: safeDuration > 0 ? Math.min(safeCurrent, safeDuration) : safeCurrent, duration: safeDuration } });
+  },
+
+  setLive: (isLive, listenedSeconds) => {
+    const safeSeconds = Number.isFinite(listenedSeconds) && listenedSeconds > 0 ? Math.floor(listenedSeconds) : 0;
+    set({ isLive, listenedSeconds: isLive ? safeSeconds : 0 });
   },
 
   seek: (seconds) => {

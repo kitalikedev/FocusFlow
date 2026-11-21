@@ -8,6 +8,7 @@ import { setMasterVolume, toggleMasterMute } from '@/shared/lib/web-audio';
 import { useMuted } from '../hooks/useAudioSync';
 import { CHANNEL_DEFS } from '../lib/channelDefs';
 import { LOFI_RADIO } from '../lib/lofiRadio';
+import { parseYouTubeId, thumbnailUrl } from '../lib/youtube';
 import { useAudioStore } from '../store/useAudioStore';
 import { SeekBar } from './MusicController';
 
@@ -221,6 +222,18 @@ const YouTubeQueue: React.FC = () => {
         <ol data-testid="youtube-queue" aria-label="Queue" className="flex flex-col gap-1">
           {queue.map((track, index) => (
             <li key={track.id} className="group flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-white/5">
+              {parseYouTubeId(track.url) && (
+                <img
+                  src={thumbnailUrl(parseYouTubeId(track.url) as string)}
+                  alt=""
+                  width={40}
+                  height={22}
+                  loading="lazy"
+                  decoding="async"
+                  data-testid="queue-thumbnail"
+                  className="h-[22px] w-10 shrink-0 rounded object-cover"
+                />
+              )}
               <button
                 type="button"
                 onClick={() => playAt(index)}

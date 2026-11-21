@@ -17,6 +17,8 @@ export const YouTubeHost: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YouTubePlayer | null>(null);
   const loadedIdRef = useRef<string | null>(null);
+  // How long the current live stream has been listened to; kept across pauses, reset when the track changes.
+  const listenedRef = useRef<{ id: string | null; seconds: number }>({ id: null, seconds: 0 });
   const [ready, setReady] = useState(false);
   const [muted, setMuted] = useState(isMuted);
   const queue = useAudioStore((state) => state.queue);
@@ -108,11 +110,20 @@ export const YouTubeHost: React.FC = () => {
   useEffect(() => {
     const player = playerRef.current;
     if (!ready || !player || !videoId || !wantsPlaying || muted) return;
+    let lastTick = Date.now();
     const report = () => {
-      if (document.visibilityState === 'hidden') return;
-      // A live stream has no position to seek to: 0 and 0 make the seek bar show "0:00 … Live", not its hours on air.
+      // Time is counted even in a hidden tab (its timer runs slower), but never more than a few seconds per tick.
+      const now = Date.now();
+      const elapsed = Math.min((now - lastTick) / 1000, 5);
+      lastTick = now;
       const isLive = isLiveStream(player);
-      useAudioStore.getState().setProgress(isLive ? 0 : player.getCurrentTime(), isLive ? 0 : player.getDuration());
+      if (listenedRef.current.id !== videoId) listenedRef.current = { id: videoId, seconds: 0 };
+      if (isLive) listenedRef.current.seconds += elapsed;
+      if (document.visibilityState === 'hidden') return;
+      // A live stream has no position to seek to: its on-air time is not shown, the time listened is.
+      const store = useAudioStore.getState();
+      store.setProgress(isLive ? 0 : player.getCurrentTime(), isLive ? 0 : player.getDuration());
+      store.setLive(isLive, listenedRef.current.seconds);
     };
     report();
     const timer = setInterval(report, PROGRESS_INTERVAL_MS);

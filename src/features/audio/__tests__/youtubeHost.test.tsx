@@ -63,6 +63,8 @@ beforeEach(() => {
     currentIndex: 0,
     wantsYouTubePlaying: true,
     progress: { current: 0, duration: 0 },
+    isLive: false,
+    listenedSeconds: 0,
     seekRequest: null,
   });
 });
@@ -117,6 +119,22 @@ describe('YouTubeHost progress and seeking', () => {
     render(<YouTubeHost />);
     await waitFor(() => expect(player.getVideoData).toHaveBeenCalled());
     expect(useAudioStore.getState().progress).toEqual({ current: 0, duration: 0 });
+  });
+
+  it('counts how long a live stream has been listened to, and not for a normal video', async () => {
+    player.getVideoData.mockReturnValue({ isLive: true });
+    player.getDuration.mockReturnValue(15_000_000);
+    render(<YouTubeHost />);
+    await waitFor(() => expect(useAudioStore.getState().listenedSeconds).toBeGreaterThanOrEqual(1), {
+      timeout: PROGRESS_INTERVAL_MS * 8,
+    });
+    expect(useAudioStore.getState().isLive).toBe(true);
+  });
+
+  it('does not report live listening time for a normal video', async () => {
+    render(<YouTubeHost />);
+    await waitFor(() => expect(useAudioStore.getState().progress.duration).toBe(180));
+    expect(useAudioStore.getState()).toMatchObject({ isLive: false, listenedSeconds: 0 });
   });
 
   it('also treats an impossibly long video as live when YouTube does not say so', async () => {

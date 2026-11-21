@@ -38,15 +38,19 @@ body {
   [role='tab'],
   [role='option'],
   select {
-    transition-property: background-color, color, border-color, box-shadow, opacity, transform;
+    transition-property: background-color, color, border-color, box-shadow, opacity, transform, scale;
     transition-duration: 150ms;
     transition-timing-function: ease-out;
   }
 
+  /*
+   * The press uses the separate `scale` property, never `transform`: a button that is centered with a
+   * translate (the carousel arrows, "Exit Zen") would lose that translate and jump away from the pointer.
+   */
   button:not(:disabled):active,
   [role='tab']:active,
   [role='option']:active {
-    transform: scale(0.95);
+    scale: 0.95;
   }
 }
 
@@ -64,6 +68,6 @@ body {
   button:not(:disabled):active,
   [role='tab']:active,
   [role='option']:active {
-    transform: none;
+    scale: none;
   }
 }
