@@ -47,9 +47,10 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 
 | Người | Việc | Pull request / nơi lưu |
 | :--- | :--- | :--- |
-| Nam | Tính năng workspace: timer và âm báo, âm thanh nền, tasks, notes, analytics, thư viện theme, trích dẫn, tối ưu âm thanh | [#6](https://github.com/kitalikedev/FocusFlow/pull/6), [#10](https://github.com/kitalikedev/FocusFlow/pull/10), [#11](https://github.com/kitalikedev/FocusFlow/pull/11), [#15](https://github.com/kitalikedev/FocusFlow/pull/15) |
+| Nam | Tính năng workspace: timer và âm báo, âm thanh nền, tasks, notes, analytics, thư viện theme, tối ưu âm thanh | [#6](https://github.com/kitalikedev/FocusFlow/pull/6), [#10](https://github.com/kitalikedev/FocusFlow/pull/10), [#11](https://github.com/kitalikedev/FocusFlow/pull/11) |
 | Nam | Kế hoạch từng phase, cập nhật tiến độ, dọn tài liệu và chia task cho thành viên | [#7](https://github.com/kitalikedev/FocusFlow/pull/7), [#8](https://github.com/kitalikedev/FocusFlow/pull/8), [#12](https://github.com/kitalikedev/FocusFlow/pull/12) |
 | Dũng | Chế độ đồng hồ: vòng tròn, lật kiểu retro, bảng cài đặt, nút thoát Zen, kèm test | [#9](https://github.com/kitalikedev/FocusFlow/pull/9) |
+| Sanh | Tính năng trích dẫn: trích dẫn chạy như phụ đề cuối phim, kèm danh sách câu, trang hiển thị và test | [#15](https://github.com/kitalikedev/FocusFlow/pull/15) |
 | Phú | Lofi radio trong bảng âm thanh, tối ưu trích dẫn, theme mặc định | [#13](https://github.com/kitalikedev/FocusFlow/pull/13), [#16](https://github.com/kitalikedev/FocusFlow/pull/16) |
 | Thảo Anh | Wireframe workspace (máy tính và điện thoại), theme Pixel Cyberpunk | [#14](https://github.com/kitalikedev/FocusFlow/pull/14), `docs/wireframes/` |
 
@@ -152,6 +153,7 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 | Người | Việc | Pull request / nơi lưu |
 | :--- | :--- | :--- |
 | Phú | Báo cáo Lighthouse lần 2 theo từng trang ([#30](https://github.com/kitalikedev/FocusFlow/issues/30)) | [#45](https://github.com/kitalikedev/FocusFlow/pull/45) |
+| Phú | Sửa theo góp ý đánh giá chéo của nhóm Đạt: nút không nhảy khi bấm, thời gian đã nghe cho stream trực tiếp, ảnh bìa trong danh sách phát, thanh nhạc nhỏ ở trang website | [#51](https://github.com/kitalikedev/FocusFlow/pull/51) |
 | Nam | Sửa lofi radio, tách nhạc và âm thanh nền, làm mượt Zen, hiện Live cho stream, sửa ô mục tiêu, cải thiện Lighthouse | [#46](https://github.com/kitalikedev/FocusFlow/pull/46), [#47](https://github.com/kitalikedev/FocusFlow/pull/47) |
 | Dũng | README theo mẫu nộp bài ([#31](https://github.com/kitalikedev/FocusFlow/issues/31)) và biên bản họp ([#23](https://github.com/kitalikedev/FocusFlow/issues/23)) | README.md |
 
@@ -160,12 +162,12 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 | Ý tưởng | Đề xuất | Quyết định |
 | :--- | :--- | :--- |
 | Báo cáo Lighthouse lần 2 theo từng trang và từng thiết bị, ghi cách tái hiện số liệu | Phú | Làm trong PR #45. |
-| Sửa nút Exit Zen của chế độ Zen theo góp ý của nhóm Đạt (nút nhảy khi bấm) | Nhóm Đạt (đánh giá chéo) | Ghi vào `docs/PEER_REVIEW.md`, sửa trong một PR riêng. |
+| Nút Exit Zen và mũi tên carousel nhảy khi bấm; muốn biết đã nghe lofi bao lâu; muốn điều khiển nhạc ở trang khác | Nhóm Đạt (đánh giá chéo) | Ghi vào `docs/PEER_REVIEW.md`; Phú sửa trong PR #51. |
 
 **Kết quả**
 
 - Lighthouse sau khi sửa (bản production): Performance 94 – 100; Accessibility, Best Practices, SEO đều 100 ở cả 3 trang.
-- 60 file test, 640 test đạt. README có đủ 5 mục đề yêu cầu, kèm ERD và sơ đồ.
+- 62 file test, 653 test đạt. README có đủ 5 mục đề yêu cầu, kèm ERD và sơ đồ.
 
 **Khó khăn và cách giải quyết**
 
@@ -173,6 +175,7 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 | :--- | :--- |
 | Lofi radio không phát vì YouTube chặn nhúng link stream cũ. | Đổi link mới; hàng chờ đã lưu tự chuyển link cũ sang link mới. |
 | Stream trực tiếp hiện thời lượng là tổng số giờ đã phát. | Nhận ra stream trực tiếp và hiện chữ Live. |
+| Nút carousel và Exit Zen tụt xuống khi bấm (góp ý của nhóm Đạt). | Dùng thuộc tính CSS `scale` riêng thay cho `transform` khi nhấn nút. |
 | Điểm Lighthouse lần đo trước thấp do đo trong cửa sổ có sẵn dữ liệu và extension. | Đo lại bằng Lighthouse CLI trong trình duyệt sạch. |
 
-**Việc chưa xong:** Điền sau khi xong: đánh giá chéo UI/UX (xem `docs/PEER_REVIEW.md`), video demo.
+**Việc chưa xong:** đánh giá UI/UX cho 2 nhóm khác (xem `docs/PEER_REVIEW.md`), video demo.

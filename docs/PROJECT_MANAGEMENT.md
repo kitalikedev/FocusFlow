@@ -10,9 +10,9 @@ The team met at the start of the project to agree on the roles below. The meetin
 | :--- | :--- | :--- |
 | Đàm Huỳnh Hoài Nam | Team leader, tech lead | Architecture, specification documents, database, CI/CD, deployment, workspace features, website pages, Google Analytics and Sentry, reviewing and merging every pull request |
 | Nguyễn Anh Dũng | Vice leader, reporter, frontend developer, UI designer | Tracking progress and planning for the team, clock styles, README, redesign of the website |
-| Võ Xuân Phú | Frontend developer, performance QA | Lofi radio, quotes, default theme, Lighthouse audits |
+| Võ Xuân Phú | Frontend developer, performance QA | Lofi radio, quote display and default theme, Lighthouse audits, mini player and the fixes from the peer review |
 | Lê Nguyễn Thảo Anh | UI/UX designer, frontend developer | Pixel theme, wireframes, new website interface |
-| Trần Công Sanh | Backend and frontend developer | Demo data for the database, YouTube music controller |
+| Trần Công Sanh | Backend and frontend developer | Quotes, demo data for the database, YouTube music controller |
 
 
 ## 2. Plan and milestones

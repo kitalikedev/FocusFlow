@@ -105,7 +105,7 @@ The pages follow the wireframes in [`docs/wireframes/`](docs/wireframes/).
 - **Clock:** 3 styles (Minimal, Circular Ring, Retro Flip), centered or in the corner, Zen mode (also time only) and fullscreen.
 - **Focus intent:** write the goal of a session or pick a task; the finished session is saved with that goal.
 - **Themes:** 12 built-in themes, wallpapers (gradient, animated, pixel, your own upload), a Customize tab with live preview, effects (rain, snow, fireflies, film grain, scan lines), your own saved themes.
-- **Sounds:** Rain, Brown Noise, Campfire and Lofi made in the browser; a YouTube queue with a music bar and lofi radio stations; master volume and mute.
+- **Sounds:** Rain, Brown Noise, Campfire and Lofi made in the browser; a YouTube queue with a music bar (also shown on the website pages) and lofi radio stations; master volume and mute.
 - **Tasks and notepad:** priority, due date, labels, search and filters; the notepad saves by itself.
 - **Focus analytics:** minutes per week, daily streak, time per goal, session history.
 - **Quotes** rolling like film credits (off by default), keyboard shortcuts, and a phone layout where tools open as bottom sheets.
@@ -252,9 +252,9 @@ The team met to agree on the roles below (meeting notes: [Issue #23](https://git
 | :--- | :--- | :--- |
 | Đàm Huỳnh Hoài Nam | Team leader, tech lead | Architecture, specification, database, CI/CD, workspace features, website pages, Analytics and Sentry, merging every pull request |
 | Nguyễn Anh Dũng | Vice leader, reporter, frontend developer, UI designer | Progress reports and planning, clock styles, README, website redesign |
-| Võ Xuân Phú | Frontend developer, performance QA | Lofi radio, quotes, default theme, Lighthouse audits |
+| Võ Xuân Phú | Frontend developer, performance QA | Lofi radio, quote display and default theme, Lighthouse audits, mini player and the fixes from the peer review |
 | Lê Nguyễn Thảo Anh | UI/UX designer, frontend developer | Pixel theme, wireframes, new website interface |
-| Trần Công Sanh | Backend and frontend developer | Demo data for the database, YouTube music controller |
+| Trần Công Sanh | Backend and frontend developer | Quotes, demo data for the database, YouTube music controller |
 
 **GitHub workflow:** every task is an Issue with an assignee and a milestone (5 milestones); work happens on a branch and goes to `main` only through a pull request that links its issue (`Closes #N`), passes CI (secret check, lint, type check, tests, build) and gets 1 approval, then is squash-merged and deployed by Vercel. `main` is protected by a ruleset. Commit messages are short sentences.
 
@@ -265,7 +265,7 @@ The team met to agree on the roles below (meeting notes: [Issue #23](https://git
 - **Database:** the brief asks for MySQL or PostgreSQL; we use **PostgreSQL** through Supabase (see [section 3](#3-tools-and-technologies) for why there is no separate Node.js server).
 - **Dynamic pages:** `/analytics` and `/themes` show data from the database for a signed-in user. Load the demo data from [section 2](#2-how-to-run-the-application) to see them filled. Without signing in they read the data saved in the browser.
 - **Security:** no `.env` files in git (a pre-commit hook and a CI step check it), Row Level Security on every table, a Content Security Policy on Vercel. Details: [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md#3-security-testing-and-cicd).
-- **Testing:** 60 test files, 640 tests (Vitest, React Testing Library), run on every pull request.
+- **Testing:** 62 test files, 653 tests (Vitest, React Testing Library), run on every pull request.
 - **Documentation:** [`PRD`](docs/PRD.md), [`ARCHITECTURE`](docs/ARCHITECTURE.md), [`ERD`](docs/ERD.md), [`API_DOCS`](docs/API_DOCS.md), [`plans/`](docs/plans/), [`PROGRESS`](docs/PROGRESS.md), [`FEATURES`](docs/FEATURES.md), [`SYSTEM_DESIGN`](docs/SYSTEM_DESIGN.md), [`PROJECT_MANAGEMENT`](docs/PROJECT_MANAGEMENT.md), [`MONITORING`](docs/MONITORING.md), [`reports/`](docs/reports/).
 
 ## 10. Team

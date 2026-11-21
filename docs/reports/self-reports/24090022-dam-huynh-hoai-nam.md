@@ -45,7 +45,7 @@ _(viết: vấn đề bạn gặp và cách bạn xử lý)_
 
 | Việc | Pull request / nơi lưu |
 | :--- | :--- |
-| Tính năng workspace: timer và âm báo, âm thanh nền, tasks, notes, analytics, thư viện theme, trích dẫn, tối ưu âm thanh | [#6](https://github.com/kitalikedev/FocusFlow/pull/6), [#10](https://github.com/kitalikedev/FocusFlow/pull/10), [#11](https://github.com/kitalikedev/FocusFlow/pull/11), [#15](https://github.com/kitalikedev/FocusFlow/pull/15) |
+| Tính năng workspace: timer và âm báo, âm thanh nền, tasks, notes, analytics, thư viện theme, tối ưu âm thanh | [#6](https://github.com/kitalikedev/FocusFlow/pull/6), [#10](https://github.com/kitalikedev/FocusFlow/pull/10), [#11](https://github.com/kitalikedev/FocusFlow/pull/11) |
 | Kế hoạch từng phase, cập nhật tiến độ, dọn tài liệu và chia task cho thành viên | [#7](https://github.com/kitalikedev/FocusFlow/pull/7), [#8](https://github.com/kitalikedev/FocusFlow/pull/8), [#12](https://github.com/kitalikedev/FocusFlow/pull/12) |
 
 _(bổ sung việc không có pull request nếu có)_

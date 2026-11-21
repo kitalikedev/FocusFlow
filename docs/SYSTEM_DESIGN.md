@@ -179,6 +179,6 @@ The diagram and the list of tables are in the [README](../README.md#6-database-d
 
 ### 3.2 Testing and CI/CD
 
-- 60 test files and 640 tests with Vitest and React Testing Library: timer, data layer, guest data migration, every feature and the page routes.
+- 62 test files and 653 tests with Vitest and React Testing Library: timer, data layer, guest data migration, every feature and the page routes.
 - Every pull request runs: the secret check, ESLint, the type check, the tests with coverage and the build.
 - Vercel builds a preview for each pull request and deploys production when a pull request is merged into `main`.
