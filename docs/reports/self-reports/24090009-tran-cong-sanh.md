@@ -38,7 +38,11 @@ _(viết: vấn đề bạn gặp và cách bạn xử lý)_
 
 ### 1. Việc đã làm
 
-_(viết: bạn làm gì trong sprint này; ví dụ họp, tìm hiểu đặc tả, chuẩn bị môi trường, thử nghiệm, review, hỗ trợ bạn khác)_
+| Việc | Pull request / nơi lưu |
+| :--- | :--- |
+| Tính năng trích dẫn: trích dẫn chạy như phụ đề cuối phim, kèm danh sách câu, trang hiển thị và test | [#15](https://github.com/kitalikedev/FocusFlow/pull/15) |
+
+_(bổ sung việc không có pull request nếu có)_
 
 ### 2. Khó khăn và cách giải quyết
 

@@ -100,6 +100,7 @@ _(viết: vấn đề bạn gặp và cách bạn xử lý)_
 | Việc | Pull request / nơi lưu |
 | :--- | :--- |
 | Báo cáo Lighthouse lần 2 theo từng trang ([#30](https://github.com/kitalikedev/FocusFlow/issues/30)) | [#45](https://github.com/kitalikedev/FocusFlow/pull/45) |
+| Sửa theo góp ý đánh giá chéo của nhóm Đạt: nút không nhảy khi bấm, thời gian đã nghe cho stream trực tiếp, thanh nhạc nhỏ ở trang website | [#51](https://github.com/kitalikedev/FocusFlow/pull/51) |
 
 _(bổ sung việc không có pull request nếu có)_
 

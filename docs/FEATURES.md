@@ -41,7 +41,8 @@ The full list of FocusFlow features with screenshots. A short version is in the 
 
 - 4 background sounds made with Web Audio, with no files to download: Rain, Brown Noise, Campfire and Lofi (an electric piano loop with bass, soft drums and vinyl noise). Each has its own volume and fades in and out.
 - A YouTube player: paste a link to add it to the queue (up to 20 tracks). Titles are fetched automatically and the next track plays on its own. A list of lofi radio stations is ready to add.
-- A music bar with the cover, title, previous / play / next, a seek bar ("Live" for live streams) and its own volume.
+- A music bar with the cover, title, previous / play / next, a seek bar and its own volume. For a live stream the seek bar is replaced by "Live" and the time you have listened. The queue shows the cover of each track.
+- A small music player at the bottom of the website pages (Home, Themes, Analytics...), because the music keeps playing when you leave the workspace: play / pause, previous / next and the volume.
 - Master volume, pause everything, mute with the `M` key.
 
 ![The sound panel](../public/images/home/sounds-720.webp)
