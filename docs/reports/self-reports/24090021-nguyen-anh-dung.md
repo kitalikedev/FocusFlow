@@ -9,83 +9,53 @@
 | Dự án | FocusFlow, nhóm 1, lớp 24SE1, môn Web Basic (CSB25022) |
 
 > **Hướng dẫn (xóa phần này khi viết xong):**
-> - Chỉ sửa file của chính bạn. Với mỗi sprint, thay mọi dòng _(viết ...)_ bằng nội dung thật của bạn, bằng lời của bạn.
-> - Mục 1 đã liệt kê sẵn các pull request của bạn trong sprint. Hãy bổ sung việc không có pull request (họp, tìm hiểu, review, thử nghiệm, hỗ trợ bạn khác).
+> - Chỉ sửa file của chính bạn. Với mỗi sprint, thay các dòng _(viết ...)_ bằng nội dung thật của bạn, bằng lời của bạn.
+> - Mục 1 đã liệt kê sẵn các việc có pull request của bạn. Hãy bổ sung việc không có pull request (họp, tìm hiểu, review, thử nghiệm, hỗ trợ bạn khác).
 > - Sprint nào bạn không có pull request vẫn phải viết, ghi những việc khác bạn đã làm.
-> - Báo cáo chung của nhóm cho từng sprint nằm ở [`../sprints/`](../sprints/); đọc để nhớ bối cảnh.
+> - Bối cảnh chung của từng sprint nằm trong [`../sprints.md`](../sprints.md).
 > - Khi xong: tạo nhánh riêng, commit file này, mở pull request vào `main`.
 
 ---
 
-## Sprint 1: Đặc tả và nền tảng
-
-**Thời gian:** 05/11/2026 – 06/11/2026. **Báo cáo của nhóm:** [sprint-1.md](../sprints/sprint-1.md)
+## Sprint 1: Đặc tả và nền tảng (05/11 – 06/11/2026)
 
 ### 1. Việc đã làm
 
-_(viết: trong sprint này bạn làm gì; ví dụ tham gia họp, tìm hiểu đặc tả, chuẩn bị môi trường, thử nghiệm, review, hỗ trợ bạn khác)_
+_(viết: bạn làm gì trong sprint này; ví dụ họp, tìm hiểu đặc tả, chuẩn bị môi trường, thử nghiệm, review, hỗ trợ bạn khác)_
 
-### 2. Kết quả
-
-_(viết: cái gì chạy được sau sprint này; có thể chèn ảnh hoặc link)_
-
-### 3. Khó khăn và cách giải quyết
+### 2. Khó khăn và cách giải quyết
 
 _(viết: vấn đề bạn gặp và cách bạn xử lý)_
 
-### 4. Điều học được
-
-_(viết: kiến thức hoặc kỹ năng mới)_
-
-### 5. Tự đánh giá đóng góp
+### 3. Tự đánh giá đóng góp
 
 - Mức độ đóng góp (1 – 5): _(điền số)_
 - Nhận xét: _(viết 1 – 2 câu)_
 
-### 6. Kế hoạch sprint sau
-
-_(viết: việc dự định làm ở sprint tiếp theo)_
-
 ---
 
-## Sprint 2: Tính năng workspace
-
-**Thời gian:** 07/11/2026 – 10/11/2026. **Báo cáo của nhóm:** [sprint-2.md](../sprints/sprint-2.md)
+## Sprint 2: Tính năng workspace (07/11 – 10/11/2026)
 
 ### 1. Việc đã làm
 
 | Việc | Pull request / nơi lưu |
 | :--- | :--- |
-| Chế độ đồng hồ: vòng tròn, lật kiểu retro, bảng cài đặt đồng hồ, nút thoát Zen, kèm test | [#9](https://github.com/kitalikedev/FocusFlow/pull/9) |
+| Chế độ đồng hồ: vòng tròn, lật kiểu retro, bảng cài đặt, nút thoát Zen, kèm test | [#9](https://github.com/kitalikedev/FocusFlow/pull/9) |
 
 _(bổ sung việc không có pull request nếu có)_
 
-### 2. Kết quả
-
-_(viết: cái gì chạy được sau sprint này; có thể chèn ảnh hoặc link)_
-
-### 3. Khó khăn và cách giải quyết
+### 2. Khó khăn và cách giải quyết
 
 _(viết: vấn đề bạn gặp và cách bạn xử lý)_
 
-### 4. Điều học được
-
-_(viết: kiến thức hoặc kỹ năng mới)_
-
-### 5. Tự đánh giá đóng góp
+### 3. Tự đánh giá đóng góp
 
 - Mức độ đóng góp (1 – 5): _(điền số)_
 - Nhận xét: _(viết 1 – 2 câu)_
 
-### 6. Kế hoạch sprint sau
-
-_(viết: việc dự định làm ở sprint tiếp theo)_
-
 ---
 
-## Sprint 3: Website nhiều trang
-
-**Thời gian:** 13/11/2026 – 17/11/2026. **Báo cáo của nhóm:** [sprint-3.md](../sprints/sprint-3.md)
+## Sprint 3: Website nhiều trang (13/11 – 17/11/2026)
 
 ### 1. Việc đã làm
 
@@ -95,32 +65,18 @@ _(viết: việc dự định làm ở sprint tiếp theo)_
 
 _(bổ sung việc không có pull request nếu có)_
 
-### 2. Kết quả
-
-_(viết: cái gì chạy được sau sprint này; có thể chèn ảnh hoặc link)_
-
-### 3. Khó khăn và cách giải quyết
+### 2. Khó khăn và cách giải quyết
 
 _(viết: vấn đề bạn gặp và cách bạn xử lý)_
 
-### 4. Điều học được
-
-_(viết: kiến thức hoặc kỹ năng mới)_
-
-### 5. Tự đánh giá đóng góp
+### 3. Tự đánh giá đóng góp
 
 - Mức độ đóng góp (1 – 5): _(điền số)_
 - Nhận xét: _(viết 1 – 2 câu)_
 
-### 6. Kế hoạch sprint sau
-
-_(viết: việc dự định làm ở sprint tiếp theo)_
-
 ---
 
-## Sprint 4: Giám sát, hiệu năng, dữ liệu mẫu và giao diện mới
-
-**Thời gian:** 18/11/2026 – 20/11/2026. **Báo cáo của nhóm:** [sprint-4.md](../sprints/sprint-4.md)
+## Sprint 4: Giám sát, hiệu năng, dữ liệu mẫu, giao diện mới (18/11 – 20/11/2026)
 
 ### 1. Việc đã làm
 
@@ -130,59 +86,32 @@ _(viết: việc dự định làm ở sprint tiếp theo)_
 
 _(bổ sung việc không có pull request nếu có)_
 
-### 2. Kết quả
-
-_(viết: cái gì chạy được sau sprint này; có thể chèn ảnh hoặc link)_
-
-### 3. Khó khăn và cách giải quyết
+### 2. Khó khăn và cách giải quyết
 
 _(viết: vấn đề bạn gặp và cách bạn xử lý)_
 
-### 4. Điều học được
-
-_(viết: kiến thức hoặc kỹ năng mới)_
-
-### 5. Tự đánh giá đóng góp
+### 3. Tự đánh giá đóng góp
 
 - Mức độ đóng góp (1 – 5): _(điền số)_
 - Nhận xét: _(viết 1 – 2 câu)_
 
-### 6. Kế hoạch sprint sau
-
-_(viết: việc dự định làm ở sprint tiếp theo)_
-
 ---
 
-## Sprint 5: Hoàn thiện và nộp bài
-
-**Thời gian:** 21/11/2026 – 26/11/2026. **Báo cáo của nhóm:** [sprint-5.md](../sprints/sprint-5.md)
+## Sprint 5: Hoàn thiện và nộp bài (21/11 – 26/11/2026)
 
 ### 1. Việc đã làm
 
 | Việc | Pull request / nơi lưu |
 | :--- | :--- |
-| Báo cáo README theo mẫu nộp bài: cách chạy, công cụ, tính năng và ảnh, ERD, sơ đồ ([#31](https://github.com/kitalikedev/FocusFlow/issues/31)) | README.md |
-| Biên bản họp và phân vai ([#23](https://github.com/kitalikedev/FocusFlow/issues/23)) | [#23](https://github.com/kitalikedev/FocusFlow/issues/23) |
+| README theo mẫu nộp bài ([#31](https://github.com/kitalikedev/FocusFlow/issues/31)) và biên bản họp ([#23](https://github.com/kitalikedev/FocusFlow/issues/23)) | README.md |
 
 _(bổ sung việc không có pull request nếu có)_
 
-### 2. Kết quả
-
-_(viết: cái gì chạy được sau sprint này; có thể chèn ảnh hoặc link)_
-
-### 3. Khó khăn và cách giải quyết
+### 2. Khó khăn và cách giải quyết
 
 _(viết: vấn đề bạn gặp và cách bạn xử lý)_
 
-### 4. Điều học được
-
-_(viết: kiến thức hoặc kỹ năng mới)_
-
-### 5. Tự đánh giá đóng góp
+### 3. Tự đánh giá đóng góp
 
 - Mức độ đóng góp (1 – 5): _(điền số)_
 - Nhận xét: _(viết 1 – 2 câu)_
-
-### 6. Kế hoạch sprint sau
-
-Không (sprint cuối).
