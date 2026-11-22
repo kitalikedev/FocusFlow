@@ -4,7 +4,7 @@ Roles, plan and milestones, wireframes and the GitHub workflow of the team. The 
 
 ## 1. Roles and responsibilities
 
-The team met at the start of the project to agree on the roles below. The meeting notes are in [Issue #23](https://github.com/kitalikedev/FocusFlow/issues/23). The work was done in 5 sprints; the report of the 5 sprints is in [`docs/reports/sprints.md`](reports/sprints.md).
+The team met at the start of the project to agree on the roles below. The meeting notes are in [`MEETING_NOTES.md`](MEETING_NOTES.md) (tracked in [Issue #23](https://github.com/kitalikedev/FocusFlow/issues/23)). The work was done in 5 sprints; the report of the 5 sprints is in [`docs/reports/sprints.md`](reports/sprints.md).
 
 | Member | Role | Main responsibilities |
 | :--- | :--- | :--- |

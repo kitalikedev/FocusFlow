@@ -49,7 +49,7 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 ## 4. Trạng thái Kho Lưu Trữ (Git & GitHub)
 
 * **Remote:** `https://github.com/kitalikedev/FocusFlow.git`
-* **`main`:** commit gần nhất `bf57b7f` (PR #51). Các mốc chính: PR #1 (Phase 0), #5 (Phase 1), #6 (Phase 2), #9 đến #16 (Phase 3 và hoàn thiện giao diện), #17 (chặn file env, dọn mã), #24 và #27 và #28 (website nhiều trang), #29 (Google Analytics và Sentry), #33 (sửa test tiêu đề trang chạy không ổn định), #35 (báo cáo Lighthouse lần đo trước), #36 (sửa lỗi Lighthouse ở trang chủ), #38 (dữ liệu mẫu `seed.sql`), #39 (wireframe), #41 (điều khiển nhạc YouTube), #42 (giao diện mới cho các trang website), #43 (website mặc theme và ảnh workspace), #44 (carousel ảnh demo, chấm chọn theme mới, ảnh theme trên trang Themes), #45 (báo cáo Lighthouse v2), #46 (sửa lofi radio, tách nhạc khỏi ambient, Zen không giật và tùy chọn chỉ còn thời gian, sửa Lighthouse), #47 (hiện Live cho stream trực tiếp, ô mục tiêu đủ rộng khi đồng hồ ở góc), #50 (báo cáo dự án: README rút gọn, chi tiết tách sang `docs/FEATURES.md`, `SYSTEM_DESIGN.md`, `PROJECT_MANAGEMENT.md`, `MONITORING.md`, báo cáo 5 sprint `docs/reports/sprints.md`, file self-report từng người), #51 (sửa theo góp ý của nhóm Đạt: nút không nhảy khi bấm, hiện thời gian đã nghe cho stream trực tiếp, thanh nhạc nhỏ ở các trang website). Cổng dev cố định: `5180`. Production: https://focus-flow-two-wheat.vercel.app.
+* **`main`:** commit gần nhất `cd244f5` (PR #58). Các mốc chính: PR #1 (Phase 0), #5 (Phase 1), #6 (Phase 2), #9 đến #16 (Phase 3 và hoàn thiện giao diện), #17 (chặn file env, dọn mã), #24 và #27 và #28 (website nhiều trang), #29 (Google Analytics và Sentry), #33 (sửa test tiêu đề trang chạy không ổn định), #35 (báo cáo Lighthouse lần đo trước), #36 (sửa lỗi Lighthouse ở trang chủ), #38 (dữ liệu mẫu `seed.sql`), #39 (wireframe), #41 (điều khiển nhạc YouTube), #42 (giao diện mới cho các trang website), #43 (website mặc theme và ảnh workspace), #44 (carousel ảnh demo, chấm chọn theme mới, ảnh theme trên trang Themes), #45 (báo cáo Lighthouse v2), #46 (sửa lofi radio, tách nhạc khỏi ambient, Zen không giật và tùy chọn chỉ còn thời gian, sửa Lighthouse), #47 (hiện Live cho stream trực tiếp, ô mục tiêu đủ rộng khi đồng hồ ở góc), #50 (báo cáo dự án: README rút gọn, chi tiết tách sang `docs/FEATURES.md`, `SYSTEM_DESIGN.md`, `PROJECT_MANAGEMENT.md`, `MONITORING.md`, báo cáo 5 sprint `docs/reports/sprints.md`, file self-report từng người), #51 (sửa theo góp ý của nhóm Đạt: nút không nhảy khi bấm, hiện thời gian đã nghe cho stream trực tiếp, thanh nhạc nhỏ ở các trang website). Sau đó: #52, #54, #55, #56, #58 (self-report của Dũng, Phú, Sanh, Thảo Anh, Nam), #57 (biên bản họp `docs/MEETING_NOTES.md`). Cổng dev cố định: `5180`. Production: https://focus-flow-two-wheat.vercel.app.
 * **Quản lý công việc:** mỗi việc là một Issue gắn Milestone và người nhận; PR ghi `Closes #số` để Issue tự đóng khi merge. Milestone 1 (Multi-page routing, hạn 20/11/2026), 2 (Tracking and logging, đã xong), 3 (Seed data and README), 4 (Lighthouse), 5 (Peer review, hạn 26/11/2026). Các PR từ #24 trở đi đã liên kết Issue (#19, #20, #21, #22, #26, #34), các PR trước đó chưa có Issue.
 * **Bảo vệ `main`:** Ruleset "Main Protection" (PR bắt buộc, 1 approval, chỉ Squash, linear history, chặn force push và xóa; admin bypass khi merge PR). Cần xác nhận ruleset đang Active và đã thêm status check `ci`.
 * **Dependabot:** các PR nâng `vite`, `vitest`, `@vitest/coverage-v8` (#2, #3) đang đỏ vì bước nhảy phiên bản lớn, và PR nâng `react-router` lên bản 7 chưa được thử; xử lý trong PR chore nâng toolchain riêng.
@@ -101,26 +101,22 @@ Chỉ số hiện tại: lint 0/0, typecheck sạch, 62 file / 653 test xanh, bu
 
 ## 7. Việc Đang Dang Dở
 
-Các Issue đang mở, theo Milestone:
+Không còn Issue nào mở; Milestone 1 đến 4 đã đóng hết các Issue (#19 đến #23, #26, #30, #31, #34). Tình trạng theo barem:
 
-| Milestone | Issue | Việc | Người nhận |
-| :--- | :--- | :--- | :--- |
-| 1 - Multi-page routing (hạn 20/11/2026) | #23 | Biên bản họp và phân vai của 5 thành viên. Đã soạn bản nháp 6 buổi họp theo 5 sprint; còn điền ngày, hình thức họp, người vắng và dán vào Issue rồi đóng | Nguyễn Anh Dũng |
-| 3 - Seed data and README | #31 | Báo cáo trong README đã merge (PR #50). Còn: thay dòng "Demo video: coming soon" bằng link video; ảnh Analytics và Themes chụp ở 67 % nếu muốn | Nguyễn Anh Dũng |
-| 4 - Lighthouse | #30 | Báo cáo trước và sau đã đủ (PR #35, #36, #45, #46). Còn: đo lại Lighthouse trên production rồi cập nhật bảng trong README, đóng Issue | Võ Xuân Phú |
-
-Milestone 5 (Peer review, hạn 26/11/2026), chưa có Issue:
-
-| Việc | Trạng thái |
+| Phần barem | Tình trạng |
 | :--- | :--- |
-| Góp ý nhận được (Task 5b) | Nhóm Đạt (ứng dụng quản lý chi tiêu) gửi 6 góp ý ngày 21/11. Làm 4: nút không nhảy khi bấm ở carousel và Exit Zen, hiện thời gian đã nghe cho stream trực tiếp, thanh nhạc nhỏ ở trang website; không làm tốc độ lofi và danh sách yêu thích (lý do trong `docs/PEER_REVIEW.md`). **Xong:** Võ Xuân Phú làm trong PR #51, đã merge |
-| Đánh giá cho nhóm khác (Task 5a) | Chưa làm: cả nhóm đánh giá UI/UX của ít nhất 2 nhóm khác và điền Phần A của `docs/PEER_REVIEW.md` |
-| Self-report 5 sprint | Mỗi thành viên có sẵn một file trong `docs/reports/self-reports/` (tên gồm mã số sinh viên) và tự viết; thiếu hoặc trễ bị trừ 10 % điểm nhóm |
-| Video demo (tối đa 10 phút, 720p) | Chưa quay |
+| Task 1: họp và phân vai, wireframe, kế hoạch, GitHub, quy trình | Xong: `docs/MEETING_NOTES.md`, `docs/wireframes/`, `docs/PROJECT_MANAGEMENT.md`, 5 Milestone, Issue và PR có liên kết |
+| Task 2: website nhiều trang, Tailwind, tương tác, responsive | Xong: 6 trang, ảnh trong README |
+| Task 3: schema, PostgreSQL, 2 trang động | Xong: ERD trong README, `supabase/migrations/`, trang Analytics và Themes, `supabase/seed.sql` |
+| Task 4: Lighthouse, GA và Sentry | Xong: đo lại trên production ngày 22/11 (Performance 95 – 100, các hạng mục khác 100, `docs/Lighthouse_v2_report.md` mục 11.5), GA4 và Sentry kèm ảnh |
+| Task 5a: đánh giá 2 nhóm khác | Xong: nhóm của Đạt (ứng dụng quản lý chi tiêu) và nhóm PawPass, Phần A của `docs/PEER_REVIEW.md` |
+| Task 5b: áp dụng góp ý nhận được | Xong: nhóm Đạt và nhóm PawPass góp ý tương tự nhau; làm 4 trên 6 góp ý (PR #51 của Phú), ghi lý do cho 2 góp ý không làm, có ảnh trước và sau |
+| Báo cáo README, video demo | Xong: README đủ 5 mục; link video demo trên Google Drive |
+| Self-report 5 sprint | Xong: 5 file trong `docs/reports/self-reports/` (PR #52, #54, #55, #56, #58) |
 
-Việc còn lại ngoài Issue:
+Việc còn lại ngoài Issue (không bắt buộc):
 
-1. Kiểm tay trang `/analytics` và `/themes` với tài khoản demo đã chạy `supabase/seed.sql`: đã xem được số liệu seed trên production (7h 24m, streak 6 ngày, 3 theme đã lưu).
+1. Video demo đang là file `.mov` trên Google Drive; đề yêu cầu tối thiểu 720p dạng MP4 và không quá 10 phút, nên kiểm tra lại định dạng và độ dài trước khi nộp.
 2. Kiểm tay chế độ đăng nhập trên production (đồng bộ, upload nền, lưu theme, task/note, analytics, gộp dữ liệu guest).
 3. Sentry đã nhận lỗi thật từ production (lỗi tải một file script của trang Themes sau khi có bản triển khai mới, vô hại); có thể đánh dấu Resolved.
 
@@ -128,14 +124,10 @@ Việc còn lại ngoài Issue:
 
 ## 8. Việc Cần Làm Tiếp Theo
 
-1. Đo lại Lighthouse trên production theo `docs/Lighthouse_v2_report.md` mục 11.1, cập nhật bảng trong README và đóng Issue #30.
-2. Dán biên bản họp vào Issue #23 và đóng Issue.
-3. Mỗi thành viên viết self-report 5 sprint trong `docs/reports/self-reports/` (một file, tên có mã số sinh viên) và mở PR.
-4. Đánh giá UI/UX cho 2 nhóm khác (Phần A của `docs/PEER_REVIEW.md`).
-5. Quay video demo (tối đa 10 phút), rồi thay dòng "Demo video: coming soon" trong README bằng link.
-6. Cập nhật PRD, ARCHITECTURE, API_DOCS theo bố cục và tính năng hiện tại (website nhiều trang, theo dõi và ghi lỗi, thanh nhạc ở trang website).
-7. Cài Node 22 (khớp `.nvmrc` và CI), rồi PR chore nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8) và xử lý các PR Dependabot; chưa merge PR nâng `react-router` lên bản 7 trước khi nộp.
-8. Về sau: `syncQueue` (FR-23), Google OAuth (FR-03), xuất/nhập theme JSON, PiP (FR-28), E2E Playwright; hướng phát triển từ góp ý đánh giá chéo: chỉnh tốc độ phát và danh sách yêu thích đồng bộ cho nhạc.
+1. Kiểm tra video demo đúng yêu cầu nộp bài (MP4, tối thiểu 720p, không quá 10 phút).
+2. Cập nhật PRD, ARCHITECTURE, API_DOCS theo bố cục và tính năng hiện tại (website nhiều trang, theo dõi và ghi lỗi, thanh nhạc ở trang website).
+3. Cài Node 22 (khớp `.nvmrc` và CI), rồi PR chore nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8) và xử lý các PR Dependabot; chưa merge PR nâng `react-router` lên bản 7 trước khi nộp.
+4. Về sau: `syncQueue` (FR-23), Google OAuth (FR-03), xuất/nhập theme JSON, PiP (FR-28), E2E Playwright; hướng phát triển từ góp ý đánh giá chéo: chỉnh tốc độ phát và danh sách yêu thích đồng bộ cho nhạc.
 
 ---
 
@@ -153,4 +145,4 @@ Việc còn lại ngoài Issue:
 
 ---
 
-*Cập nhật lần cuối: 2026-11-21*
+*Cập nhật lần cuối: 2026-11-22*

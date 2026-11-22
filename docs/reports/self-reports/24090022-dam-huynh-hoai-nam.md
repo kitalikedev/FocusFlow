@@ -186,7 +186,7 @@ Ngoài các PR trên:
 | Phú | Báo cáo Lighthouse lần 2 theo từng trang; làm PR sửa theo góp ý của nhóm Đạt | PR #45, #51 |
 | Dũng | README theo mẫu nộp bài, biên bản họp | PR #52, #57 |
 | Thảo Anh, Sanh, Phú, Dũng | Mỗi người tự viết self-report của mình | PR #52, #54, #55, #56 |
-| Cả nhóm | Đánh giá 2 nhóm khác, quay video demo | Đang thực hiện |
+| Cả nhóm | Đánh giá UI/UX nhóm của Đạt và nhóm PawPass, quay video demo | Đã xong (`docs/PEER_REVIEW.md`, link video trong README) |
 
 ### 2. Khó khăn và cách giải quyết
 
