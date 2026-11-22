@@ -6,16 +6,16 @@ Lighthouse changes, Google Analytics 4 and Sentry in detail. The summary is in t
 
 We ran Lighthouse on the 3 most used pages, on mobile and desktop, then fixed the problems it found and ran it again.
 
-| Page | Device | First audit, 19/11 (P / A / BP / SEO) | After the fixes, 21/11 (P / A / BP / SEO) |
+| Page | Device | First audit, 19/11 (P / A / BP / SEO) | Re-audit on production, 22/11 (P / A / BP / SEO) |
 | :--- | :--- | :---: | :---: |
-| Home `/` | Mobile | 80 / 93 / 100 / 92 | **94 / 100 / 100 / 100** |
+| Home `/` | Mobile | 80 / 93 / 100 / 92 | **97 / 100 / 100 / 100** |
 | Home `/` | Desktop | 89 / 93 / 100 / 92 | **100 / 100 / 100 / 100** |
-| Workspace `/app` | Mobile | 91 / 94 / 100 / 91 | **97 / 100 / 100 / 100** |
+| Workspace `/app` | Mobile | 91 / 94 / 100 / 91 | **95 / 100 / 100 / 100** |
 | Workspace `/app` | Desktop | 91 / 94 / 100 / 91 | **100 / 100 / 100 / 100** |
-| Analytics `/analytics` | Mobile | 83 / 91 / 100 / 91 | **94 / 100 / 100 / 100** |
+| Analytics `/analytics` | Mobile | 83 / 91 / 100 / 91 | **96 / 100 / 100 / 100** |
 | Analytics `/analytics` | Desktop | 92 / 91 / 100 / 91 | **100 / 100 / 100 / 100** |
 
-P = Performance, A = Accessibility, BP = Best Practices. The "after" audit used Lighthouse CLI 12.8.2 in a clean browser on the production build.
+P = Performance, A = Accessibility, BP = Best Practices. The re-audit used Lighthouse CLI 12.8.2 in a clean headless Chrome on the production site on 22/11/2026, after all fixes were deployed (PR #46, #47, #51).
 
 What we changed:
 

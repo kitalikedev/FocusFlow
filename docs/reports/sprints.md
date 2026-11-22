@@ -155,18 +155,19 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 | Phú | Báo cáo Lighthouse lần 2 theo từng trang ([#30](https://github.com/kitalikedev/FocusFlow/issues/30)) | [#45](https://github.com/kitalikedev/FocusFlow/pull/45) |
 | Phú | Sửa theo góp ý đánh giá chéo của nhóm Đạt: nút không nhảy khi bấm, thời gian đã nghe cho stream trực tiếp, ảnh bìa trong danh sách phát, thanh nhạc nhỏ ở trang website | [#51](https://github.com/kitalikedev/FocusFlow/pull/51) |
 | Nam | Sửa lofi radio, tách nhạc và âm thanh nền, làm mượt Zen, hiện Live cho stream, sửa ô mục tiêu, cải thiện Lighthouse | [#46](https://github.com/kitalikedev/FocusFlow/pull/46), [#47](https://github.com/kitalikedev/FocusFlow/pull/47) |
-| Dũng | README theo mẫu nộp bài ([#31](https://github.com/kitalikedev/FocusFlow/issues/31)) và biên bản họp ([#23](https://github.com/kitalikedev/FocusFlow/issues/23)) | README.md |
+| Dũng | README theo mẫu nộp bài ([#31](https://github.com/kitalikedev/FocusFlow/issues/31)) và biên bản họp ([#23](https://github.com/kitalikedev/FocusFlow/issues/23)) | README.md, `docs/MEETING_NOTES.md` |
+| Cả nhóm | Đánh giá UI/UX cho nhóm của Đạt và nhóm PawPass; viết self-report; quay video demo | `docs/PEER_REVIEW.md`, `docs/reports/self-reports/`, link video trong README |
 
 **Thảo luận và ý tưởng**
 
 | Ý tưởng | Đề xuất | Quyết định |
 | :--- | :--- | :--- |
 | Báo cáo Lighthouse lần 2 theo từng trang và từng thiết bị, ghi cách tái hiện số liệu | Phú | Làm trong PR #45. |
-| Nút Exit Zen và mũi tên carousel nhảy khi bấm; muốn biết đã nghe lofi bao lâu; muốn điều khiển nhạc ở trang khác | Nhóm Đạt (đánh giá chéo) | Ghi vào `docs/PEER_REVIEW.md`; Phú sửa trong PR #51. |
+| Nút Exit Zen và mũi tên carousel nhảy khi bấm; muốn biết đã nghe lofi bao lâu; muốn điều khiển nhạc ở trang khác | Nhóm Đạt và nhóm PawPass (đánh giá chéo) | Ghi vào `docs/PEER_REVIEW.md`; Phú sửa trong PR #51. |
 
 **Kết quả**
 
-- Lighthouse sau khi sửa (bản production): Performance 94 – 100; Accessibility, Best Practices, SEO đều 100 ở cả 3 trang.
+- Lighthouse đo lại trên production ngày 22/11: Performance 95 – 100; Accessibility, Best Practices, SEO đều 100 ở cả 3 trang.
 - 62 file test, 653 test đạt. README có đủ 5 mục đề yêu cầu, kèm ERD và sơ đồ.
 
 **Khó khăn và cách giải quyết**
@@ -178,4 +179,4 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 | Nút carousel và Exit Zen tụt xuống khi bấm (góp ý của nhóm Đạt). | Dùng thuộc tính CSS `scale` riêng thay cho `transform` khi nhấn nút. |
 | Điểm Lighthouse lần đo trước thấp do đo trong cửa sổ có sẵn dữ liệu và extension. | Đo lại bằng Lighthouse CLI trong trình duyệt sạch. |
 
-**Việc chưa xong:** đánh giá UI/UX cho 2 nhóm khác (xem `docs/PEER_REVIEW.md`), video demo.
+**Việc chưa xong:** không. Cả nhóm đã đánh giá UI/UX cho nhóm của Đạt và nhóm PawPass, nhận góp ý từ hai nhóm này và sửa 4 góp ý (PR #51); video demo đã quay và gắn link trong README; Lighthouse đo lại trên production đạt Performance 95 – 100.

@@ -214,5 +214,19 @@ FocusFlow đã đạt chất lượng tốt: Best Practices và SEO đạt tuy�
 
 - **JavaScript chưa dùng (khoảng 250 KB):** gồm `gtag.js` của Google Analytics (đã nạp sau sự kiện `load`), thư viện Supabase (cần để kiểm tra phiên đăng nhập) và code workspace (được giữ chạy nền để timer và nhạc không ngắt khi chuyển trang). Tách nhỏ thêm cần thay đổi kiến trúc, để PR riêng nếu cần.
 - **CSS chặn hiển thị (khoảng 10 KB):** file CSS chính; mức ảnh hưởng nhỏ khi có nén trên Vercel.
-- **Đo lại trên production sau khi merge** bằng đúng cách ở mục 11.1, rồi cập nhật bảng 11.2 bằng số production.
+- ~~Đo lại trên production sau khi merge~~: đã đo, xem mục 11.5.
 
+### 11.5. Đo lại trên production sau khi merge (22/11/2026)
+
+Đo bằng Lighthouse CLI `12.8.2`, Chrome headless ẩn danh, trên `https://focus-flow-two-wheat.vercel.app` sau khi các bản sửa ở PR #46, #47 và #51 đã lên production.
+
+| Trang | Thiết bị | P / A / BP / SEO | LCP | TBT | CLS |
+|---|---|:---:|:---:|:---:|:---:|
+| Trang chủ `/` | Mobile | **97** / 100 / 100 / 100 | 2,1 s | 70 ms | 0 |
+| Trang chủ `/` | Desktop | **100** / 100 / 100 / 100 | 0,6 s | 0 ms | 0,002 |
+| App `/app` | Mobile | **95** / 100 / 100 / 100 | 2,5 s | 50 ms | 0 |
+| App `/app` | Desktop | **100** / 100 / 100 / 100 | 0,4 s | 0 ms | 0,001 |
+| Analytics `/analytics` | Mobile | **96** / 100 / 100 / 100 | 2,6 s | 70 ms | 0,001 |
+| Analytics `/analytics` | Desktop | **100** / 100 / 100 / 100 | 0,6 s | 0 ms | 0 |
+
+Cả 3 trang đạt mục tiêu Performance từ 90 trở lên trên cả mobile và desktop, các hạng mục khác đều 100. So với lần đo đầu (mục 3 của `lighthouse-report.md`): trang chủ mobile tăng từ 80 lên 97, Analytics mobile từ 83 lên 96.
