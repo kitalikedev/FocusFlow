@@ -140,3 +140,124 @@ Nguồn: file đánh giá của nhóm Đạt, 21/11/2026, ghi đầy đủ trong
 | P4 | Chỉnh tốc độ âm thanh cho lofi | Không làm | Stream trực tiếp của YouTube chỉ phát đúng tốc độ thật, âm Lofi tạo bằng Web Audio là vòng lặp cố định, và đổi tốc độ không có trong PRD | Hướng phát triển |
 | P5 | Danh sách link YouTube yêu thích | Làm một phần | Ảnh bìa đã thêm (P2); yêu thích đồng bộ cần bảng database mới và sửa PRD, để về sau | Hướng phát triển |
 | P6 | Test | Làm | Nút không nhảy khi bấm (kiểm tra CSS), thời gian đã nghe của stream trực tiếp, thanh tua Live, thanh nhạc nhỏ (hiện, phát/tạm dừng, bài trước/sau, âm lượng, Live), ảnh bìa trong danh sách phát | `pressEffect.test.ts`, `miniPlayer.test.tsx`, `youtubeHost.test.tsx`, `musicController.test.tsx`, `routing.test.tsx` |
+
+## 10. Sửa theo bản chấm thử và chuyển sang Next.js (26/11 – 27/11/2026)
+
+Nguồn: bản chấm thử của giảng viên trên commit `02dbb44` (8/10). Mục tiêu: lấy lại tối đa 2 điểm đang mất, không làm hỏng bản đang chạy. Lớp yêu cầu dùng Next.js; không dùng thì mục 3(c) tối đa 50 %.
+
+### 10.1 Điểm đang mất và việc lấy lại
+
+| Mục | Còn thiếu | Việc | Lấy lại tối đa | Người làm |
+| :-- | :-- | :-- | :-: | :-- |
+| 5(a) | Góp ý cho PawPass còn chung chung; chưa có bằng chứng đã gửi góp ý cho 2 nhóm | P1 | +0.5 | Nhóm |
+| 3(c) | Không dùng Next.js, đọc Supabase thẳng từ trình duyệt | N1, N2 (N3 nếu kịp) | +0.5 | Nam |
+| 3(a) | Chưa có ghi nhận nhóm cùng rà soát lược đồ | D1 | +0.25 | Nam và cả nhóm |
+| 1(b) | Chưa ghi công cụ vẽ wireframe, chưa có link file gốc | W1 | +0.25 | Dũng |
+| 1(d), 1(e) | Issue dùng muộn, commit lớn, ít PR có `Closes #n` | Quy trình 10.3 cho mọi việc từ giờ | một phần của +0.5 | Cả nhóm |
+
+### 10.2 Chọn cách chuyển sang Next.js
+
+**Thử trước trên một bản sao (26/11):** Next.js 16.4.6 với React 18 build xong trong khoảng 9 giây; 62 file / 653 test vẫn đạt; timer chạy bằng Web Worker vẫn đếm; mở thẳng `/analytics`, `/app` đúng trang. Có hai chỗ bắt buộc phải sửa, nếu không trang sẽ trắng sau khi deploy:
+
+1. CSP hiện tại chặn các script inline mà Next.js chèn vào trang. Đã thử: trang trắng; thêm `'unsafe-inline'` vào `script-src` (cách Next.js hướng dẫn khi không dùng nonce) thì trang chạy lại.
+2. `vercel.json` đang chuyển mọi đường dẫn về `/index.html` của Vite. Phải bỏ quy tắc này và khai báo `"framework": "nextjs"`.
+
+Next.js 16 báo React 18 sẽ bị bỏ ở Next.js 17. Giữ React 18 lúc này để không phải sửa code giao diện.
+
+| Phương án | Nội dung | Rủi ro | Công sức | Đáp ứng 3(c) |
+| :-- | :-- | :-- | :-- | :-- |
+| A | Next.js làm nền, toàn bộ app chạy qua một route bắt mọi đường dẫn, vẫn dùng React Router (bước 1 trong hướng dẫn chuyển từ Vite của Next.js) | Thấp | Nửa ngày | Chưa đủ: dữ liệu chưa đọc qua Next.js |
+| B | A cộng Route Handler: trang Analytics và Themes đọc `focus_sessions`, `saved_themes` qua `/api` của Next.js, chạy trên server Vercel, vẫn qua RLS | Thấp đến vừa | Thêm nửa ngày | Đúng việc giảng viên đề xuất |
+| C | B cộng định tuyến App Router: mỗi trang là một route có metadata riêng, bỏ React Router | Vừa | Thêm nửa đến một ngày | Thể hiện rõ nhất việc dùng Next.js |
+| D | Server Component đọc dữ liệu, phiên đăng nhập lưu bằng cookie (`@supabase/ssr`), trang render phía server | Cao | Nhiều ngày | Đủ, nhưng dễ hỏng đăng nhập, chế độ khách và gộp dữ liệu khách |
+
+**Chọn:** làm lần lượt A → B → C, mỗi bước một PR (N1, N2, N3). Chỉ sang bước sau khi bước trước đã chạy ổn trên production. Không làm D.
+
+**Vì sao dùng Route Handler mà không dùng Server Component:** phiên đăng nhập đang nằm trong trình duyệt nên server không đọc được. Route Handler nhận access token qua header `Authorization` và tạo client Supabase theo token đó, nên RLS vẫn chỉ trả dữ liệu của đúng người dùng. Không cần service role key, không đổi luồng đăng nhập. Ngoài ra các store đọc `localStorage` ngay khi tải, nên nội dung trang vẫn render phía trình duyệt.
+
+### 10.3 Quy trình cho mọi việc từ giờ (1d, 1e)
+
+- Mỗi việc có issue trước khi làm, có nhãn, milestone và người nhận.
+- Mỗi issue một nhánh. Commit nhỏ, mỗi commit một thay đổi, thân commit ghi `Refs #n`.
+- PR nhỏ, mô tả có `Closes #n`, CI xanh, một bạn duyệt rồi mới merge.
+- Squash merge gộp các commit nhỏ thành một. Cân nhắc bật "Rebase and merge" trong ruleset để giữ từng commit nhỏ trên `main`.
+- Mỗi thành viên có ít nhất một PR trong hai ngày này.
+
+### 10.4 Danh sách issue
+
+| Mã | Issue | Người làm | Hạn |
+| :-- | :-- | :-- | :-- |
+| N1 | Chuyển nền tảng build sang Next.js, giữ nguyên giao diện | Nam | 26/11 |
+| N2 | Đọc dữ liệu trang Analytics và Themes qua Route Handler của Next.js | Nam | 26/11 |
+| N3 | Dùng định tuyến App Router thay React Router (chỉ làm khi đủ điều kiện ở 10.7) | Nam | Trưa 27/11 |
+| D1 | Rà soát lược đồ CSDL cùng nhóm và cập nhật migration | Nam và cả nhóm | Tối 26/11 |
+| W1 | Ghi công cụ và link file gốc của wireframe | Dũng | 27/11 |
+| P1 | Viết lại góp ý cho PawPass, đăng góp ý thành issue trên repo của 2 nhóm | Nhóm | 27/11 |
+| E1 | Bảng test thủ công và ảnh ở 3 kích thước màn hình | Nam | 27/11 |
+| E2 | Đo lại Lighthouse sau khi chuyển sang Next.js, thêm Themes, Tracking, About | Nam | 27/11 |
+| R1 | Cập nhật README, tài liệu và `AGENTS.md` theo Next.js; xuất video MP4 | Nam | 27/11 |
+
+### 10.5 Chi tiết từng việc
+
+**N1: nền tảng Next.js** (mỗi dòng là một commit)
+
+1. Thêm Next.js và điểm vào App Router: `next.config.ts`; `app/layout.tsx` (metadata, viewport, CSS); `app/[[...slug]]/page.tsx` render app phía trình duyệt (`ssr: false`); `src/app/ClientEntry.tsx` thay `main.tsx`, khởi động Sentry và GA trong `useEffect`. Route của Next.js nằm ở thư mục `app/` ở gốc. `src/app/` giữ vai trò lớp ghép giao diện như cũ, vì Next.js bỏ qua `src/app` khi đã có `app/` ở gốc.
+2. Đọc biến môi trường qua `process.env.NEXT_PUBLIC_*` (3 file code, 3 file test, `.env.example`). `next.config.ts` nhận cả tên cũ `VITE_*`, nên chưa cần sửa biến trên Vercel.
+3. Chuyển header bảo mật sang `next.config.ts` để thử được bằng `next start`; thêm `'unsafe-inline'` vào `script-src`; `vercel.json` chỉ còn `"framework": "nextjs"`.
+4. Bỏ các file của Vite (`index.html`, `vite.config.ts`, `src/app/main.tsx`, `src/vite-env.d.ts`). Các script `dev`, `build`, `start` chạy bằng `next`. `tsconfig.json` thêm `app`; `.gitignore` và ESLint bỏ qua `.next`. Vitest giữ nguyên `vitest.config.ts`.
+
+**N2: Route Handler đọc dữ liệu**
+
+1. Tách câu truy vấn `focus_sessions` (90 ngày, mỗi trang 500 dòng) và `saved_themes` ra `src/core/data/queries.ts` để trình duyệt và server dùng chung.
+2. Thêm `createSupabaseForToken(token)` trong `src/shared/lib/supabase.ts`, nơi duy nhất được gọi `createClient` theo luật ESLint. Client này không lưu phiên và gửi kèm header `Authorization`.
+3. Thêm `app/api/focus-sessions/route.ts` và `app/api/saved-themes/route.ts` (GET). Token được kiểm tra bằng `auth.getUser`; thiếu hoặc sai token thì trả 401. Lỗi CSDL trả 500 nhưng không lộ chi tiết. Phản hồi có `Cache-Control: no-store`.
+4. `SupabaseRepository.getFocusSessions` và `getSavedThemes` gọi `/api/...` kèm access token của phiên hiện tại; 401 thì báo `AUTH_SESSION_EXPIRED`. Các thao tác thêm, sửa, xoá giữ nguyên. Chế độ khách (`LocalRepository`) không đổi.
+5. Test: route handler (không có token, token sai, thành công, lỗi CSDL) chạy trong môi trường node; repository dùng `fetch` giả; test của trang Analytics và Themes vẫn phải xanh.
+
+Bằng chứng: ảnh tab Network trên production có `/api/focus-sessions` trả dữ liệu.
+
+**N3: định tuyến App Router** (chỉ làm khi đủ điều kiện ở 10.7)
+
+- Root layout giữ workspace luôn được mount để timer và nhạc không ngắt khi đổi trang. `src/app/ClientShell.tsx` chứa Providers, workspace, hộp thoại đăng nhập và toast. `app/(site)/layout.tsx` dùng `SiteLayout`. Các route: `/`, `/themes`, `/analytics`, `/tracking`, `/about`, `/app`; `not-found` chuyển về `/`.
+- Mỗi trang có `metadata` riêng.
+- `src/core/ui/navigation.ts` bọc `next/link` và `next/navigation`, để sửa 10 file đang dùng React Router theo cùng một cách. Sau đó bỏ `react-router-dom`. Viết lại 4 file test có dùng router.
+- Kiểm tra quan trọng nhất: đang chạy timer và nhạc, chuyển qua lại các trang website rồi về `/app` mà timer và nhạc không ngắt.
+
+**D1: rà soát lược đồ**
+
+- Nam rà trước và mở issue với các điểm cần bàn:
+  1. `focus_sessions.task_id` chỉ kiểm tra task có tồn tại, chưa kiểm tra task thuộc cùng người dùng, vì chính sách INSERT chỉ so `user_id`. Đề xuất: khoá ngoại ghép `(task_id, user_id)` tới `tasks(id, user_id)` với `ON DELETE SET NULL (task_id)`. Cách này cần thêm `UNIQUE (id, user_id)` trên `tasks`.
+  2. `saved_themes` cho phép trùng tên trong cùng một tài khoản. Cân nhắc `UNIQUE (user_id, lower(name))`, nhưng phải kiểm tra dữ liệu trùng trước.
+  3. Các điểm thành viên khác nêu ra.
+- Họp online 20 – 30 phút, đủ 5 người. Ghi biên bản thật vào `docs/MEETING_NOTES.md` (ngày, người dự, quyết định).
+- Migration mới chỉ gồm những điểm nhóm đồng ý; chỉ thêm ràng buộc hoặc chỉ mục, không xoá dữ liệu. Chạy thử trong `BEGIN … ROLLBACK` trên SQL Editor trước khi chạy thật, rồi cập nhật ERD (`docs/ERD.md`, README).
+
+**W1, P1, E1, E2, R1**
+
+- W1: Dũng gửi link Figma (quyền xem), tên công cụ và ngày vẽ lấy từ lịch sử phiên bản của Figma; ghi vào `docs/wireframes/` và README đúng như lịch sử đó.
+- P1: viết góp ý cho PawPass chi tiết như bản cho nhóm Đạt (màn hình, thành phần, vấn đề, cách sửa). Mở issue góp ý trên repo của cả 2 nhóm, rồi đưa link 2 issue vào `docs/PEER_REVIEW.md`.
+- E1: bảng thao tác, kết quả mong đợi, kết quả thực tế cho các luồng chính; ảnh ở 375, 768 và 1440 px.
+- E2: đo trên production sau N1, N2 (và N3 nếu có) cho trang chủ, `/app`, Analytics, Themes, Tracking, About, trên cả mobile và desktop. Trang cần đăng nhập đo trong DevTools, bỏ chọn "Clear storage". Nếu điểm thấp hơn bản Vite thì ghi lý do và sửa trước giờ đóng băng.
+- R1: README (công nghệ, cách chạy, kiến trúc có Route Handler), `docs/SYSTEM_DESIGN.md`, `AGENTS.md` (stack, tên biến môi trường), `docs/PROGRESS.md`. Video xuất ra MP4, tối thiểu 720p, không quá 10 phút.
+
+### 10.6 Kiểm tra trước khi merge mỗi PR
+
+Chạy trên `next start` ở máy và trên Vercel Preview của PR:
+
+- [ ] Lint, typecheck, test, build đều xanh
+- [ ] Mở thẳng `/`, `/themes`, `/analytics`, `/tracking`, `/about`, `/app`; đường dẫn lạ quay về `/`
+- [ ] Console không có lỗi CSP
+- [ ] Timer đếm; chuyển trang thì timer vẫn chạy
+- [ ] Nhạc YouTube phát; thanh nhạc nhỏ hiện ở các trang website
+- [ ] Đăng nhập, đăng xuất; Analytics và Themes hiện dữ liệu của tài khoản; đổi tài khoản thì dữ liệu đổi theo
+- [ ] Chế độ khách vẫn lưu task và ghi chú
+- [ ] GA nhận page view (Realtime); `/?sentry_test` gửi được về Sentry
+- [ ] Trên điện thoại: menu 3 gạch, panel dạng bảng trượt
+
+### 10.7 An toàn và mốc dừng
+
+- Production chỉ đổi khi PR được merge vào `main`. Mỗi PR phải qua checklist 10.6 trên Vercel Preview trước.
+- Trước khi merge N1: kiểm tra Vercel → Settings → Build không ghi đè Output Directory thành `dist`, và môi trường Preview có đủ biến Supabase.
+- Nếu có sự cố sau khi merge: dùng Instant Rollback trên Vercel để quay về bản trước, rồi revert PR.
+- N3 chỉ bắt đầu nếu N1 và N2 đã chạy ổn trên production trước 12:00 ngày 27/11, và phải merge trước 16:00. Quá giờ thì giữ nhánh lại và ghi vào hướng phát triển.
+- Đóng băng code lúc 18:00 ngày 27/11; sau giờ này chỉ sửa tài liệu.
