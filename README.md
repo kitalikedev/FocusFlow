@@ -246,7 +246,7 @@ More screenshots and the full list of changes: [`docs/MONITORING.md`](docs/MONIT
 
 ## 8. Project planning and teamwork
 
-The team met to agree on the roles below (meeting notes: [`docs/MEETING_NOTES.md`](docs/MEETING_NOTES.md), tracked in [Issue #23](https://github.com/kitalikedev/FocusFlow/issues/23)) and worked in 5 sprints. Sprint reports and the self-report of each member are in [`docs/reports/`](docs/reports/); wireframes, milestones and the workflow are in [`docs/PROJECT_MANAGEMENT.md`](docs/PROJECT_MANAGEMENT.md).
+The team met to agree on the roles below (meeting notes: [`docs/MEETING_NOTES.md`](docs/MEETING_NOTES.md), tracked in [Issue #23](https://github.com/kitalikedev/FocusFlow/issues/23)) and worked in 5 sprints. Sprint reports and the self-report of each member are in [`docs/reports/`](docs/reports/); wireframes, milestones and the workflow are in [`docs/PROJECT_MANAGEMENT.md`](docs/PROJECT_MANAGEMENT.md). After the trial grading, the whole team reviewed the database schema together on 26/11/2026 (session 7 of the meeting notes, tracked in [Issue #63](https://github.com/kitalikedev/FocusFlow/issues/63)).
 
 | Member | Role | Main responsibilities |
 | :--- | :--- | :--- |
