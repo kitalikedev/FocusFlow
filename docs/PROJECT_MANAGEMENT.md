@@ -57,7 +57,7 @@ The team first drew wireframes of the workspace for desktop and mobile, then one
 
 | Wireframe | Tool | Source file | Date |
 | :-- | :-- | :-- | :-- |
-| Workspace, desktop and mobile | Figma | [wireframe_focusflow](https://www.figma.com/design/SB7nswLyX7S57NwEHATfKH/wireframe_focusflow?node-id=0-1) | ____ (Figma version history) |
+| Workspace, desktop and mobile | Figma | [wireframe_focusflow](https://www.figma.com/design/SB7nswLyX7S57NwEHATfKH/wireframe_focusflow?node-id=0-1) | 19/11/2026 (Figma version history) |
 | Website redesign: Home, Themes, Analytics, Tracking, About | Claude Design canvas | [FocusFlow Website Redesign](https://claude.ai/artifact/6GVLXUjZeKgWe6j8hjJXw5) | 19/11/2026 |
 
 The images below are exports of these files.
