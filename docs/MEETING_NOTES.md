@@ -216,3 +216,41 @@
 - Phân chia công việc hợp lý và cân đối hơn ngay từ đầu.
 - Ghi nhận đầy đủ ý kiến của từng thành viên trong quá trình thảo luận để hạn chế bất đồng quan điểm.
 - Chọn thời điểm họp phù hợp hơn dựa trên lịch trình rảnh của tất cả mọi người nhằm tránh delay lịch họp.
+
+---
+
+## Buổi 7 (sau khi giảng viên chấm thử): Rà soát lược đồ cơ sở dữ liệu
+
+- **Ngày:** tối 26/11/2026
+- **Hình thức:** Discord
+- **Chủ trì:** Đàm Huỳnh Hoài Nam. **Ghi biên bản:** Nguyễn Anh Dũng
+- **Thành phần:** Hoài Nam, Anh Dũng, Xuân Phú, Thảo Anh, Công Sanh. **Vắng:** không
+- **Theo dõi tại:** [Issue #63](https://github.com/kitalikedev/FocusFlow/issues/63)
+
+### Lý do họp
+
+Giảng viên nhận xét lược đồ chỉ được viết một lần trong migration ngày 06/11, chưa có buổi họp hay PR nào để cả nhóm cùng xem lại. Buổi này cả nhóm đọc lại `docs/ERD.md` (sơ đồ, từ điển dữ liệu, khóa ngoại, chỉ mục, các quyết định thiết kế ở mục 12) và quyết định chỗ nào cần sửa.
+
+### Thảo luận
+
+1. **Nam trình bày lược đồ:** 6 bảng (`profiles`, `tasks`, `focus_sessions`, `saved_themes`, `user_settings`, `user_wallpapers`), 7 khóa ngoại, quy tắc xóa, RLS theo `user_id`, trigger Last-Write-Wins và trigger giới hạn số lượng.
+2. **Đối chiếu với PRD:** Không thấy thiếu bảng, thiếu cột hay cột thừa so với các chức năng trong PRD.
+3. **Biểu quyết từng đề xuất:**
+
+| #   | Đề xuất                                                              | Quyết định              | Lý do / cách làm                                                                                                                                                                                                                                            |
+| :-- | :------------------------------------------------------------------- | :---------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Thêm mô tả cho 6 bảng và các cột                                     | Duyệt                   | Migration mới với `COMMENT ON TABLE` và `COMMENT ON COLUMN`, không đổi dữ liệu và code.                                                                                                                                                                     |
+| 2   | Khóa ngoại `focus_sessions.task_id` phải cùng chủ với phiên          | Duyệt có điều kiện      | Khóa ngoại ghép `(task_id, user_id)` tới `tasks(id, user_id)`, thêm `UNIQUE (id, user_id)` trên `tasks`. Chỉ áp dụng khi câu kiểm tra trên dữ liệu thật không trả về dòng nào và chạy thử trong `BEGIN … ROLLBACK` thành công; nếu không thì hoãn và ghi lý do vào ERD. |
+| 3   | Theme trùng tên trong một tài khoản                                  | Giữ nguyên              | Thêm ràng buộc duy nhất có thể làm hỏng lúc gộp dữ liệu khách vào tài khoản; ghi lý do vào ERD.                                                                                                                                                             |
+| 4   | Giới hạn 100 task, 10 theme, 3 hình nền kiểm tra bằng đếm rồi chèn  | Ghi là rủi ro chấp nhận | Chỉ xảy ra khi một người chèn nhiều dòng cùng lúc; ghi vào ERD.                                                                                                                                                                                             |
+| 5   | Nhãn task dạng `text[]`, cấu hình theme dạng `jsonb`                 | Giữ nguyên              | Lý do ở ERD mục 12 vẫn đúng.                                                                                                                                                                                                                                |
+| 6   | Chỉ mục                                                              | Giữ nguyên              | 7 chỉ mục là đủ, mỗi người tối đa 100 task.                                                                                                                                                                                                                 |
+| 7   | CI kiểm thử migration và RLS trên PostgreSQL thật                    | Duyệt                   | Job CI mới dựng PostgreSQL, chạy migration, seed và bộ kiểm thử ở ERD mục 11.                                                                                                                                                                               |
+| 8   | Ý kiến khác                                                          | Không có                    | ____                                                                                                                                                                                                                                                        |
+
+### Việc cần làm (hạn 27/11/2026)
+
+| Việc                                                                                 | Người           | Kết quả             |
+| :----------------------------------------------------------------------------------- | :-------------- | :------------------ |
+| Migration cho điểm 1 và 2, cập nhật `docs/ERD.md` (điểm 2, 3, 4) và README mục 6     | Dũng, Nam duyệt | PR đóng Issue #63   |
+| Job CI chạy migration và kiểm thử RLS trên PostgreSQL thật (điểm 7)                  | Dũng, Nam duyệt | PR đóng Issue #63   |
