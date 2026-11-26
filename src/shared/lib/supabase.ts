@@ -5,7 +5,7 @@ let cachedClient: SupabaseClient | null = null;
 /** True when both public Supabase environment variables are present. */
 export function isSupabaseConfigured(): boolean {
   return Boolean(
-    import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   );
 }
 
@@ -19,12 +19,12 @@ export function getSupabaseClient(): SupabaseClient {
     return cachedClient;
   }
 
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
     throw new Error(
-      'Supabase environment variables missing: VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY must be provided.',
+      'Supabase environment variables missing: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY must be provided.',
     );
   }
 

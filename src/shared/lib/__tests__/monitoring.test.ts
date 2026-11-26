@@ -29,7 +29,7 @@ afterEach(() => {
 
 describe('error logging without a DSN', () => {
   it('does nothing at all', async () => {
-    vi.stubEnv('VITE_SENTRY_DSN', '');
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', '');
     initMonitoring();
     captureError(new Error('boom'));
     sendTestMessage();
@@ -44,7 +44,7 @@ describe('error logging without a DSN', () => {
 
 describe('error logging with a DSN', () => {
   beforeEach(() => {
-    vi.stubEnv('VITE_SENTRY_DSN', DSN);
+    vi.stubEnv('NEXT_PUBLIC_SENTRY_DSN', DSN);
   });
 
   it('starts once with errors only and no personal data', async () => {

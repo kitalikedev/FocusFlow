@@ -1,5 +1,5 @@
 /**
- * Error logging with Sentry (Task 4b). Everything here is a no-op unless VITE_SENTRY_DSN is set, so a fresh clone,
+ * Error logging with Sentry (Task 4b). Everything here is a no-op unless NEXT_PUBLIC_SENTRY_DSN is set, so a fresh clone,
  * the tests and Guest Mode keep working without it. The SDK is loaded on demand so it never weighs on the first page.
  *
  * Privacy: only the error itself (message, stack, browser and page address) is sent. No user, cookies, headers,
@@ -18,7 +18,7 @@ const pending: Array<(module: SentryModule) => void> = [];
 
 /** True when a Sentry DSN was provided at build time. */
 export function isMonitoringConfigured(): boolean {
-  return Boolean(import.meta.env.VITE_SENTRY_DSN);
+  return Boolean(process.env.NEXT_PUBLIC_SENTRY_DSN);
 }
 
 /** Removes everything that could identify the user from an event before it is sent. */
@@ -42,7 +42,7 @@ function whenReady(action: (module: SentryModule) => void): void {
 
 /** Starts Sentry in the background; safe to call more than once. */
 export function initMonitoring(): void {
-  const dsn = import.meta.env.VITE_SENTRY_DSN;
+  const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
   if (!dsn || sentry || isStarting) return;
   isStarting = true;
 
@@ -50,7 +50,7 @@ export function initMonitoring(): void {
     .then((module) => {
       module.init({
         dsn,
-        environment: import.meta.env.MODE,
+        environment: process.env.NODE_ENV,
         sendDefaultPii: false,
         // Error logging only: no performance tracing and no session replay.
         tracesSampleRate: 0,

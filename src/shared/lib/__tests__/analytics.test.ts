@@ -24,7 +24,7 @@ afterEach(() => {
 
 describe('Google Analytics', () => {
   it('does nothing without a Measurement ID', () => {
-    vi.stubEnv('VITE_GA_MEASUREMENT_ID', '');
+    vi.stubEnv('NEXT_PUBLIC_GA_MEASUREMENT_ID', '');
     initAnalytics();
     trackPageView('/', 'Home');
     trackEvent('focus_session_completed', { minutes: 25 });
@@ -35,13 +35,13 @@ describe('Google Analytics', () => {
   });
 
   it('ignores a value that is not a Measurement ID', () => {
-    vi.stubEnv('VITE_GA_MEASUREMENT_ID', 'UA-123');
+    vi.stubEnv('NEXT_PUBLIC_GA_MEASUREMENT_ID', 'UA-123');
     initAnalytics();
     expect(isAnalyticsActive()).toBe(false);
   });
 
   it('stays off when the browser sends Do Not Track', () => {
-    vi.stubEnv('VITE_GA_MEASUREMENT_ID', 'G-TEST12345');
+    vi.stubEnv('NEXT_PUBLIC_GA_MEASUREMENT_ID', 'G-TEST12345');
     setDoNotTrack('1');
     initAnalytics();
     expect(isAnalyticsActive()).toBe(false);
@@ -49,7 +49,7 @@ describe('Google Analytics', () => {
   });
 
   it('configures gtag without automatic page views or ad features and loads the script once the page is loaded', () => {
-    vi.stubEnv('VITE_GA_MEASUREMENT_ID', 'G-TEST12345');
+    vi.stubEnv('NEXT_PUBLIC_GA_MEASUREMENT_ID', 'G-TEST12345');
     initAnalytics();
     initAnalytics(); // calling twice must not start it twice
 
@@ -70,7 +70,7 @@ describe('Google Analytics', () => {
   });
 
   it('sends page views with a path and a fixed name', () => {
-    vi.stubEnv('VITE_GA_MEASUREMENT_ID', 'G-TEST12345');
+    vi.stubEnv('NEXT_PUBLIC_GA_MEASUREMENT_ID', 'G-TEST12345');
     initAnalytics();
     trackPageView('/themes', 'Themes');
 
@@ -83,7 +83,7 @@ describe('Google Analytics', () => {
   });
 
   it('sends the allowed events with their numbers only', () => {
-    vi.stubEnv('VITE_GA_MEASUREMENT_ID', 'G-TEST12345');
+    vi.stubEnv('NEXT_PUBLIC_GA_MEASUREMENT_ID', 'G-TEST12345');
     initAnalytics();
     trackEvent('focus_session_completed', { minutes: 25 });
 
