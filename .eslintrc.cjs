@@ -11,7 +11,7 @@ module.exports = {
     },
   },
   plugins: ['@typescript-eslint'],
-  ignorePatterns: ['dist', 'coverage'],
+  ignorePatterns: ['dist', 'coverage', '.next', 'next-env.d.ts'],
   rules: {
     // Luật toàn cục: Cấm khởi tạo Supabase Client ngoài src/shared/lib/supabase.ts
     'no-restricted-imports': [

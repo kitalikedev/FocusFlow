@@ -1,5 +1,5 @@
 /**
- * Google Analytics 4 (Task 4b). A no-op unless VITE_GA_MEASUREMENT_ID is set, and also when the browser sends
+ * Google Analytics 4 (Task 4b). A no-op unless NEXT_PUBLIC_GA_MEASUREMENT_ID is set, and also when the browser sends
  * "Do Not Track". Page views are sent by us on every route change; only a fixed list of events with numbers or
  * fixed words is ever sent. Never titles, notes, goals or any other text the user typed.
  */
@@ -20,7 +20,7 @@ const GA_ID_PATTERN = /^G-[A-Z0-9]{4,}$/;
 let started = false;
 
 function measurementId(): string | null {
-  const id = import.meta.env.VITE_GA_MEASUREMENT_ID?.trim();
+  const id = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
   return id && GA_ID_PATTERN.test(id) ? id : null;
 }
 

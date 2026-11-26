@@ -6,8 +6,8 @@ import { useAuthStore } from '../core/auth/useAuthStore';
 describe('Application Smoke Test', () => {
   beforeEach(() => {
     // CI and fresh clones have no .env.local: the app must still start as a guest.
-    vi.stubEnv('VITE_SUPABASE_URL', '');
-    vi.stubEnv('VITE_SUPABASE_PUBLISHABLE_KEY', '');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_URL', '');
+    vi.stubEnv('NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY', '');
     // The workspace lives at /app.
     window.history.pushState({}, '', '/app');
   });

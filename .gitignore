@@ -13,6 +13,8 @@ node_modules
 .pnp.js
 
 # Production build
+.next
+next-env.d.ts
 dist
 dist-ssr
 build
