@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { getSupabaseClient } from '@/shared/lib/supabase';
 import {
   createMockQueryBuilder,
@@ -16,7 +16,7 @@ vi.mock('@/shared/lib/supabase');
 
 const UUID_V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const sb = getSupabaseClient() as unknown as MockSupabase;
-const SESSION = { data: { session: { user: { id: 'u1' } } }, error: null };
+const SESSION = { data: { session: { user: { id: 'u1' }, access_token: 'tok-1' } }, error: null };
 
 const taskRow = {
   id: 't1',
@@ -46,6 +46,10 @@ async function codeOf(promise: Promise<unknown>): Promise<string | undefined> {
 describe('SupabaseRepository', () => {
   let repo: SupabaseRepository;
   let bucket: MockStorageBucket;
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
   beforeEach(() => {
     repo = new SupabaseRepository();
@@ -298,24 +302,40 @@ describe('SupabaseRepository', () => {
       expect(await codeOf(repo.recordFocusSession(25))).toBe('FOREIGN_KEY_INVALID');
     });
 
-    it('pages through the last 90 days in chunks of 500', async () => {
-      const page = Array.from({ length: 500 }, (_, i) => ({ ...sessionRow, id: `a${i}` }));
-      const first = createMockQueryBuilder({ data: page });
-      const second = createMockQueryBuilder({ data: [{ ...sessionRow, id: 'last' }] });
-      queue(first, second);
+    it('reads the sessions through /api/focus-sessions with the access token', async () => {
+      const list = [{ id: 's1', durationMinutes: 25, intentTitle: null, taskId: null, completedAt: 'c' }];
+      const fetchMock = vi.fn().mockResolvedValue(Response.json(list));
+      vi.stubGlobal('fetch', fetchMock);
 
-      const sessions = await repo.getFocusSessions();
-      expect(sessions).toHaveLength(501);
-      expect(first.range).toHaveBeenCalledWith(0, 499);
-      expect(second.range).toHaveBeenCalledWith(500, 999);
-      expect(first.gte).toHaveBeenCalledWith('completed_at', expect.any(String));
+      expect(await repo.getFocusSessions()).toEqual(list);
+      expect(fetchMock).toHaveBeenCalledWith('/api/focus-sessions', {
+        headers: { Authorization: 'Bearer tok-1' },
+        cache: 'no-store',
+      });
+      expect(sb.from).not.toHaveBeenCalled();
     });
 
-    it('handles an empty history and errors', async () => {
-      queue(createMockQueryBuilder({ data: null }));
-      expect(await repo.getFocusSessions()).toEqual([]);
-      queue(createMockQueryBuilder({ error: { code: 'PGRST301' } }));
+    it('maps API failures: 401, other statuses, a wrong body and a network error', async () => {
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+
+      fetchMock.mockResolvedValueOnce(Response.json({ error: 'UNAUTHORIZED' }, { status: 401 }));
       expect(await codeOf(repo.getFocusSessions())).toBe('AUTH_SESSION_EXPIRED');
+      fetchMock.mockResolvedValueOnce(Response.json({ error: 'READ_FAILED' }, { status: 500 }));
+      expect(await codeOf(repo.getFocusSessions())).toBe('UNKNOWN_ERROR');
+      fetchMock.mockResolvedValueOnce(Response.json({ not: 'a list' }));
+      expect(await codeOf(repo.getFocusSessions())).toBe('UNKNOWN_ERROR');
+      fetchMock.mockRejectedValueOnce(new TypeError('Failed to fetch'));
+      expect(await codeOf(repo.getFocusSessions())).toBe('NETWORK_DISCONNECTED');
+    });
+
+    it('does not call the API without a session', async () => {
+      const fetchMock = vi.fn();
+      vi.stubGlobal('fetch', fetchMock);
+      sb.auth.getSession.mockResolvedValue({ data: { session: null }, error: null });
+
+      expect(await codeOf(repo.getFocusSessions())).toBe('AUTH_SESSION_EXPIRED');
+      expect(fetchMock).not.toHaveBeenCalled();
     });
   });
 
@@ -408,17 +428,19 @@ describe('SupabaseRepository', () => {
   describe('saved themes', () => {
     const themeRow = { id: 'th1', user_id: 'u1', name: 'Night', config: {}, created_at: 'c', updated_at: 'u' };
 
-    it('lists themes oldest first', async () => {
-      const builder = createMockQueryBuilder({ data: [themeRow] });
-      queue(builder);
-      const themes = await repo.getSavedThemes();
-      expect(themes[0].config).toBe(DEFAULT_THEME_CONFIG);
-      expect(builder.order).toHaveBeenCalledWith('created_at', { ascending: true });
+    it('lists themes through /api/saved-themes with the access token', async () => {
+      const themes = [{ id: 'th1', name: 'Night', config: DEFAULT_THEME_CONFIG, createdAt: 'c', updatedAt: 'u' }];
+      const fetchMock = vi.fn().mockResolvedValue(Response.json(themes));
+      vi.stubGlobal('fetch', fetchMock);
 
-      queue(createMockQueryBuilder({ data: null }));
-      expect(await repo.getSavedThemes()).toEqual([]);
-      queue(createMockQueryBuilder({ error: { code: '42501' } }));
-      expect(await codeOf(repo.getSavedThemes())).toBe('PERMISSION_DENIED');
+      expect(await repo.getSavedThemes()).toEqual(themes);
+      expect(fetchMock).toHaveBeenCalledWith('/api/saved-themes', {
+        headers: { Authorization: 'Bearer tok-1' },
+        cache: 'no-store',
+      });
+
+      fetchMock.mockResolvedValueOnce(Response.json({ error: 'UNAUTHORIZED' }, { status: 401 }));
+      expect(await codeOf(repo.getSavedThemes())).toBe('AUTH_SESSION_EXPIRED');
     });
 
     it('saves a theme with a UUID v4 id', async () => {
