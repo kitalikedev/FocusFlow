@@ -223,14 +223,41 @@ Bằng chứng: ảnh tab Network trên production có `/api/focus-sessions` tr�
 - `src/core/ui/navigation.ts` bọc `next/link` và `next/navigation`, để sửa 10 file đang dùng React Router theo cùng một cách. Sau đó bỏ `react-router-dom`. Viết lại 4 file test có dùng router.
 - Kiểm tra quan trọng nhất: đang chạy timer và nhạc, chuyển qua lại các trang website rồi về `/app` mà timer và nhạc không ngắt.
 
-**D1: rà soát lược đồ**
+**D1: rà soát lược đồ cùng cả nhóm (họp tối 26/11/2026)**
 
-- Nam rà trước và mở issue với các điểm cần bàn:
-  1. `focus_sessions.task_id` chỉ kiểm tra task có tồn tại, chưa kiểm tra task thuộc cùng người dùng, vì chính sách INSERT chỉ so `user_id`. Đề xuất: khoá ngoại ghép `(task_id, user_id)` tới `tasks(id, user_id)` với `ON DELETE SET NULL (task_id)`. Cách này cần thêm `UNIQUE (id, user_id)` trên `tasks`.
-  2. `saved_themes` cho phép trùng tên trong cùng một tài khoản. Cân nhắc `UNIQUE (user_id, lower(name))`, nhưng phải kiểm tra dữ liệu trùng trước.
-  3. Các điểm thành viên khác nêu ra.
-- Họp online 20 – 30 phút, đủ 5 người. Ghi biên bản thật vào `docs/MEETING_NOTES.md` (ngày, người dự, quyết định).
-- Migration mới chỉ gồm những điểm nhóm đồng ý; chỉ thêm ràng buộc hoặc chỉ mục, không xoá dữ liệu. Chạy thử trong `BEGIN … ROLLBACK` trên SQL Editor trước khi chạy thật, rồi cập nhật ERD (`docs/ERD.md`, README).
+Giảng viên trừ điểm 3(a) vì không thấy nhóm cùng rà soát lược đồ: migration được viết một lần ngày 06/11, không có buổi họp hay PR nào bàn về lược đồ. Để lấy lại điểm cần ba bằng chứng: một buổi họp thật có biên bản, các ý kiến trên issue #63, và một PR sửa theo kết quả buổi họp.
+
+*Chuẩn bị trước buổi họp:* mỗi người đọc `docs/ERD.md` (mục 1 đến 4 và mục 12) và xem sơ đồ ở README mục 6, rồi ghi ý kiến vào issue #63 (đúng ý kiến của mình, kể cả "không có gì cần sửa" nếu thật sự vậy).
+
+*Buổi họp:* online 30 – 45 phút, đủ 5 người. Giờ họp do nhóm chốt. Nam điều phối; một người khác ghi biên bản.
+
+| Thứ tự | Nội dung | Thời gian | Kết quả cần có |
+| :-: | :-- | :-: | :-- |
+| 1 | Nam trình bày 6 bảng, quan hệ và quy tắc xoá (ERD mục 1 và 3) | 5 phút | Cả nhóm hiểu lược đồ |
+| 2 | Đối chiếu từng bảng với chức năng trong PRD: thiếu bảng, thiếu cột, cột thừa | 10 phút | Danh sách thiếu và thừa, có thể là rỗng |
+| 3 | Bàn các điểm ở bảng bên dưới và biểu quyết từng điểm | 15 phút | Cột "Quyết định" được điền |
+| 4 | Chốt phần đưa vào migration mới, phân người làm | 5 phút | Danh sách việc và người nhận |
+
+*Các điểm cần bàn* (mỗi điểm đã đối chiếu với migration và code hiện tại; cột "Quyết định" nhóm điền trong buổi họp, không điền trước):
+
+| # | Điểm | Hiện trạng | Đề xuất | Rủi ro | Quyết định |
+| :-: | :-- | :-- | :-- | :-- | :-- |
+| 1 | `focus_sessions.task_id` có thể trỏ tới task của người khác | Khoá ngoại chỉ kiểm tra task có tồn tại, chính sách INSERT chỉ so `user_id`; ERD mục 12.7 đang ghi là chấp nhận | Khoá ngoại ghép `(task_id, user_id)` tới `tasks(id, user_id)` với `ON DELETE SET NULL (task_id)`; cần thêm `UNIQUE (id, user_id)` trên `tasks` | Phải kiểm tra trước trên dữ liệu thật rằng không có phiên nào vi phạm. Lỗi vi phạm vẫn là 23503, code hiện đã xử lý (thử lại không kèm task) | |
+| 2 | `saved_themes` cho phép trùng tên trong một tài khoản | Không có ràng buộc duy nhất; lúc gộp dữ liệu khách, hàm `importSavedThemes` chèn cả lô | Hoặc thêm `UNIQUE (user_id, lower(name))`, hoặc giữ nguyên và ghi lý do vào ERD | Nếu thêm: dữ liệu khách có hai theme trùng tên sẽ làm hỏng cả lô gộp dữ liệu, nên cần sửa code kèm theo. Lựa chọn giữ nguyên là hợp lệ nếu ghi rõ lý do | |
+| 3 | Giới hạn 100 task, 10 theme, 3 hình nền kiểm tra bằng `count(*)` rồi mới chèn | Hai lần chèn đồng thời có thể cùng vượt qua kiểm tra | Khoá theo người dùng trong trigger (`pg_advisory_xact_lock`) | Thấp: chỉ xảy ra khi một người chèn đồng thời nhiều dòng. Có thể ghi vào ERD là rủi ro chấp nhận | |
+| 4 | Cơ sở dữ liệu chưa có mô tả bảng và cột | Migration chưa có `COMMENT ON` | Thêm `COMMENT ON TABLE` và `COMMENT ON COLUMN` cho 6 bảng, để Supabase Studio hiện mô tả | Không ảnh hưởng dữ liệu hay code | |
+| 5 | Nhãn task lưu bằng cột mảng `text[]`, cấu hình theme lưu bằng `jsonb` | Đã có lý do trong ERD mục 12.6 | Nhóm xác nhận lại lý do còn đúng, hay cần tách bảng nhãn | Tách bảng nhãn đổi cả code; chỉ làm nếu nhóm thấy lý do hiện tại không thuyết phục | |
+| 6 | Chỉ mục | Đã có 7 chỉ mục (ERD mục 4); mỗi người chỉ có tối đa 100 task nên không cần chỉ mục sắp xếp thêm | Xác nhận đủ, hoặc thêm chỉ mục nếu có truy vấn chậm | Thấp | |
+| 7 | Kiểm thử migration và RLS trên PostgreSQL thật trong CI | CI hiện chỉ chạy test với Supabase giả; bộ kiểm thử SQL của ERD mục 11 chỉ chạy tay trong SQL Editor | Thêm job CI dựng PostgreSQL, chạy migration, seed và bộ kiểm thử RLS, quota, Last-Write-Wins | Không đụng database production hay code app; rủi ro là job CI mới bị đỏ, xử lý trước khi merge. Cần thử Supabase CLI trên GitHub Actions | |
+| 8 | Điểm khác thành viên nêu | | | | |
+
+*Sau buổi họp:*
+
+1. Ghi **Buổi 7** vào `docs/MEETING_NOTES.md` đúng như buổi họp: ngày, giờ, người dự, các điểm đã bàn, quyết định của từng điểm, người nhận việc. Không ghi điểm nào chưa bàn. README mục 8 thêm một dòng trỏ tới buổi 7.
+2. Cập nhật issue #63: dán bảng quyết định, đánh dấu các việc đã xong.
+3. Làm một PR riêng cho các điểm nhóm đồng ý, ghi `Closes #63`: migration mới `supabase/migrations/<ngày>_schema_review.sql` (chỉ thêm ràng buộc, chỉ mục hoặc mô tả, không xoá dữ liệu), cập nhật `docs/ERD.md` (sơ đồ, từ điển dữ liệu, mục 12) và README mục 6. Nếu nhóm quyết định không đổi gì ở một điểm thì ghi lý do vào ERD mục 12.
+4. Trước khi chạy migration trên production: chạy câu kiểm tra dữ liệu của từng điểm, rồi chạy thử trong `BEGIN … ROLLBACK` trên SQL Editor, sau đó mới chạy thật. Mở lại Analytics và Themes để kiểm tra.
+5. Nếu hết giờ mà migration chưa chạy được an toàn thì chỉ gộp biên bản và ERD, ghi migration vào hướng phát triển. Bằng chứng buổi họp và quyết định vẫn là phần quan trọng nhất của mục 3(a).
 
 **W1, P1, E1, E2, R1**
 
