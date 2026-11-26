@@ -97,7 +97,7 @@ Every page shares one header (links to all pages, light/dark switch, "Open Focus
 | :------------------------------------------------: |
 | <img src="docs/images/site/mobile-home.jpg" alt="Home page on a phone" width="170"> <img src="docs/images/site/mobile-menu.jpg" alt="Site menu on a phone" width="170"> |
 
-The pages follow the wireframes in [`docs/wireframes/`](docs/wireframes/).
+The pages follow the wireframes in [`docs/wireframes/`](docs/wireframes/), drawn in [Figma](https://www.figma.com/design/SB7nswLyX7S57NwEHATfKH/wireframe_focusflow?node-id=0-1) (workspace) and in a [Claude Design canvas](https://claude.ai/artifact/6GVLXUjZeKgWe6j8hjJXw5) (website pages).
 
 ## 5. Features and screenshots
 
@@ -258,7 +258,7 @@ The team met to agree on the roles below (meeting notes: [`docs/MEETING_NOTES.md
 
 **GitHub workflow:** every task is an Issue with an assignee and a milestone (5 milestones); work happens on a branch and goes to `main` only through a pull request that links its issue (`Closes #N`), passes CI (secret check, lint, type check, tests, build) and gets 1 approval, then is squash-merged and deployed by Vercel. `main` is protected by a ruleset. Commit messages are short sentences.
 
-**Wireframes** (desktop workspace and the 5 website pages): [`docs/wireframes/`](docs/wireframes/). **UI/UX peer review:** we reviewed 2 teams (Đạt's expense manager and PawPass) against the 3 criteria of the brief, and received feedback from the same 2 teams. We fixed 4 of the 6 points (buttons that moved when pressed, listening time for live radio, a mini player on the website pages, covers in the queue) in [PR #51](https://github.com/kitalikedev/FocusFlow/pull/51) and wrote down why the other 2 were not done. Reviews, decisions and before/after screenshots: [`docs/PEER_REVIEW.md`](docs/PEER_REVIEW.md) (in Vietnamese).
+**Wireframes** (desktop workspace and the 5 website pages): [`docs/wireframes/`](docs/wireframes/), source files in [Figma](https://www.figma.com/design/SB7nswLyX7S57NwEHATfKH/wireframe_focusflow?node-id=0-1) and a [Claude Design canvas](https://claude.ai/artifact/6GVLXUjZeKgWe6j8hjJXw5). **UI/UX peer review:** we reviewed 2 teams (Đạt's expense manager and PawPass) against the 3 criteria of the brief, and received feedback from the same 2 teams. We fixed 4 of the 6 points (buttons that moved when pressed, listening time for live radio, a mini player on the website pages, covers in the queue) in [PR #51](https://github.com/kitalikedev/FocusFlow/pull/51) and wrote down why the other 2 were not done. Reviews, decisions and before/after screenshots: [`docs/PEER_REVIEW.md`](docs/PEER_REVIEW.md) (in Vietnamese).
 
 ## 9. Additional information
 
