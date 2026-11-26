@@ -14,6 +14,7 @@ import {
 import { AppError, toAppError } from '@/shared/lib/errors';
 import { getSupabaseClient } from '@/shared/lib/supabase';
 import { createDefaultSettings, parseThemeConfig } from './defaults';
+import { QueryResult, unwrap } from './queries';
 import {
   FocusSessionRow,
   NoteRow,
@@ -47,19 +48,7 @@ import {
 
 const WALLPAPER_BUCKET = 'user-wallpapers';
 const PRIORITY_RANK: Record<TaskPriority, number> = { none: 0, low: 1, medium: 2, high: 3 };
-const SESSIONS_PAGE_SIZE = 500;
-const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
 const IMPORT_CHUNK_SIZE = 100;
-
-interface QueryResult<T> {
-  data: T | null;
-  error: unknown;
-}
-
-function unwrap<T>(result: QueryResult<T>): T | null {
-  if (result.error) throw toAppError(result.error);
-  return result.data;
-}
 
 function unwrapRequired<T>(result: QueryResult<T>): T {
   const data = unwrap(result);
@@ -89,6 +78,28 @@ export class SupabaseRepository implements DataRepository {
     const userId = data.session?.user.id;
     if (error || !userId) throw new AppError('AUTH_SESSION_EXPIRED');
     return userId;
+  }
+
+  /** GET a list from our own /api, sending the user's access token; the server answers with the user's rows only. */
+  private async readFromApi<T>(path: string): Promise<T[]> {
+    try {
+      const { data, error } = await this.client.auth.getSession();
+      const token = data.session?.access_token;
+      if (error || !token) throw new AppError('AUTH_SESSION_EXPIRED');
+
+      const response = await fetch(path, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+      });
+      if (response.status === 401) throw new AppError('AUTH_SESSION_EXPIRED');
+      if (!response.ok) throw new AppError('UNKNOWN_ERROR', undefined, { status: response.status });
+
+      const body: unknown = await response.json();
+      if (!Array.isArray(body)) throw new AppError('UNKNOWN_ERROR');
+      return body as T[];
+    } catch (error) {
+      throw toAppError(error);
+    }
   }
 
   // -------------------------------------------------------------------- tasks
@@ -283,32 +294,9 @@ export class SupabaseRepository implements DataRepository {
     }
   }
 
+  /** Read through the Next.js Route Handler (/api/focus-sessions), which applies the same query under RLS. */
   async getFocusSessions(): Promise<FocusSessionRecord[]> {
-    try {
-      const since = new Date(Date.now() - NINETY_DAYS_MS).toISOString();
-      const sessions: FocusSessionRecord[] = [];
-      let from = 0;
-
-      for (;;) {
-        const page = unwrap(
-          await (this.client
-            .from('focus_sessions')
-            .select('id, duration_minutes, intent_title, task_id, completed_at')
-            .gte('completed_at', since)
-            .order('completed_at', { ascending: false })
-            .range(from, from + SESSIONS_PAGE_SIZE - 1) as unknown as PromiseLike<
-            QueryResult<FocusSessionRow[]>
-          >),
-        );
-        const rows = page ?? [];
-        sessions.push(...rows.map(rowToSession));
-        if (rows.length < SESSIONS_PAGE_SIZE) break;
-        from += SESSIONS_PAGE_SIZE;
-      }
-      return sessions;
-    } catch (error) {
-      throw toAppError(error);
-    }
+    return this.readFromApi<FocusSessionRecord>('/api/focus-sessions');
   }
 
   // --------------------------------------------------------------- wallpapers
@@ -397,21 +385,9 @@ export class SupabaseRepository implements DataRepository {
 
   // ------------------------------------------------------------------- themes
 
+  /** Read through the Next.js Route Handler (/api/saved-themes), which applies the same query under RLS. */
   async getSavedThemes(): Promise<SavedTheme[]> {
-    try {
-      const rows =
-        unwrap(
-          await (this.client
-            .from('saved_themes')
-            .select('*')
-            .order('created_at', { ascending: true }) as unknown as PromiseLike<
-            QueryResult<SavedThemeRow[]>
-          >),
-        ) ?? [];
-      return rows.map(rowToSavedTheme);
-    } catch (error) {
-      throw toAppError(error);
-    }
+    return this.readFromApi<SavedTheme>('/api/saved-themes');
   }
 
   async saveTheme(theme: Omit<SavedTheme, 'id' | 'createdAt' | 'updatedAt'>): Promise<SavedTheme> {
