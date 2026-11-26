@@ -38,3 +38,23 @@ export function getSupabaseClient(): SupabaseClient {
   });
   return cachedClient;
 }
+
+/**
+ * A short-lived client for server code (Route Handlers): it acts as the user whose access token it gets, so Row
+ * Level Security still decides what is returned. It keeps no session and never refreshes a token.
+ */
+export function createSupabaseForToken(accessToken: string): SupabaseClient {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error(
+      'Supabase environment variables missing: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY must be provided.',
+    );
+  }
+
+  return createClient(supabaseUrl, supabaseKey, {
+    global: { headers: { Authorization: `Bearer ${accessToken}` } },
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+}
