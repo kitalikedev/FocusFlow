@@ -10,7 +10,7 @@ Ngoài 677 test tự động (Vitest, chạy trong mỗi pull request), nhóm ki
 | Kích thước | 375 x 812 (điện thoại), 768 x 1024 (máy tính bảng), 1440 x 900 (máy tính) |
 | Cách chụp | Chrome đặt đúng kích thước thiết bị qua giao thức DevTools; cùng lúc đo xem trang có tràn ngang và có lỗi console không |
 
-Bảng này chỉ gồm các luồng ở chế độ khách.
+Mục 1 và 2 là các luồng ở chế độ khách trên bản build chạy ở máy (26/11/2026). Mục 3 là các luồng đã đăng nhập, kiểm thử trên site production (27/11/2026).
 
 ## 1. Luồng chính (chế độ khách)
 
@@ -52,3 +52,21 @@ Nhận xét theo ảnh:
 - **375 px:** menu gọn thành nút, các nút chế độ đồng hồ xuống hai dòng, các thanh công cụ ở góc dưới vẫn nằm trọn trong màn hình.
 - **768 px:** trang Analytics hiển thị ba ô số liệu trên một hàng; chữ "0 sessions" ở ô Today bị xuống hai dòng và sát vạch ngăn. Chỉ là chỗ có thể chỉnh cho đẹp hơn, không ảnh hưởng chức năng.
 - **1440 px:** nội dung các trang web nằm giữa, rộng tối đa khoảng 1160 px; workspace dùng toàn màn hình.
+
+## 3. Luồng đã đăng nhập (production)
+
+Kiểm thử trên `https://focus-flow-two-wheat.vercel.app` ngày 27/11/2026 với tài khoản demo đã nạp dữ liệu mẫu. Dòng 17 và 18 do thành viên nhóm tự thao tác bằng tay trên trình duyệt của mình; các dòng còn lại thao tác trên trình duyệt tích hợp của công cụ làm việc, sau khi thành viên đã tự đăng nhập. Công việc "Test E1" ở dòng 21 và 22 được tạo rồi xóa ngay, dữ liệu mẫu không bị đổi.
+
+| # | Thao tác | Kết quả mong đợi | Kết quả thực tế | Kết quả |
+| :-: | :-- | :-- | :-- | :-: |
+| 16 | Chưa đăng nhập, mở `/analytics` | Dữ liệu khách rỗng, không gọi `/api` | Hiện 0m, 0 sessions, 0 Days; không có lời gọi `/api` nào; không có phiên đăng nhập | Đạt |
+| 17 | Đăng nhập bằng email và mật khẩu đúng | Vào được workspace | Vào được workspace, nút Login đổi thành menu tài khoản | Đạt |
+| 18 | Đăng nhập bằng mật khẩu sai | Bị từ chối | Không vào được | Đạt |
+| 19 | Đã đăng nhập, mở `/analytics` | Số liệu đọc từ database qua Route Handler | `/api/saved-themes` và `/api/focus-sessions` đều trả `200`; hiện 5h 17m tuần này, 0 sessions hôm nay, streak 6 Days | Đạt |
+| 20 | Đã đăng nhập, mở `/themes` | Hiện theme có sẵn và theme đã lưu của tài khoản | 12 theme có sẵn và "Your saved themes (3)"; hai lời gọi `/api` đều `200` | Đạt |
+| 21 | Thêm công việc "Test E1" ở workspace, rồi tải lại trang | Công việc còn sau khi tải lại, lưu trên database | Danh sách từ 8 lên 9 open, sau khi tải lại vẫn còn; không nằm trong dữ liệu khách của trình duyệt | Đạt |
+| 22 | Xóa "Test E1", rồi tải lại trang | Công việc biến mất, không quay lại | Không còn "Test E1", danh sách về 8 open | Đạt |
+| 23 | Đăng xuất từ menu tài khoản | Về chế độ khách, không còn dữ liệu tài khoản | Hiện lại nút Login, không còn phiên đăng nhập, danh sách công việc của tài khoản biến mất | Đạt |
+| 24 | Mở thẳng `/analytics`, `/themes`, `/app` trên production | Mỗi trang đúng tiêu đề tab | "Focus Analytics · FocusFlow", "Themes · FocusFlow", "Workspace · FocusFlow" (sau khi sửa ở lần kiểm thử 1) | Đạt |
+
+Chưa có trong bảng vì chưa kiểm thử: đồng bộ cùng một tài khoản giữa hai thiết bị, và hộp thoại gộp dữ liệu khách vào tài khoản khi đăng nhập.
