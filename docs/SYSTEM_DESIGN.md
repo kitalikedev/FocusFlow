@@ -6,12 +6,12 @@ Architecture, database rules and CRUD operations, security, testing and CI/CD. T
 
 ### 1.1 Overview
 
-The app is a single-page application served by Vercel. It talks directly to Supabase through its REST API; there is no server of our own between them.
+The app is a Next.js 16 project (App Router) deployed on Vercel. The pages, timer and music run in the browser as one React app. Writes, and every read except the two below, go from the browser straight to Supabase through its REST API. The Analytics and Themes pages read through two Next.js Route Handlers instead, which run on Vercel and query Supabase as the signed-in user. There is no database server of our own.
 
 ```mermaid
 flowchart TB
     subgraph Browser["User's browser"]
-        subgraph SPA["React single-page app (Vercel)"]
+        subgraph SPA["React app (Next.js page, runs in the browser)"]
             Pages["Website pages<br/>Home, Themes, Analytics, Tracking, About"]
             Workspace["Workspace /app<br/>timer, tasks, notepad, sounds, themes"]
             Stores["Zustand stores"]
@@ -22,6 +22,10 @@ flowchart TB
         LS[("localStorage<br/>IndexedDB")]
         Worker["Web Worker<br/>timer ticks"]
         Audio["Web Audio API<br/>background sounds"]
+    end
+
+    subgraph Vercel["Vercel: Next.js server"]
+        RH["Route Handlers<br/>GET /api/focus-sessions<br/>GET /api/saved-themes"]
     end
 
     subgraph Supabase["Supabase (backend)"]
@@ -44,7 +48,10 @@ flowchart TB
     Repo -- "guest" --> Local --> LS
     Repo -- "signed in" --> Cloud
     Cloud --> Auth
-    Cloud --> API --> DB
+    Cloud -- "writes and other reads" --> API
+    Cloud -- "Analytics and Themes reads, with the access token" --> RH
+    RH -- "queries as the user (RLS applies)" --> API
+    API --> DB
     Cloud --> Storage
     SPA -. "page views, events" .-> GA
     SPA -. "errors" .-> Sentry
@@ -95,6 +102,7 @@ sequenceDiagram
     participant Timer as Timer (Web Worker)
     participant Store as Focus sessions store
     participant Repo as SupabaseRepository
+    participant API as Route Handler (Next.js)
     participant DB as PostgreSQL (RLS)
     participant Page as Analytics page
 
@@ -107,8 +115,12 @@ sequenceDiagram
     DB-->>Repo: new row
     User->>Page: opens /analytics
     Page->>Repo: getFocusSessions()
-    Repo->>DB: SELECT ... ORDER BY completed_at DESC
-    DB-->>Page: only this user's sessions
+    Repo->>API: GET /api/focus-sessions (access token)
+    API->>API: auth.getUser(token), 401 if missing or wrong
+    API->>DB: SELECT ... ORDER BY completed_at DESC, as that user
+    DB-->>API: only this user's sessions
+    API-->>Repo: JSON, Cache-Control: no-store
+    Repo-->>Page: sessions
     Page-->>User: minutes this week, streak, recent sessions
 ```
 
@@ -175,10 +187,13 @@ The diagram and the list of tables are in the [README](../README.md#6-database-d
 - **Check before every commit:** `npm install` turns on the `.githooks/pre-commit` hook. It runs `scripts/check-secrets.mjs` and stops the commit if it contains a `.env` file or a secret key.
 - **Check on CI:** the first CI step runs the same check on the whole repository.
 - **User data:** Row Level Security on every table; the app only uses the publishable key, never the service role key.
-- **Browser:** Vercel sends a Content Security Policy that only allows the sources the app needs (Supabase, YouTube, noembed, Google Analytics, Sentry), plus HSTS, X-Frame-Options and X-Content-Type-Options.
+- **Route Handlers:** `/api/focus-sessions` and `/api/saved-themes` accept only a valid `Authorization: Bearer` access token (checked with `auth.getUser`), create a Supabase client that acts as that user, and so return only that user's rows. A missing or wrong token gets `401`, a database error gets `500` without details, and the responses are never cached (`no-store`).
+- **Browser:** `next.config.ts` sends a Content Security Policy that only allows the sources the app needs (Supabase, YouTube, noembed, Google Analytics, Sentry), plus X-Frame-Options, X-Content-Type-Options and Referrer-Policy; Vercel adds HSTS. `script-src` allows `'unsafe-inline'` because Next.js puts small inline scripts into every page; `'unsafe-eval'` is only allowed by `next dev`, never in production.
 
 ### 3.2 Testing and CI/CD
 
-- 62 test files and 653 tests with Vitest and React Testing Library: timer, data layer, guest data migration, every feature and the page routes.
-- Every pull request runs: the secret check, ESLint, the type check, the tests with coverage and the build.
+- 66 test files and 677 tests with Vitest and React Testing Library: timer, data layer, guest data migration, the Route Handlers, every feature and the page routes.
+- A second CI job, `database (PostgreSQL 15)`, applies the migrations and the demo data on a real PostgreSQL and runs the database tests of [`ERD.md`](ERD.md) section 11 (Row Level Security, per-user limits, last write wins, same-owner foreign key).
+- Manual tests on the production build, with screenshots at 375, 768 and 1440 px: [`MANUAL_TESTS.md`](MANUAL_TESTS.md).
+- Every pull request runs: the secret check, ESLint, the type check, the tests with coverage, the Next.js production build and the database job.
 - Vercel builds a preview for each pull request and deploys production when a pull request is merged into `main`.

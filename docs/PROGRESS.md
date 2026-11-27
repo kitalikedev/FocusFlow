@@ -8,7 +8,7 @@ Tài liệu này tổng hợp toàn bộ hiện trạng kỹ thuật, tài liệ
 
 * **Tên dự án:** FocusFlow
 * **Mục tiêu:** Ứng dụng web Custom Focus Timer & Aesthetic Workspace (lấy cảm hứng từ Flocus và phong cách thẩm mỹ tối giản), phục vụ sinh viên và dân văn phòng cần không gian làm việc tập trung, cá nhân hóa cao, chạy mượt mà trên cả PC và thiết bị di động.
-* **Stack công nghệ chính:** React 18, TypeScript 5 (chế độ `strict: true`), Vite 5, Tailwind CSS 3, Zustand, Supabase BaaS (Auth, PostgreSQL 15+ RLS, Storage), Vitest + React Testing Library; triển khai trên Vercel Edge Network theo triết lý vận hành $0 Operating Cost (không có máy chủ backend riêng).
+* **Stack công nghệ chính:** React 18, TypeScript 5 (chế độ `strict: true`), Next.js 16 (App Router, Route Handler; chuyển từ Vite 5 sau buổi chấm thử 22/11), Tailwind CSS 3, Zustand, Supabase BaaS (Auth, PostgreSQL 15+ RLS, Storage), Vitest + React Testing Library; triển khai trên Vercel Edge Network theo triết lý vận hành $0 Operating Cost (không có máy chủ backend riêng).
 
 ---
 
@@ -34,15 +34,16 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
   - Toàn bộ hàm, triggers (`validate_task_labels`, `handle_last_write_wins`, 3 hàm quota `tasks`/`saved_themes`/`user_wallpapers`, `ping`) đã hoạt động.
   - Phân quyền Row Level Security (RLS) đã bật 100% trên cả 6 bảng.
   - Supabase Storage bucket `user-wallpapers` đã được tạo kèm các policies kiểm soát quota và MIME/dung lượng.
+* **Migration thứ hai (buổi rà soát lược đồ 26/11/2026):** `supabase/migrations/20261127000000_schema_review.sql` (Issue #63, PR #77) đã chạy trên Supabase production: khóa ngoại ghép `(task_id, user_id)` cho `focus_sessions.task_id` thay khóa cũ `focus_sessions_task_id_fkey`, và mô tả (`COMMENT ON`) cho 6 bảng và 54 cột. Trước khi chạy, câu kiểm tra phiên trỏ sang task người khác trả về 0 dòng.
 * **Tình trạng kiểm thử RLS & Bảo mật:**
-  - Kịch bản kiểm thử RLS đa tầng tại Mục 11 của `docs/ERD.md` **đã chạy đạt 100%** trong Supabase SQL Editor.
+  - Kịch bản kiểm thử RLS đa tầng tại Mục 11 của `docs/ERD.md` **đã chạy đạt 100%** trong Supabase SQL Editor, và từ PR #77 chạy tự động trong CI trên PostgreSQL 15 thật (thêm TEST 9: khóa ngoại cùng chủ).
   - Supabase Security Advisor: **0 cảnh báo (no warnings)**.
 * **Cấu hình Supabase Auth:**
   - Đã tắt tính năng **Confirm email** (cho phép người dùng trải nghiệm ngay không cần chờ xác thực email).
   - Redirect URLs gồm `http://localhost:5173/**`, `http://localhost:5180/**` (cổng dev cố định của dự án) và domain Vercel.
   - Độ dài mật khẩu tối thiểu đặt là **6** (theo PRD AC-01.1).
 * **Trạng thái biến môi trường workspace:**
-  - `.env.local` (đã nằm trong `.gitignore`) chứa `VITE_SUPABASE_URL` và `VITE_SUPABASE_PUBLISHABLE_KEY`; thiếu hai biến này app vẫn chạy ở chế độ Guest.
+  - `.env.local` (đã nằm trong `.gitignore`) chứa `NEXT_PUBLIC_SUPABASE_URL` và `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (tên cũ `VITE_*` vẫn được `next.config.ts` đọc); thiếu hai biến này app vẫn chạy ở chế độ Guest.
 
 ---
 
@@ -52,9 +53,10 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 * **`main`:** commit gần nhất `cd244f5` (PR #58). Các mốc chính: PR #1 (Phase 0), #5 (Phase 1), #6 (Phase 2), #9 đến #16 (Phase 3 và hoàn thiện giao diện), #17 (chặn file env, dọn mã), #24 và #27 và #28 (website nhiều trang), #29 (Google Analytics và Sentry), #33 (sửa test tiêu đề trang chạy không ổn định), #35 (báo cáo Lighthouse lần đo trước), #36 (sửa lỗi Lighthouse ở trang chủ), #38 (dữ liệu mẫu `seed.sql`), #39 (wireframe), #41 (điều khiển nhạc YouTube), #42 (giao diện mới cho các trang website), #43 (website mặc theme và ảnh workspace), #44 (carousel ảnh demo, chấm chọn theme mới, ảnh theme trên trang Themes), #45 (báo cáo Lighthouse v2), #46 (sửa lofi radio, tách nhạc khỏi ambient, Zen không giật và tùy chọn chỉ còn thời gian, sửa Lighthouse), #47 (hiện Live cho stream trực tiếp, ô mục tiêu đủ rộng khi đồng hồ ở góc), #50 (báo cáo dự án: README rút gọn, chi tiết tách sang `docs/FEATURES.md`, `SYSTEM_DESIGN.md`, `PROJECT_MANAGEMENT.md`, `MONITORING.md`, báo cáo 5 sprint `docs/reports/sprints.md`, file self-report từng người), #51 (sửa theo góp ý của nhóm Đạt: nút không nhảy khi bấm, hiện thời gian đã nghe cho stream trực tiếp, thanh nhạc nhỏ ở các trang website). Sau đó: #52, #54, #55, #56, #58 (self-report của Dũng, Phú, Sanh, Thảo Anh, Nam), #57 (biên bản họp `docs/MEETING_NOTES.md`). Cổng dev cố định: `5180`. Production: https://focus-flow-two-wheat.vercel.app.
 * **Quản lý công việc:** mỗi việc là một Issue gắn Milestone và người nhận; PR ghi `Closes #số` để Issue tự đóng khi merge. Milestone 1 (Multi-page routing, hạn 20/11/2026), 2 (Tracking and logging, đã xong), 3 (Seed data and README), 4 (Lighthouse), 5 (Peer review, hạn 26/11/2026). Các PR từ #24 trở đi đã liên kết Issue (#19, #20, #21, #22, #26, #34), các PR trước đó chưa có Issue.
 * **Bảo vệ `main`:** Ruleset "Main Protection" (PR bắt buộc, 1 approval, chỉ Squash, linear history, chặn force push và xóa; admin bypass khi merge PR). Cần xác nhận ruleset đang Active và đã thêm status check `ci`.
-* **Dependabot:** các PR nâng `vite`, `vitest`, `@vitest/coverage-v8` (#2, #3) đang đỏ vì bước nhảy phiên bản lớn, và PR nâng `react-router` lên bản 7 chưa được thử; xử lý trong PR chore nâng toolchain riêng.
+* **Dependabot:** các PR nâng toolchain (#2, #3, #25, #70) đã được đóng vì bước nhảy phiên bản lớn và lỗi cài đặt (lockfile); PR nâng `react-router` lên bản 7 chưa được thử. Các cảnh báo bảo mật còn lại xử lý trong PR nâng toolchain riêng sau hạn nộp.
 * **Keep-alive:** workflow `.github/workflows/keep-alive.yml` đã có 2 secret `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` và chạy thành công (lần chạy tay ngày 18/11/2026), lịch chạy định kỳ 3 ngày một lần.
-* **CI:** chạy trên mỗi PR và trên `main`: kiểm tra bí mật, ESLint, TypeScript strict, test kèm coverage và build; hiện xanh trên `main`.
+* **CI:** chạy trên mỗi PR và trên `main` hai job: `ci` (kiểm tra bí mật, ESLint, TypeScript strict, test kèm coverage, `next build`) và `database (PostgreSQL 15)` (áp migration, dữ liệu mẫu và bộ kiểm thử RLS ở ERD mục 11); cả hai xanh trên `main`.
+* **Sau buổi chấm thử (26/11 đến 27/11/2026, Milestone 6 "Next.js and grading fixes"):** chuyển build sang Next.js (PR #69, Issue #60) và đọc dữ liệu Analytics, Themes qua Route Handler (PR #71, Issue #61); họp rà soát lược đồ và biên bản Buổi 7 (PR #73), migration và job CI cơ sở dữ liệu (PR #77, Issue #63); link và ngày của wireframe (PR #74, Issue #64); bảng kiểm thử thủ công và ảnh ở 375, 768, 1440 px (PR #76, Issue #75, `docs/MANUAL_TESTS.md`); tiêu đề tab đúng khi mở thẳng URL; cập nhật tài liệu theo Next.js. Không làm định tuyến App Router cho từng trang (Issue #67): app giữ React Router trong một route Next.js để timer và nhạc không ngắt khi đổi trang.
 * **Theo dõi và ghi lỗi:** Google Analytics 4 (đã thấy lượt truy cập trong báo cáo Realtime) và Sentry đã được cấu hình qua biến môi trường `VITE_GA_MEASUREMENT_ID`, `VITE_SENTRY_DSN` trên Vercel. Mở `/?sentry_test` để gửi một tin nhắn thử lên Sentry.
 
 ---
@@ -63,7 +65,7 @@ Toàn bộ hệ thống tài liệu đặc tả kỹ thuật cốt lõi đã ho�
 
 | Phân vùng | Trạng thái |
 | :--- | :--- |
-| Cấu hình (`package.json`, tsconfig, Vite, Vitest, Tailwind, ESLint, Prettier, `vercel.json`, CI, keep-alive) | Hoàn tất |
+| Cấu hình (`package.json`, tsconfig, `next.config.ts`, Vitest, Tailwind, ESLint, Prettier, `vercel.json`, CI, keep-alive) | Hoàn tất |
 | `src/app/` (App, layout, providers, slot trong `slots.tsx`, `PageTracker`) | Hoàn tất |
 | Website nhiều trang (`react-router-dom`): `/` giới thiệu, `/app` workspace, `/themes` xem trước 12 theme và theme đã lưu, `/analytics` thống kê từ `focus_sessions`, `/tracking` (Coming soon), `/about` | Hoàn tất; menu cạnh logo, menu 3 gạch trên điện thoại; workspace luôn giữ chạy nền khi chuyển trang nên timer và nhạc không ngắt; địa chỉ không tồn tại (kể cả `/tasks` cũ) về trang chủ |
 | Giao diện website (`src/app/site`, `src/app/pages`) | Website "mặc" một trong 12 theme: chọn chấm màu ở trang chủ hoặc ô ở `/themes` thì màu, font đồng hồ và ảnh workspace của cả website đổi theo (lan màu hình tròn, lưu ở `focusflow-site-preset`, không đổi theme trong workspace). Có light/dark, đồng hồ thử ở trang chủ, ảnh chụp workspace dạng carousel (xem trước hai bên, nút mũi tên, vuốt, tự chuyển mỗi 5 giây) (`public/images/home`, WebP 1440 và 720 px), khối giới thiệu dùng ảnh hoặc GIF riêng làm hình nền, các khối hiện dần khi cuộn; mọi animation tắt khi bật giảm chuyển động |
@@ -124,9 +126,9 @@ Việc còn lại ngoài Issue (không bắt buộc):
 
 ## 8. Việc Cần Làm Tiếp Theo
 
-1. Kiểm tra video demo đúng yêu cầu nộp bài (MP4, tối thiểu 720p, không quá 10 phút).
+1. Video demo để ở Google Drive (định dạng `.mov`); kiểm tra link mở được cho người ngoài nhóm và video không quá 10 phút.
 2. Cập nhật PRD, ARCHITECTURE, API_DOCS theo bố cục và tính năng hiện tại (website nhiều trang, theo dõi và ghi lỗi, thanh nhạc ở trang website).
-3. Cài Node 22 (khớp `.nvmrc` và CI), rồi PR chore nâng toolchain (vite, vitest, ESLint 9, typescript-eslint 8) và xử lý các PR Dependabot; chưa merge PR nâng `react-router` lên bản 7 trước khi nộp.
+3. Cài Node 22 (khớp `.nvmrc` và CI), rồi PR chore nâng toolchain (vitest, ESLint 9, typescript-eslint 8) và xử lý các PR Dependabot; chưa merge PR nâng `react-router` lên bản 7 trước khi nộp.
 4. Về sau: `syncQueue` (FR-23), Google OAuth (FR-03), xuất/nhập theme JSON, PiP (FR-28), E2E Playwright; hướng phát triển từ góp ý đánh giá chéo: chỉnh tốc độ phát và danh sách yêu thích đồng bộ cho nhạc.
 
 ---
@@ -135,7 +137,7 @@ Việc còn lại ngoài Issue (không bắt buộc):
 
 1. Streak chỉ tính trên 90 ngày dữ liệu gần nhất (giới hạn của `getFocusSessions`).
 2. Chưa có `syncQueue`: người dùng đã đăng nhập mà mất mạng sẽ bị báo lỗi khi lưu, chưa có hàng đợi; tooltip Offline dùng đúng chuỗi của AC-30.2.
-3. CSP trong `vercel.json` chỉ kiểm chứng được trên Vercel (preview hoặc production).
+3. CSP trong `next.config.ts` cho phép `'unsafe-inline'` ở `script-src` vì Next.js chèn script khởi động vào trang; chỉ kiểm chứng đầy đủ được trên bản `next start` hoặc trên Vercel.
 4. devDependencies còn lỗ hổng audit (production = 0), xử lý bằng PR nâng toolchain.
 5. Docs còn LaTeX trong ARCHITECTURE và README (thẩm mỹ).
 6. Việc lưu cài đặt đã được xếp hàng chạy lần lượt nên không còn ghi đè nhau.

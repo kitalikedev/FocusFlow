@@ -16,13 +16,13 @@ Toàn bộ hệ thống tuân thủ triết lý **$0 Operating Cost**:
 * Bộ trộn âm thanh môi trường và chuông báo được tổng hợp trực tiếp bằng Web Audio API với 0 byte băng thông server (FR-07, FR-16).
 * Nhạc nền lo-fi streaming trực tiếp từ YouTube CDN qua IFrame API ẩn (FR-17).
 * Hệ thống Theme Engine vận hành trên biến CSS variables native, lazy-load font self-hosted WOFF2 theo nhu cầu mà không gọi dịch vụ ngoài (FR-24, FR-25).
-* Dữ liệu người dùng được phân tách và bảo vệ đa tầng bằng PostgreSQL Row Level Security (RLS) với khóa công khai `VITE_SUPABASE_PUBLISHABLE_KEY` (FR-01, FR-02).
+* Dữ liệu người dùng được phân tách và bảo vệ đa tầng bằng PostgreSQL Row Level Security (RLS) với khóa công khai `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (FR-01, FR-02).
 
 ### Sơ đồ kiến trúc tổng thể (System Architecture)
 
 ```mermaid
 graph TD
-    subgraph Client ["Client Browser (React 18 + Vite SPA)"]
+    subgraph Client ["Client Browser (React 18, trang của Next.js)"]
         subgraph AppShell ["Application Shell & Layout"]
             App["App.tsx / Providers"]
             Layout["app/layout.tsx (Grid Shell)"]
@@ -108,17 +108,17 @@ graph TD
 | :--- | :--- | :--- | :--- |
 | **React** | `^18.3.0` | UI Library | Khả năng render tối ưu, hỗ trợ Concurrent Features, quản lý trạng thái giao diện linh hoạt qua Hooks và Context. |
 | **TypeScript** | `^5.4.0` | Programming Language | Chế độ `strict: true` bắt buộc, bảo đảm type-safety tuyệt đối, kiểm soát chặt chẽ hợp đồng (contracts) giữa Core và Features. |
-| **Vite** | `^5.2.0` | Build Tool & Bundler | Tốc độ Hot Module Replacement (HMR) tức thì dưới $100\text{ms}$, tối ưu Rollup tree-shaking chia nhỏ bundle ban đầu $\le 200\text{KB}$. |
+| **Next.js** | `16.4.6` | Framework, Build Tool & Route Handlers | Build và chạy bằng `next build` / `next start` (App Router). Route Handler `/api/focus-sessions` và `/api/saved-themes` chạy trên server Vercel, nhận access token và truy vấn Supabase dưới danh nghĩa người dùng nên RLS vẫn áp dụng (xem `SYSTEM_DESIGN.md`). Dự án chuyển từ Vite sang Next.js sau buổi chấm thử, theo Issue #60 và #61. |
 | **Tailwind CSS** | `^3.4.0` | Utility CSS Styling | Thiết lập Design Tokens ánh xạ trực tiếp vào CSS variables của Theme Engine; 0 runtime overhead, kích thước CSS sau purge $< 15\text{KB}$. |
 | **Zustand** | `^4.5.0` | State Management | Cực nhẹ ($< 2\text{KB}$), selector subscription chính xác giúp đồng hồ đếm tick 1 giây không gây re-render các component không liên quan. |
 | **`@supabase/supabase-js`** | `^2.42.0` | BaaS Client SDK | Kết nối trực tiếp PostgreSQL với RLS qua Publishable Key, quản lý session Auth và Storage API mà không cần server trung gian. |
 | **Lucide React** | `^0.370.0` | Iconography | Bộ icon đơn sắc, thanh mảnh, hỗ trợ tree-shaking triệt để theo từng component. |
-| **Vitest + RTL** | `^1.5.0` | Unit & Integration Test | Tương thích native với cấu hình Vite, thực thi test nhanh gấp 5-10x so với Jest, kiểm thử độc lập từng layer. |
+| **Vitest + RTL** | `^1.5.0` | Unit & Integration Test | Chạy bằng `vitest.config.ts` riêng, độc lập với Next.js, thực thi test nhanh gấp 5-10x so với Jest, kiểm thử độc lập từng layer. |
 | **Web Audio API** | Native | Sound Synthesis | Tự tạo tiếng mưa, brown noise, lửa trại và chuông kết thúc trực tiếp trên trình duyệt (FR-07, FR-16), tiêu tốn $0\text{ byte}$ băng thông hosting. |
 | **Web Worker** | Native | Background Timer Thread | Đảm bảo đồng hồ chạy liên tục khi tab bị ẩn, tránh trình duyệt can thiệp bóp nghẹt tài nguyên CPU (FR-06). |
 | **FontFace API** | Native | Font Lazy-loading | Nạp font WOFF2 self-hosted theo nhu cầu sử dụng (FR-25), không dùng Google Fonts CDN, kích thước mỗi font $\le 30\text{KB}$. |
 | **ESLint** | `^8.57.0` | Code Quality & Boundaries | Thực thi các ranh giới kiến trúc bất biến giữa Core, Features và Shared qua `no-restricted-imports`. |
-| **Vercel** | Hobby | Hosting & Edge CDN | Triển khai tự động từ Git, cấu hình CSP và cache headers qua `vercel.json`, băng thông toàn cầu miễn phí. |
+| **Vercel** | Hobby | Hosting & Edge CDN | Triển khai tự động từ Git, chạy Next.js (`vercel.json` khai báo `"framework": "nextjs"`); CSP và các header bảo mật đặt trong `next.config.ts`; băng thông toàn cầu miễn phí. |
 
 ---
 
@@ -232,13 +232,15 @@ FocusFlow/
 │   │       ├── web-audio.ts       # AudioContext singleton & bộ tạo âm thanh
 │   │       └── utils.ts           # cn(), formatTime(), relative luminance
 │   ├── index.css                  # Tailwind directives & CSS variable tokens
-│   ├── main.tsx                   # Entry point
-│   └── vite-env.d.ts
-├── vercel.json                    # Cấu hình CSP headers cho môi trường Production
+│   ├── app/ClientEntry.tsx        # Điểm vào phía trình duyệt (thay main.tsx của Vite)
+│   └── env.d.ts
+├── app/                           # Next.js App Router: layout, route [[...slug]] và Route Handler api/
+├── next.config.ts                 # Biến môi trường, CSP và header bảo mật
+├── vercel.json                    # Khai báo framework nextjs cho Vercel
 ├── .env.example
 ├── .eslintrc.cjs                  # Cấu hình ranh giới module (Overrides by Directory)
 ├── tsconfig.json
-├── vite.config.ts
+├── vitest.config.ts
 └── package.json
 ```
 
@@ -1041,43 +1043,17 @@ USING ((SELECT auth.uid()) = user_id);
 ### 10.2. Quản lý Biến Môi trường & Khóa Công Khai
 
 * Ứng dụng client chỉ sử dụng duy nhất 2 biến môi trường công khai:
-  * `VITE_SUPABASE_URL`: Đường dẫn API của dự án Supabase.
-  * `VITE_SUPABASE_PUBLISHABLE_KEY`: Khóa công khai của Supabase (được bảo vệ triệt để bởi RLS).
+  * `NEXT_PUBLIC_SUPABASE_URL`: Đường dẫn API của dự án Supabase.
+  * `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`: Khóa công khai của Supabase (được bảo vệ triệt để bởi RLS).
+  * Tên cũ `VITE_SUPABASE_URL` và `VITE_SUPABASE_PUBLISHABLE_KEY` vẫn được `next.config.ts` đọc khi thiếu tên mới, nên cấu hình trên Vercel không phải đổi.
 * **NGHIÊM CẤM TUYỆT ĐỐI:** Không bao giờ đưa khóa bí mật `SUPABASE_SERVICE_ROLE_KEY` hoặc các khóa quản trị vào mã nguồn, file `.env`, hay bất kỳ gói build client nào.
 
-### 10.3. Content Security Policy (CSP) & `vercel.json`
+### 10.3. Content Security Policy (CSP) & `next.config.ts`
 
-Cấu hình Content Security Policy được áp dụng thông qua HTTP Response Headers trong `vercel.json` cho môi trường Production (trong môi trường phát triển cục bộ, Vite yêu cầu dynamic inline script và WebSockets cho HMR nên CSP khắt khe được tắt):
+Content Security Policy và các header bảo mật được gửi từ `next.config.ts` (hàm `headers()`, áp dụng cho mọi đường dẫn), không còn đặt trong `vercel.json`. Production gửi: `Content-Security-Policy`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`; Vercel tự thêm `Strict-Transport-Security`.
 
-```json
-{
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://www.youtube.com https://s.ytimg.com; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://*.supabase.co https://noembed.com; img-src 'self' data: blob: https://*.supabase.co https://i.ytimg.com; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; font-src 'self'; worker-src 'self' blob:;"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        }
-      ]
-    }
-  ]
-}
-```
-
-* `script-src`: Không chứa `'unsafe-inline'` cho code ứng dụng; chỉ cho phép script từ nguồn `self` và YouTube iframe API.
+* `script-src 'self' 'unsafe-inline'` kèm YouTube iframe API và Google Tag Manager: Next.js chèn các đoạn script inline nhỏ vào mỗi trang để khởi động ứng dụng; khi không dùng nonce thì `'unsafe-inline'` là cách Next.js hướng dẫn. `'unsafe-eval'` chỉ được thêm khi chạy `next dev` (hot reload), không có trong bản production.
+* `connect-src`: chỉ `'self'`, Supabase, noembed, Google Analytics và Sentry.
 * `font-src 'self'`: Khóa chặt nguồn phông chữ từ chính bundle ứng dụng (self-hosted WOFF2), chặn các CDN font ngoài.
 * `worker-src 'self' blob:`: Cho phép khởi tạo Web Worker đếm giờ và Audio synthesizer.
 
@@ -1220,8 +1196,8 @@ jobs:
 # FocusFlow Client Environment Variables
 # Đổi tên file này thành .env.local trong môi trường phát triển cục bộ
 
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxxxxxxxxxxxxxxxxxxxxx
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ---

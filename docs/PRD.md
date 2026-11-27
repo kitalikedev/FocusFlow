@@ -72,7 +72,7 @@ Sản phẩm tham chiếu chức năng tiện ích từ hai web focus timer đi�
 * **Deployment & Hosting:** Vercel (Hobby Free Tier — áp dụng theo hạn mức free tier hiện hành, cần kiểm tra lại trước khi deploy; Edge Network toàn cầu).
 * **Database & BaaS:** Supabase Free Tier (PostgreSQL Database, Supabase Auth, Supabase Storage — áp dụng theo hạn mức free tier hiện hành, cần kiểm tra lại trước khi deploy).
 * **Xác thực Supabase Auth:** Cấu hình tắt tính năng "Confirm email" cho phiên bản này để cấp phiên đăng nhập (session token) hợp lệ ngay sau khi đăng ký mà không bắt buộc bước kích hoạt qua thư điện tử.
-* **Frontend Core:** React 18, TypeScript 5, Vite 5, Tailwind CSS 3, Lucide React (Icons), Zustand (State Management), Vitest + React Testing Library.
+* **Frontend Core:** Next.js 16 (App Router; ban đầu dùng Vite 5, chuyển sang Next.js sau buổi chấm thử), React 18, TypeScript 5, Tailwind CSS 3, Lucide React (Icons), Zustand (State Management), Vitest + React Testing Library.
 * **Tối ưu chi phí $0:** Toàn bộ âm thanh nền thiên nhiên (mưa, tiếng ồn nâu, lửa trại) và chuông báo hết giờ được tổng hợp trực tiếp bằng Web Audio API trên client để tiêu tốn 0 byte băng thông máy chủ. Video lo-fi phát thông qua YouTube IFrame Embed (tận dụng CDN YouTube).
 
 ### 2.4. Out of Scope (Những thứ KHÔNG làm trong phiên bản này)

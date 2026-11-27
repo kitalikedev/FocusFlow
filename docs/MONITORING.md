@@ -30,7 +30,7 @@ Full reports with screenshots: [first audit](lighthouse-report.md) and [second a
 
 ## 2. Google Analytics 4
 
-`src/shared/lib/analytics.ts` loads GA4 after the page has loaded and sends a page view on every route change. It is turned on by `VITE_GA_MEASUREMENT_ID` and allowed by the Content Security Policy. It also sends one custom event, `focus_session_completed`, with only the length of the session in minutes (never the goal or the task). It stays off when the browser sends Do Not Track.
+`src/shared/lib/analytics.ts` loads GA4 after the page has loaded and sends a page view on every route change. It is turned on by `NEXT_PUBLIC_GA_MEASUREMENT_ID` and allowed by the Content Security Policy. It also sends one custom event, `focus_session_completed`, with only the length of the session in minutes (never the goal or the task). It stays off when the browser sends Do Not Track.
 
 Report of the first week after the launch (14 to 20 November 2026), from the GA4 dashboard of the production site:
 
@@ -47,7 +47,7 @@ Report of the first week after the launch (14 to 20 November 2026), from the GA4
 
 ## 3. Sentry
 
-`src/shared/lib/monitoring.ts` starts Sentry when `VITE_SENTRY_DSN` is set. Each feature is wrapped in an error boundary (`SlotErrorBoundary`) that reports the error to Sentry and keeps the rest of the app working.
+`src/shared/lib/monitoring.ts` starts Sentry when `NEXT_PUBLIC_SENTRY_DSN` is set. Each feature is wrapped in an error boundary (`SlotErrorBoundary`) that reports the error to Sentry and keeps the rest of the app working.
 
 Only the error itself is sent: message, stack, browser and page address. Cookies, request data, clicks and typed text are removed before sending, so task titles, notes and goals never leave the browser. Sentry captured a real error from the production site, shown below with the visitor's address hidden:
 
