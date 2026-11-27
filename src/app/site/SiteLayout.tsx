@@ -206,14 +206,20 @@ export const SiteLayout: React.FC = () => {
       >
         <div className="flex min-h-full flex-col">
           <SiteHeader theme={theme} onToggleTheme={toggleTheme} />
-          <main className="flex-1 px-4 sm:px-6">
-            <Suspense
-              fallback={<p className="py-12 text-center text-sm text-site-muted">Loading…</p>}
-            >
+          {/* The footer waits for the page inside the same boundary. Otherwise it sits at the bottom of the screen
+              under "Loading…" and is pushed out of sight when a lazy page arrives (layout shift, Lighthouse CLS). */}
+          <Suspense
+            fallback={
+              <main className="flex-1 px-4 sm:px-6">
+                <p className="py-12 text-center text-sm text-site-muted">Loading…</p>
+              </main>
+            }
+          >
+            <main className="flex-1 px-4 sm:px-6">
               <Outlet />
-            </Suspense>
-          </main>
-          <SiteFooter />
+            </main>
+            <SiteFooter />
+          </Suspense>
         </div>
         <MiniPlayerSlot />
       </div>
