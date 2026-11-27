@@ -218,13 +218,35 @@ Ngoài các PR trên:
 | Sửa dịch chuyển bố cục của chân trang làm giảm điểm Lighthouse ([#86](https://github.com/kitalikedev/FocusFlow/issues/86)) | [#87](https://github.com/kitalikedev/FocusFlow/pull/87) |
 | Tải trước ảnh xem trước, gộp 3 trang nhỏ và bỏ hiệu ứng xuất hiện ở phần dựng lớn nhất ([#88](https://github.com/kitalikedev/FocusFlow/issues/88)) | [#89](https://github.com/kitalikedev/FocusFlow/pull/89) |
 
-_(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_
+Ngoài các PR trên:
+
+- Đọc kỹ bản chấm thử của giảng viên, tính điểm đang mất ở từng mục rồi viết kế hoạch (`docs/plans/phase-4-polish.md`, mục 10) và commit trước khi sửa code; tạo issue cho từng việc, gom vào Milestone 6 "Next.js and grading fixes".
+- Chủ trì buổi họp rà soát lược đồ tối 26/11 trên Discord (đủ 5 người): trình bày 6 bảng, chuẩn bị bảng 8 điểm để cả nhóm biểu quyết, rồi làm migration theo kết quả.
+- Kiểm thử thủ công bản build và site production (bảng 24 dòng, 18 ảnh); chính việc này tìm ra lỗi tiêu đề tab.
+- Tìm nguyên nhân điểm Lighthouse mobile của trang Themes thấp bằng cách đo giả lập mạng 4G chậm và CPU chậm 4 lần, trước và sau mỗi thay đổi.
+- Đọc hai bài đánh giá chéo của Thảo Anh (PawPass) và Sanh (Let's Talk) đã đăng trên repo của hai nhóm, nhận xét mức độ chi tiết và cập nhật `docs/PEER_REVIEW.md` theo nội dung đã đăng.
+- Review và merge các PR của Dũng ([#73](https://github.com/kitalikedev/FocusFlow/pull/73), [#74](https://github.com/kitalikedev/FocusFlow/pull/74)) và Phú ([#90](https://github.com/kitalikedev/FocusFlow/pull/90)).
+
+**Giao việc cho team:**
+
+| Người | Việc | Kết quả |
+| :--- | :--- | :--- |
+| Dũng | Ghi biên bản Buổi 7; link file thiết kế gốc cho wireframe | PR #73, #74 |
+| Phú | Báo cáo Lighthouse v3 sau khi chuyển sang Next.js | PR #90 |
+| Thảo Anh | Đánh giá UI/UX nhóm PawPass, đăng issue trên repo của nhóm | Issue PawPass #23 |
+| Sanh | Đánh giá UI/UX nhóm Let's Talk, đăng issue trên repo của nhóm | Issue Let's Talk #71 |
 
 ### 2. Khó khăn và cách giải quyết
 
-_(Viết vấn đề bạn gặp trong sprint này và cách bạn xử lý, bằng lời của bạn.)_
+- **Chuyển sang Next.js sát hạn mà giảng viên dặn không được làm hỏng code.** Mình chia làm ba bước nhỏ (nền tảng, Route Handler, định tuyến App Router), mỗi bước một PR, chỉ sang bước sau khi bước trước chạy ổn trên production. Bước ba không làm vì timer và nhạc phải chạy liên tục khi đổi trang và sát hạn dễ làm hỏng bản đang chạy; phần giảng viên yêu cầu (đọc dữ liệu qua Next.js) đã xong ở bước hai.
+- **Sau khi chuyển, trang trắng** vì Content Security Policy chặn các script inline mà Next.js chèn vào. Mình thêm `'unsafe-inline'` vào `script-src` (còn `'unsafe-eval'` chỉ cho `next dev`) và khai báo `"framework": "nextjs"` trong `vercel.json`.
+- **Đọc dữ liệu qua server mà vẫn giữ Row Level Security.** Route Handler nhận access token của người dùng, kiểm tra bằng `auth.getUser` rồi tạo client Supabase theo token đó, nên RLS vẫn quyết định dòng nào trả về và không cần service role key.
+- **Chạy migration trên dữ liệu thật.** Mình viết sẵn câu kiểm tra (không có phiên nào trỏ sang task người khác), cho migration tự dừng nếu vi phạm, và chạy thử trước trên PostgreSQL thật trong CI rồi mới chạy trên production.
+- **Lỗi tiêu đề tab** (mở thẳng một trang chỉ hiện "FocusFlow") do `metadata` của Next.js ghi đè sau khi trang chạy; sửa bằng `generateMetadata` cho từng trang và kiểm tra lại trên production.
+- **Điểm Lighthouse mobile của Themes thấp.** Nguyên nhân thật là chân trang bị đẩy làm dịch bố cục (CLS 0.133) và các hiệu ứng xuất hiện làm chậm phần dựng lớn nhất, chứ không phải ảnh hay thư viện bên thứ ba như giả thuyết ban đầu. Mình sửa ở hai PR #87 và #89. Các lần đo bằng DevTools trong cửa sổ thường bị cảnh báo dữ liệu IndexedDB nên số thấp hơn lần đo sạch.
+- **Hướng dẫn bạn commit từ xa.** Khi hướng dẫn Dũng, một lệnh sửa chữ mình đưa đã đổi nhầm khoảng 79 dòng bảng khác; mình phát hiện nhờ số dòng thay đổi của PR (+112 −74 thay vì +47 −9), hoàn tác commit đó và sửa lại trước khi merge. Từ đó mình kiểm tra số dòng thay đổi trước mỗi lần đẩy.
 
 ### 3. Tự đánh giá đóng góp
 
-- Mức độ đóng góp (1 – 5): _(điền số)_
-- Nhận xét: _(viết 1 – 2 câu bằng lời của bạn)_
+- Mức độ đóng góp (1 – 5): 5
+- Nhận xét: Mình làm phần lớn việc kỹ thuật của đợt này (Next.js, Route Handler, migration và CI, kiểm thử thủ công, sửa Lighthouse, README), đồng thời chia việc tài liệu cho Dũng, Phú, Thảo Anh, Sanh và review các PR của các bạn. Còn thiếu: chưa làm định tuyến App Router đầy đủ (#67) và chưa đo lại Lighthouse bằng CLI trong trình duyệt sạch sau các bản sửa cuối.
