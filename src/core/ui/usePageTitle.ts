@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
-
-const APP_NAME = 'FocusFlow';
+import { formatPageTitle } from './pageTitles';
 
 /**
  * Sets the browser tab title for the current page ("Tasks · FocusFlow"); no title gives just "FocusFlow".
@@ -9,6 +8,6 @@ const APP_NAME = 'FocusFlow';
 export function usePageTitle(title?: string, enabled = true): void {
   useEffect(() => {
     if (!enabled) return;
-    document.title = title ? `${title} · ${APP_NAME}` : APP_NAME;
+    document.title = formatPageTitle(title);
   }, [title, enabled]);
 }
