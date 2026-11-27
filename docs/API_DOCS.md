@@ -58,13 +58,13 @@ Mọi yêu cầu gửi từ `SupabaseRepository` tới Supabase Data API (PostgR
 
 | Tên Header | Giá trị / Định dạng | Mục đích & Ý nghĩa |
 | :--- | :--- | :--- |
-| `apikey` | `<VITE_SUPABASE_PUBLISHABLE_KEY>` | Xác thực định danh dự án trên Supabase API Gateway. Bắt buộc cho mọi request (kể cả Guest/Anon). |
+| `apikey` | `<NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY>` | Xác thực định danh dự án trên Supabase API Gateway. Bắt buộc cho mọi request (kể cả Guest/Anon). |
 | `Authorization` | `Bearer <access_token>` | Cung cấp mã JWT định danh người dùng. Khi chưa đăng nhập (Anon), giá trị này chính là publishable key. Khi đã đăng nhập, GoTrue SDK tự động gắn JWT của user để kích hoạt Context `auth.uid()` cho hàng rào RLS. *(Lưu ý: Đối với RPC ping trong cron CI, xem ghi chú kiểm chứng thực tế tại Mục 13 - Giả định 6)*. |
 | `Content-Type` | `application/json` | Định dạng dữ liệu gửi lên cho các phương thức `POST`, `PATCH`, `PUT`. |
 | `Prefer` | `return=representation` hoặc `resolution=merge-duplicates` | Chỉ thị phản hồi cho PostgREST: yêu cầu trả về bản ghi sau khi ghi (`return=representation`) hoặc giải quyết xung đột khi upsert (`resolution=merge-duplicates`). |
 
 > [!IMPORTANT]
-> **Ràng buộc Bảo mật Tối cao:** Client chỉ được lưu trữ và sử dụng duy nhất mã Publishable Key (`VITE_SUPABASE_PUBLISHABLE_KEY`). Tuyệt đối **KHÔNG BAO GIỜ** nhúng hoặc cấu hình `service_role` key tại bất kỳ file mã nguồn nào trên frontend. Toàn bộ logic phân quyền, giới hạn hạn ngạch (quota), và cô lập người dùng được kiểm soát triệt để bởi PostgreSQL RLS và Triggers.
+> **Ràng buộc Bảo mật Tối cao:** Client chỉ được lưu trữ và sử dụng duy nhất mã Publishable Key (`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`). Tuyệt đối **KHÔNG BAO GIỜ** nhúng hoặc cấu hình `service_role` key tại bất kỳ file mã nguồn nào trên frontend. Toàn bộ logic phân quyền, giới hạn hạn ngạch (quota), và cô lập người dùng được kiểm soát triệt để bởi PostgreSQL RLS và Triggers.
 
 ### 1.2. Quy tắc Ánh xạ Định danh (camelCase ↔ snake_case)
 
@@ -88,8 +88,8 @@ Theo quy ước kiến trúc tại Mục 3.1 của `ARCHITECTURE.md` và Mục 9
 // Khởi tạo Supabase Client duy nhất (src/shared/lib/supabase.ts)
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
@@ -217,7 +217,7 @@ PostgREST cung cấp giao diện RESTful trực tiếp trên các bảng Postgre
 
 * **Base URL:** `https://<project-ref>.supabase.co/rest/v1`
 * **Tham số Headers bắt buộc:**
-  * `apikey: <VITE_SUPABASE_PUBLISHABLE_KEY>`
+  * `apikey: <NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY>`
   * `Authorization: Bearer <access_token>`
   * `Prefer: return=representation` (áp dụng cho INSERT, UPDATE, UPSERT)
 
@@ -468,7 +468,7 @@ PostgREST cung cấp giao diện RESTful trực tiếp trên các bảng Postgre
 ### 3.4. Bảng `public.focus_sessions`
 
 * **FR liên quan:** FR-21 (Focus Analytics), FR-29 (Focus Intent).
-* **Ràng buộc:** `duration_minutes` từ 1 đến 1440. `intent_title` tối đa 80 ký tự (`char_length(intent_title) <= 80`). `task_id` trỏ tới `tasks(id)`.
+* **Ràng buộc:** `duration_minutes` từ 1 đến 1440. `intent_title` tối đa 80 ký tự (`char_length(intent_title) <= 80`). `task_id` cùng với `user_id` trỏ tới `tasks(id, user_id)` (khóa ngoại ghép, task phải cùng chủ với phiên; migration `20261127000000_schema_review.sql`).
 
 #### 3.4.1 Ghi nhận Phiên Focus Hoàn thành
 * **supabase-js:**
@@ -681,6 +681,21 @@ export function computeAnalyticsAndStreak(sessions: FocusSessionRecord[]): {
 }
 ```
 
+### 4.3. Route Handler của Next.js: đọc dữ liệu cho trang Analytics và Themes
+
+Từ khi chuyển sang Next.js, khi đã đăng nhập, trang Analytics và Themes không truy vấn Supabase thẳng từ trình duyệt nữa mà gọi hai Route Handler chạy trên server Vercel. Ghi dữ liệu và các lượt đọc khác vẫn đi thẳng tới Supabase như các mục trên.
+
+| Endpoint | Phương thức | Trả về | Truy vấn bên trong |
+| :--- | :--- | :--- | :--- |
+| `/api/focus-sessions` | `GET` | Mảng `FocusSessionRecord` của người dùng, 90 ngày gần nhất | `focus_sessions` theo từng trang 500 dòng, sắp xếp `completed_at DESC` (cùng truy vấn ở mục 4.1) |
+| `/api/saved-themes` | `GET` | Mảng theme đã lưu của người dùng | `saved_themes` |
+
+* **Xác thực:** header `Authorization: Bearer <access token>` lấy từ phiên Supabase hiện tại. Server kiểm tra token bằng `auth.getUser(token)`, rồi tạo client Supabase gửi kèm header đó (`createSupabaseForToken`), nên truy vấn chạy dưới danh nghĩa người dùng và RLS vẫn quyết định dòng nào được trả về. Không dùng service role key.
+* **Mã trả về:** `200` kèm mảng JSON; `401` với `{"error":"UNAUTHORIZED"}` khi thiếu hoặc sai token; `500` với `{"error":"READ_FAILED"}` khi truy vấn lỗi (không lộ chi tiết lỗi cơ sở dữ liệu).
+* **Cache:** mọi phản hồi có `Cache-Control: no-store`; route khai báo `dynamic = 'force-dynamic'`.
+* **Phía client:** `SupabaseRepository.getFocusSessions()` và `getSavedThemes()` gọi hai endpoint này; `401` được ánh xạ thành `AUTH_SESSION_EXPIRED`, mọi lỗi khác thành `UNKNOWN_ERROR`. Chế độ khách (`LocalRepository`) không dùng các endpoint này.
+* **Mã nguồn:** `app/api/focus-sessions/route.ts`, `app/api/saved-themes/route.ts`, logic dùng chung ở `src/core/data/apiHandler.ts` và `src/core/data/queries.ts`; kiểm thử ở `src/core/data/__tests__/`.
+
 ---
 
 ## 5. Supabase Storage API (User Wallpapers — FR-14)
@@ -816,8 +831,8 @@ const { data, error } = await supabase.rpc('ping');
 ### 6.2 Lời gọi REST API (Dùng trong cURL / GitHub Actions)
 * **Endpoint:** `POST https://<project-ref>.supabase.co/rest/v1/rpc/ping`
 * **Headers:**
-  * `apikey: <VITE_SUPABASE_PUBLISHABLE_KEY>`
-  * `Authorization: Bearer <VITE_SUPABASE_PUBLISHABLE_KEY>`
+  * `apikey: <NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY>`
+  * `Authorization: Bearer <NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY>`
   * `Content-Type: application/json`
 * **Request Body:** `{}`
 * **Response (200 OK):**
@@ -860,8 +875,8 @@ Khi người dùng dán đường dẫn YouTube vào hàng đợi nhạc Lo-fi (
 
 * **Script SDK:** `https://www.youtube.com/iframe_api`
 * **Chính sách Bảo mật Nội dung (Content Security Policy — CSP):**  
-  File `index.html` và cấu hình server header phải chứa:  
-  `frame-src https://www.youtube.com; script-src 'self' https://www.youtube.com https://s.ytimg.com;`
+  Header đặt trong `next.config.ts` phải chứa:  
+  `frame-src https://www.youtube.com; script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com;` (`'unsafe-inline'` do Next.js chèn script khởi động vào trang).
 * **Các Sự kiện Cần Lắng nghe trong Hàng đợi Nhạc:**
   * `onReady`: Kích hoạt player ngầm, đặt âm lượng theo `ambientVolumes.master`.
   * `onStateChange`:
@@ -1163,7 +1178,7 @@ Cách dùng trong test: gọi `vi.mock('@/shared/lib/supabase')` (tự nhận fi
 ## 12. Bảo mật & Tuân thủ (Security & Compliance)
 
 1. **Nguyên tắc Khóa Công khai Duy nhất (Publishable Key Isolation):**
-   * Ứng dụng chỉ sử dụng `VITE_SUPABASE_PUBLISHABLE_KEY`. Khóa này an toàn khi lộ ra ngoài client vì nó không cấp bất kỳ quyền hạn trực tiếp nào nếu không vượt qua được các chính sách RLS trên PostgreSQL.
+   * Ứng dụng chỉ sử dụng `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Khóa này an toàn khi lộ ra ngoài client vì nó không cấp bất kỳ quyền hạn trực tiếp nào nếu không vượt qua được các chính sách RLS trên PostgreSQL.
 2. **Bảo vệ Đa tầng bằng PostgreSQL RLS (Zero-Trust Client):**
    * Ngay cả khi người dùng can thiệp vào mã nguồn JavaScript trên trình duyệt hoặc gửi request trực tiếp qua Postman/cURL, họ **không bao giờ** có thể đọc, sửa hay xóa dữ liệu của người dùng khác nhờ mệnh đề `USING (auth.uid() = user_id)` được ép buộc cấp kernel của PostgreSQL.
 3. **An toàn Phiên & Không Rò rỉ Dữ liệu Nhạy cảm:**
