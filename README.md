@@ -120,7 +120,7 @@ The full feature list, the 12 themes, shortcuts and the phone layout are in [`do
 
 ## 6. Database design (ERD)
 
-PostgreSQL 15 on Supabase. The schema is in [`supabase/migrations/20261105000000_init_schema.sql`](supabase/migrations/20261105000000_init_schema.sql); the full data dictionary is in [`docs/ERD.md`](docs/ERD.md).
+PostgreSQL 15 on Supabase. The schema is in [`supabase/migrations/20261105000000_init_schema.sql`](supabase/migrations/20261105000000_init_schema.sql), with the changes from the team schema review in [`supabase/migrations/20261127000000_schema_review.sql`](supabase/migrations/20261127000000_schema_review.sql); the full data dictionary is in [`docs/ERD.md`](docs/ERD.md).
 
 ```mermaid
 erDiagram
@@ -130,7 +130,7 @@ erDiagram
     AUTH_USERS ||--o{ FOCUS_SESSIONS : "records"
     AUTH_USERS ||--o{ USER_WALLPAPERS : "uploads (max 3)"
     AUTH_USERS ||--o{ SAVED_THEMES : "saves (max 10)"
-    TASKS |o--o{ FOCUS_SESSIONS : "is the goal of (SET NULL on delete)"
+    TASKS |o--o{ FOCUS_SESSIONS : "is the goal of (same owner, SET NULL on delete)"
     USER_WALLPAPERS ||--|| STORAGE_OBJECTS : "file in bucket user-wallpapers"
 
     AUTH_USERS {
@@ -180,7 +180,7 @@ erDiagram
     FOCUS_SESSIONS {
         uuid id PK
         uuid user_id FK "ON DELETE CASCADE"
-        uuid task_id FK "nullable, ON DELETE SET NULL"
+        uuid task_id FK "nullable, (task_id, user_id) to a task of the same user, ON DELETE SET NULL (task_id)"
         int duration_minutes "1-1440"
         text intent_title "nullable, max 80 characters"
         timestamptz completed_at
@@ -220,6 +220,8 @@ erDiagram
 | `saved_themes` | up to 10 | Themes the user saved | **Themes page** |
 
 Rules are enforced in the database: Row Level Security on every table (each user only sees their own rows), `CHECK` constraints on values, triggers for the per-user limits and for "last write wins" sync. CRUD operations per table: [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md#2-database-rules-and-crud-operations).
+
+**Schema review.** On 26/11/2026 the whole team reviewed the schema against the PRD and voted on 7 points (session 7 of [`docs/MEETING_NOTES.md`](docs/MEETING_NOTES.md), [Issue #63](https://github.com/kitalikedev/FocusFlow/issues/63)). The follow-up migration makes `focus_sessions.task_id` a composite foreign key, so a session can only point to a task of the same user, and adds a description (`COMMENT ON`) to every table and column. The points kept as they are (repeated theme names, the count-then-insert limits, `text[]` labels, the indexes) are explained in [`docs/ERD.md`](docs/ERD.md#12-open-decisions--giả-định-thiết-kế) section 12.
 
 ## 7. Optimization: Lighthouse, Analytics and Sentry
 
@@ -265,7 +267,7 @@ The team met to agree on the roles below (meeting notes: [`docs/MEETING_NOTES.md
 - **Database:** the brief asks for MySQL or PostgreSQL; we use **PostgreSQL** through Supabase (see [section 3](#3-tools-and-technologies) for why there is no separate Node.js server).
 - **Dynamic pages:** `/analytics` and `/themes` show data from the database for a signed-in user. Load the demo data from [section 2](#2-how-to-run-the-application) to see them filled. Without signing in they read the data saved in the browser.
 - **Security:** no `.env` files in git (a pre-commit hook and a CI step check it), Row Level Security on every table, a Content Security Policy on Vercel. Details: [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md#3-security-testing-and-cicd).
-- **Testing:** 65 test files, 666 tests (Vitest, React Testing Library), run on every pull request. Manual test table and screenshots of every page at 375, 768 and 1440 px: [`docs/MANUAL_TESTS.md`](docs/MANUAL_TESTS.md) (in Vietnamese).
+- **Testing:** 65 test files, 666 tests (Vitest, React Testing Library), run on every pull request. A second CI job applies the migrations and the demo data on a real PostgreSQL 15 and runs the database tests of [`docs/ERD.md`](docs/ERD.md) section 11 (Row Level Security, per-user limits, last write wins, same-owner foreign key). Manual test table and screenshots of every page at 375, 768 and 1440 px: [`docs/MANUAL_TESTS.md`](docs/MANUAL_TESTS.md) (in Vietnamese).
 - **Documentation:** [`PRD`](docs/PRD.md), [`ARCHITECTURE`](docs/ARCHITECTURE.md), [`ERD`](docs/ERD.md), [`API_DOCS`](docs/API_DOCS.md), [`plans/`](docs/plans/), [`PROGRESS`](docs/PROGRESS.md), [`FEATURES`](docs/FEATURES.md), [`SYSTEM_DESIGN`](docs/SYSTEM_DESIGN.md), [`PROJECT_MANAGEMENT`](docs/PROJECT_MANAGEMENT.md), [`MONITORING`](docs/MONITORING.md), [`reports/`](docs/reports/).
 
 ## 10. Team

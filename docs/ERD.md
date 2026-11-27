@@ -22,7 +22,7 @@ erDiagram
     users ||--o{ focus_sessions : "ghi nhận phiên (1-N)"
     users ||--o{ user_wallpapers : "lưu ảnh tải lên (1-N, max 3)"
     users ||--o{ saved_themes : "lưu theme cá nhân (1-N, max 10)"
-    tasks ||--o{ focus_sessions : "gán mục tiêu (1-N, SET NULL on delete)"
+    tasks ||--o{ focus_sessions : "gán mục tiêu (1-N, cùng chủ, SET NULL on delete)"
 
     users {
         uuid id PK "auth.users identifier"
@@ -77,7 +77,7 @@ erDiagram
         uuid user_id FK "REFERENCES auth.users(id) ON DELETE CASCADE"
         integer duration_minutes "Số phút phiên tập trung (1-1440)"
         text intent_title "Mục tiêu tập trung (tối đa 80 ký tự, nullable)"
-        uuid task_id FK "REFERENCES tasks(id) ON DELETE SET NULL, nullable"
+        uuid task_id FK "(task_id, user_id) REFERENCES tasks(id, user_id) ON DELETE SET NULL (task_id), nullable"
         timestamptz completed_at "Thời điểm kết thúc phiên"
         timestamptz created_at "now()"
         timestamptz updated_at "LWW managed"
@@ -140,6 +140,7 @@ erDiagram
 * **Mục đích:** Quản lý danh sách tác vụ tập trung kèm độ ưu tiên, hạn chót và nhãn phân loại.
 * **Truy vết PRD:** FR-19 (Core CRUD & Advanced).
 * **Giới hạn số lượng:** Tối đa 100 tasks per user (được thực thi bởi trigger `enforce_tasks_limit`).
+* **Ràng buộc thêm (migration `20261127000000_schema_review.sql`):** `UNIQUE (id, user_id)` tên `uq_tasks_id_user_id`, để `focus_sessions` tham chiếu được cặp (task, chủ sở hữu).
 
 | Tên cột | Kiểu dữ liệu | Nullable | Mặc định | Ràng buộc / Validation | Ý nghĩa nghiệp vụ |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -180,7 +181,7 @@ erDiagram
 | `user_id` | `uuid` | NO | None | `REFERENCES auth.users(id) ON DELETE CASCADE` | Người dùng hoàn thành phiên |
 | `duration_minutes` | `integer` | NO | None | `CHECK (duration_minutes > 0 AND duration_minutes <= 1440)` | Thời lượng phiên tính bằng phút |
 | `intent_title` | `text` | YES | `NULL` | `CHECK (intent_title IS NULL OR (char_length(trim(intent_title)) > 0 AND char_length(intent_title) <= 80))` | Mục tiêu tập trung đã gán (tối đa 80 ký tự) |
-| `task_id` | `uuid` | YES | `NULL` | `REFERENCES public.tasks(id) ON DELETE SET NULL` | ID task liên kết (nếu có) |
+| `task_id` | `uuid` | YES | `NULL` | `FOREIGN KEY (task_id, user_id) REFERENCES public.tasks(id, user_id) ON DELETE SET NULL (task_id)` (tên `fk_focus_sessions_task_same_owner`) | ID task liên kết (nếu có); task phải cùng chủ với phiên |
 | `completed_at` | `timestamptz` | NO | `now()` | None | Thời điểm đếm giờ kết thúc |
 | `created_at` | `timestamptz` | NO | `now()` | None | Thời điểm ghi nhận bản ghi |
 | `updated_at` | `timestamptz` | NO | `now()` | Managed by LWW Trigger | Thời điểm cập nhật |
@@ -225,8 +226,10 @@ erDiagram
 1. **Quy tắc `ON DELETE CASCADE` với `auth.users(id)`:**
    * Áp dụng cho: `user_settings.user_id`, `tasks.user_id`, `notes.user_id`, `focus_sessions.user_id`, `user_wallpapers.user_id`, `saved_themes.user_id`.
    * **Lý do chọn:** Tuân thủ quyền riêng tư dữ liệu (Right to be Forgotten). Khi người dùng xóa tài khoản trên hệ thống Supabase Auth, toàn bộ thông tin cá nhân, công việc, sổ tay, lịch sử tập trung và hình nền cá nhân của họ sẽ được tự động xóa sạch khỏi cơ sở dữ liệu ngay lập tức.
-2. **Quy tắc `ON DELETE SET NULL` với `focus_sessions.task_id`:**
-   * Áp dụng cho: `focus_sessions.task_id REFERENCES public.tasks(id) ON DELETE SET NULL`.
+2. **Quy tắc `ON DELETE SET NULL (task_id)` với khóa ngoại ghép `focus_sessions (task_id, user_id)`:**
+   * Áp dụng cho: `FOREIGN KEY (task_id, user_id) REFERENCES public.tasks(id, user_id) ON DELETE SET NULL (task_id)`, thêm ở migration `20261127000000_schema_review.sql` sau buổi rà soát lược đồ ngày 26/11/2026 (thay cho khóa ngoại một cột `task_id REFERENCES tasks(id)` ban đầu).
+   * **Cùng chủ sở hữu:** một phiên chỉ trỏ được tới task của chính người dùng đó; trỏ tới task của người khác bị từ chối với lỗi `23503`, client xử lý bằng cách lưu phiên không kèm task.
+   * **Chỉ xóa `task_id`:** danh sách cột `(task_id)` sau `SET NULL` giữ nguyên `user_id` (cột `NOT NULL`); cú pháp này cần PostgreSQL 15 trở lên.
    * **Lý do chọn:** Đáp ứng đúng yêu cầu của **FR-29**: Khi người dùng xóa một task khỏi Task Manager, lịch sử thời gian tập trung trong quá khứ không được phép biến mất khỏi biểu đồ Analytics. Trường `task_id` chuyển về `NULL` trong khi trường `intent_title` (tiêu đề nhiệm vụ lưu dưới dạng text) vẫn được bảo toàn nguyên vẹn.
 
 ---
@@ -438,6 +441,21 @@ npx supabase db push
 2. Chọn biểu tượng **SQL Editor** trên thanh menu bên trái.
 3. Tạo truy vấn mới (New Query), dán toàn bộ nội dung tệp `supabase/migrations/20261105000000_init_schema.sql`.
 4. Nhấn nút **Run** (Ctrl + Enter). Kết quả báo `Success. No rows returned` xác nhận hệ thống đã khởi tạo hoàn tất và an toàn.
+5. Chạy tiếp các migration sau theo đúng thứ tự tên tệp:
+
+| Tệp | Nội dung |
+| :--- | :--- |
+| `20261105000000_init_schema.sql` | Khởi tạo 6 bảng, chỉ mục, trigger, RLS, Storage |
+| `20261127000000_schema_review.sql` | Kết quả buổi rà soát lược đồ 26/11/2026: khóa ngoại ghép cùng chủ cho `focus_sessions.task_id`, mô tả (`COMMENT ON`) cho 6 bảng và mọi cột |
+
+Trước khi chạy `20261127000000_schema_review.sql` trên dữ liệu thật, chạy câu kiểm tra dưới đây. Kết quả phải là `0`; migration cũng tự kiểm tra lại và dừng (không đổi gì) nếu khác `0`:
+
+```sql
+SELECT count(*) AS cross_owner_sessions
+FROM public.focus_sessions fs
+JOIN public.tasks t ON t.id = fs.task_id
+WHERE t.user_id <> fs.user_id;
+```
 
 ### 10.2 Kịch bản Rollback (Khi cần hoàn tác sạch)
 
@@ -479,6 +497,8 @@ COMMIT;
 ## 11. Kiểm thử Kiểm chứng RLS & Ràng buộc (RLS Verification Script)
 
 Đoạn mã SQL dưới đây được thiết kế để **chạy trực tiếp thành công trong Supabase SQL Editor** nhằm kiểm chứng toàn bộ ma trận phân quyền RLS, cơ chế Last-Write-Wins và các hạn mức Quota ở tầng database:
+
+CI cũng tự chạy đúng đoạn mã này trong mỗi pull request (job `database (PostgreSQL 15)` trong `.github/workflows/ci.yml`): dựng PostgreSQL 15 thật, tạo phần `auth` và `storage` tối giản bằng `supabase/tests/supabase_stub.sql`, chạy các migration theo thứ tự, nạp `supabase/seed.sql` hai lần, rồi chạy đoạn mã dưới đây và chỉ đạt khi in ra `ALL DATABASE & SECURITY TESTS PASSED`.
 
 > [!NOTE]
 > Phần kiểm thử Storage 3-file quota không thể chạy trực tiếp trong SQL Editor do Storage nằm ngoài Postgres schema của project (test qua API/frontend).
@@ -703,6 +723,43 @@ BEGIN
         RAISE EXCEPTION 'TEST 8 FAILED: Anon cannot execute public.ping().';
     END IF;
 
+    -- -------------------------------------------------------------------------
+    -- TEST 9: Khóa ngoại ghép cùng chủ (migration 20261127000000_schema_review.sql)
+    -- -------------------------------------------------------------------------
+    RESET ROLE;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', user_a::text, 'role', 'authenticated')::text, true);
+
+    -- 9.1 user_a ghi phiên gắn task của chính mình -> thành công
+    INSERT INTO public.focus_sessions (user_id, duration_minutes, intent_title, task_id)
+    VALUES (user_a, 25, 'Own task', task_a_id);
+
+    -- 9.2 user_b ghi phiên gắn task của user_a -> bị chặn (23503)
+    RESET ROLE;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', user_b::text, 'role', 'authenticated')::text, true);
+    BEGIN
+        INSERT INTO public.focus_sessions (user_id, duration_minutes, intent_title, task_id)
+        VALUES (user_b, 25, 'Not my task', task_a_id);
+        RAISE EXCEPTION 'TEST 9 FAILED: user_b linked a session to a task of user_a.';
+    EXCEPTION WHEN foreign_key_violation THEN
+        NULL;
+    END;
+
+    -- 9.3 user_a xóa task -> phiên còn nguyên, chỉ task_id về NULL
+    RESET ROLE;
+    SET LOCAL ROLE authenticated;
+    PERFORM set_config('request.jwt.claims', json_build_object('sub', user_a::text, 'role', 'authenticated')::text, true);
+    DELETE FROM public.tasks WHERE id = task_a_id;
+    SELECT count(*) INTO v_count
+    FROM public.focus_sessions
+    WHERE user_id = user_a AND intent_title = 'Own task' AND task_id IS NULL;
+    IF v_count = 1 THEN
+        RAISE NOTICE 'TEST 9 PASSED: sessions only link to tasks of the same user, and deleting the task keeps the session.';
+    ELSE
+        RAISE EXCEPTION 'TEST 9 FAILED: session missing or task_id not cleared after deleting the task (rows: %).', v_count;
+    END IF;
+
     RAISE NOTICE 'ALL DATABASE & SECURITY TESTS PASSED WITH 100%% SUCCESS.';
 END $$;
 
@@ -731,5 +788,13 @@ ROLLBACK; -- Luôn rollback để không để lại dữ liệu thử nghiệm
 6. **Khai thác Kiểu mảng `text[]` cho Labels thay vì Bảng phụ (Junction Table):**
    * *Quyết định:* Lưu trữ các nhãn công việc trực tiếp trong cột `text[]` của bảng `tasks` kết hợp chỉ mục GIN `idx_tasks_labels_gin`.
    * *Lý do:* Theo FR-19, mỗi task chỉ có tối đa 5 nhãn ngắn và người dùng chỉ dùng tối đa 20 nhãn. Việc dùng native array giúp truy vấn cực nhanh trong 1 query duy nhất, không cần JOIN nhiều bảng, tiết kiệm dung lượng lưu trữ trên Free Tier.
-7. **Ràng buộc Khóa ngoại `focus_sessions.task_id` (Same-owner Assumption):**
-   * *Quyết định:* `focus_sessions.task_id` chỉ kiểm tra tồn tại (FK), không ràng buộc task phải thuộc cùng user; rủi ro cực thấp (UUID v4 khó đoán, không lộ nội dung task), chấp nhận cho phiên bản này.
+7. **Ràng buộc Khóa ngoại `focus_sessions.task_id` phải cùng chủ (đã đổi sau buổi rà soát 26/11/2026):**
+   * *Trước đây:* `focus_sessions.task_id` chỉ kiểm tra task có tồn tại, chưa ràng buộc task phải thuộc cùng user; nhóm từng chấp nhận vì UUID v4 khó đoán.
+   * *Quyết định mới:* buổi rà soát lược đồ (biên bản Buổi 7 trong `docs/MEETING_NOTES.md`, Issue #63) duyệt dùng khóa ngoại ghép `(task_id, user_id)` tới `tasks(id, user_id)`, áp dụng khi dữ liệu thật không có phiên nào trỏ sang task của người khác. Migration `20261127000000_schema_review.sql` tự kiểm tra điều kiện này trước khi đổi; kiểm thử ở mục 11 (TEST 9).
+8. **Cho phép trùng tên theme trong một tài khoản (`saved_themes.name`):**
+   * *Quyết định:* không thêm `UNIQUE (user_id, lower(name))` (giữ nguyên sau buổi rà soát 26/11/2026).
+   * *Lý do:* khi khách đăng nhập, `importSavedThemes` chèn cả lô theme đã lưu trong trình duyệt; nếu có hai theme cùng tên, ràng buộc duy nhất sẽ làm hỏng cả lô gộp dữ liệu. Mỗi theme đã có `id` riêng nên trùng tên không gây sai dữ liệu.
+9. **Giới hạn số lượng kiểm tra bằng đếm rồi chèn (rủi ro chấp nhận):**
+   * *Quyết định:* các trigger `enforce_tasks_limit`, `enforce_saved_themes_limit`, `enforce_user_wallpapers_limit` đếm số dòng rồi mới cho chèn, không khóa theo người dùng.
+   * *Rủi ro:* hai lần chèn cùng lúc của một người có thể cùng vượt qua kiểm tra và vượt giới hạn một chút. Chỉ xảy ra khi một người gửi nhiều yêu cầu đồng thời, không ảnh hưởng người khác; nhóm ghi nhận là rủi ro chấp nhận (buổi rà soát 26/11/2026).
+10. **Kiểu `text[]`, `jsonb` và các chỉ mục (giữ nguyên sau buổi rà soát 26/11/2026):** lý do ở mục 12.6 và mục 4 vẫn đúng; 7 chỉ mục đủ cho các truy vấn hiện có vì mỗi người tối đa 100 task.
