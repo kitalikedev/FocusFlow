@@ -199,7 +199,8 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 | Dũng | Link file thiết kế gốc và công cụ cho wireframe ([#64](https://github.com/kitalikedev/FocusFlow/issues/64)) | [#74](https://github.com/kitalikedev/FocusFlow/pull/74) |
 | Thảo Anh | Đánh giá UI/UX nhóm PawPass, đăng thành issue trên repo của nhóm đó ([#65](https://github.com/kitalikedev/FocusFlow/issues/65)) | [PawPass #23](https://github.com/iceruychi-netizen/PawPass-Hosothucung/issues/23) |
 | Sanh | Đánh giá UI/UX nhóm Let's Talk, đăng thành issue trên repo của nhóm đó ([#65](https://github.com/kitalikedev/FocusFlow/issues/65)) | [Let's Talk #71](https://github.com/nguyenbaphat59-del/Let-s-Talk-project/issues/71) |
-| Phú | Đo lại Lighthouse trên Next.js cho các trang chính ([#66](https://github.com/kitalikedev/FocusFlow/issues/66)) | Đang làm |
+| Nam | Sửa dịch chuyển bố cục của chân trang làm giảm điểm Lighthouse ([#86](https://github.com/kitalikedev/FocusFlow/issues/86)); tải trước ảnh xem trước, gộp 3 trang nhỏ, bỏ hiệu ứng xuất hiện ở phần dựng lớn nhất ([#88](https://github.com/kitalikedev/FocusFlow/issues/88)) | [#87](https://github.com/kitalikedev/FocusFlow/pull/87), [#89](https://github.com/kitalikedev/FocusFlow/pull/89) |
+| Phú | Đo lại Lighthouse trên Next.js: 4 trang, mobile và desktop, kèm 8 ảnh chụp ([#66](https://github.com/kitalikedev/FocusFlow/issues/66)) | [#90](https://github.com/kitalikedev/FocusFlow/pull/90), [`docs/Lighthouse_v3_report.md`](../Lighthouse_v3_report.md) |
 
 **Thảo luận và ý tưởng**
 
@@ -214,6 +215,7 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 - Migration `20261127000000_schema_review.sql` đã chạy trên production sau khi kiểm tra dữ liệu; CI có thêm job `database (PostgreSQL 15)`.
 - 66 file test, 677 test đạt; bảng kiểm thử thủ công 24 dòng ([`docs/MANUAL_TESTS.md`](../MANUAL_TESTS.md)).
 - Đánh giá UI/UX đã đăng trên repo của nhóm PawPass và nhóm Let's Talk.
+- Lighthouse v3 trên Next.js (27/11, DevTools): Accessibility, Best Practices, SEO đều 100 ở 8/8 lượt đo; Performance desktop 95 – 100, mobile 87 – 90. Chân trang gây dịch chuyển bố cục (CLS 0.133 ở Themes) và hiệu ứng xuất hiện làm chậm phần dựng lớn nhất đã được sửa ở PR #87 và #89.
 
 **Khó khăn và cách giải quyết**
 
@@ -223,4 +225,4 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 | Khi mở thẳng một đường dẫn, tiêu đề tab bị Next.js đặt lại thành "FocusFlow". | Để Next.js gửi sẵn tiêu đề của từng trang bằng `generateMetadata`; kiểm tra lại trên production. |
 | Bài đánh giá PawPass trước đó chung chung. | Viết lại theo từng màn hình thật (trang, thành phần, vấn đề, cách sửa, ảnh) và đăng lên repo của nhóm. |
 
-**Việc chưa xong:** đo Lighthouse trên Next.js cho các trang chính ([#66](https://github.com/kitalikedev/FocusFlow/issues/66)); nhóm PawPass và nhóm Let's Talk chưa trả lời issue.
+**Việc chưa xong:** đo lại Lighthouse trên bản deploy mới nhất (Trang chủ và Workspace được đo trước các bản sửa) và đo thêm Tracking, About; nhóm PawPass và nhóm Let's Talk chưa trả lời issue.
