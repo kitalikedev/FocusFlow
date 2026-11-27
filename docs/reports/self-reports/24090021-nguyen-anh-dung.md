@@ -135,13 +135,15 @@
 | Đồng tác giả migration rà soát lược đồ | [#77](https://github.com/kitalikedev/FocusFlow/pull/77) |
 | Dự họp rà soát lược đồ cơ sở dữ liệu tối 26/11 trên Discord (đủ 5 người) | Buổi 7 trong `docs/MEETING_NOTES.md` |
 
-_(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_
+- Hỗ trợ Công Sanh tìm các nhóm cần làm Peer Review để trao đổi và góp ý chéo lẫn nhau.
+- Kiểm thử (test) lại toàn bộ website sau khi dự án chuyển sang Next.js.
 
 ### 2. Khó khăn và cách giải quyết
 
-_(Viết vấn đề bạn gặp trong sprint này và cách bạn xử lý, bằng lời của bạn.)_
+- Gặp khó khăn trong việc rà soát lược đồ cơ sở dữ liệu để đảm bảo khớp với thiết kế và các yêu cầu sửa theo bản chấm thử.
+- Cách giải quyết: Nhờ sự trợ giúp và góp ý của cả team để tổng hợp, đối chiếu và cập nhật lược đồ chính xác hơn.
 
 ### 3. Tự đánh giá đóng góp
 
-- Mức độ đóng góp (1 – 5): _(điền số)_
-- Nhận xét: _(viết 1 – 2 câu bằng lời của bạn)_
+- Mức độ đóng góp (1 – 5): 5
+- Nhận xét: Tôi đã hoàn thành tốt các phần việc được giao trong giai đoạn sửa theo bản chấm thử, từ ghi biên bản, bổ sung link thiết kế đến kiểm thử lại website sau khi chuyển sang Next.js. Nhờ sự hỗ trợ nhiệt tình của cả nhóm, tôi cũng đã nắm rõ và hoàn thiện tốt phần rà soát lược đồ cơ sở dữ liệu.
