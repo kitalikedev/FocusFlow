@@ -233,7 +233,7 @@ Giảng viên nhận xét lược đồ chỉ được viết một lần trong 
 
 ### Thảo luận
 
-1. **Nam trình bày lược đồ:** 6 bảng (`profiles`, `tasks`, `focus_sessions`, `saved_themes`, `user_settings`, `user_wallpapers`), 7 khóa ngoại, quy tắc xóa, RLS theo `user_id`, trigger Last-Write-Wins và trigger giới hạn số lượng.
+1. **Nam trình bày lược đồ:** 6 bảng (`user_settings`, `tasks`, `notes`, `focus_sessions`, `user_wallpapers`, `saved_themes`), 7 khóa ngoại, quy tắc xóa, RLS theo `user_id`, trigger Last-Write-Wins và trigger giới hạn số lượng.
 2. **Đối chiếu với PRD:** Không thấy thiếu bảng, thiếu cột hay cột thừa so với các chức năng trong PRD.
 3. **Biểu quyết từng đề xuất:**
 
