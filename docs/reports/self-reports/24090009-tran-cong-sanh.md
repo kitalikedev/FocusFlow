@@ -111,13 +111,16 @@ Mình không được giao phần việc mới nên chưa gặp khó khăn kỹ 
 | Đánh giá UI/UX nhóm Let's Talk và đăng thành issue trên repo của nhóm đó ([#65](https://github.com/kitalikedev/FocusFlow/issues/65)) | [Let's Talk #71](https://github.com/nguyenbaphat59-del/Let-s-Talk-project/issues/71) |
 | Dự họp rà soát lược đồ cơ sở dữ liệu tối 26/11 trên Discord (đủ 5 người) | Buổi 7 trong `docs/MEETING_NOTES.md` |
 
-_(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_
+- Dùng thử website Let's Talk của Nhóm 3 trên laptop và điện thoại (có xoay ngang) ngày 26/11, đánh giá theo 3 tiêu chí: dễ dùng, thẩm mỹ, thân thiện. Kết quả: web đẹp, chơi trơn tru, có 1 lỗi nặng, 3 lỗi nhỏ và một số điểm nên chỉnh.
+- Đăng issue #71 kèm 11 ảnh chụp màn hình khoanh vùng lỗi và đề xuất sửa.
+- Họp nhóm buổi 7 trên Discord để rà soát và thống nhất lược đồ cơ sở dữ liệu.
 
 ### 2. Khó khăn và cách giải quyết
 
-_(Viết vấn đề bạn gặp trong sprint này và cách bạn xử lý, bằng lời của bạn.)_
+- Khó khăn: Lỗi nặng chỉ lộ ra khi mới mở web, còn lỗi bố cục chỉ thấy trên điện thoại hoặc khi xoay ngang.
+- Cách giải quyết: Thử ở nhiều tình huống và thiết bị, chụp khoanh vùng từng lỗi, kèm đề xuất sửa cụ thể.
 
 ### 3. Tự đánh giá đóng góp
 
-- Mức độ đóng góp (1 – 5): _(điền số)_
-- Nhận xét: _(viết 1 – 2 câu bằng lời của bạn)_
+- Mức độ đóng góp (1 – 5): 5
+- Nhận xét: Hoàn thành đánh giá UI/UX chéo trên laptop và điện thoại, đăng issue đủ lỗi, minh chứng và đề xuất, đồng thời dự họp rà soát cơ sở dữ liệu đúng tiến độ.
