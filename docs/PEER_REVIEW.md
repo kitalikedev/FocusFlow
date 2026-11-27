@@ -2,7 +2,7 @@
 
 Tài liệu này ghi lại Task 5 của đồ án cuối kỳ:
 
-- **Phần A:** các bài đánh giá nhóm chúng tôi viết cho hai nhóm khác (Task 5a).
+- **Phần A:** các bài đánh giá nhóm chúng tôi viết cho các nhóm khác (Task 5a). Bài cho nhóm PawPass và nhóm Let's Talk đã được đăng thành issue công khai trên repo của hai nhóm đó (bảng A.0).
 - **Phần B:** các góp ý nhóm chúng tôi nhận được và cách nhóm xử lý (Task 5b).
 
 Mỗi bài đánh giá dùng ba tiêu chí trong đề bài. Mỗi mục chấm từ 1 (kém) đến 5 (xuất sắc) kèm một nhận xét ngắn giải thích điểm.
@@ -16,6 +16,16 @@ Mỗi bài đánh giá dùng ba tiêu chí trong đề bài. Mỗi mục chấm 
 ---
 
 ## Phần A. Các bài đánh giá nhóm đã viết
+
+### A.0 Bằng chứng đã gửi cho các nhóm
+
+| Nhóm được đánh giá | Người viết | Bài đánh giá | Ngày | Phản hồi của nhóm |
+| :--- | :--- | :--- | :--- | :--- |
+| PawPass | Thảo Anh (đại diện nhóm FocusFlow) | [Issue #23 trên repo PawPass](https://github.com/iceruychi-netizen/PawPass-Hosothucung/issues/23) | 27/11/2026 | Chưa có (đến thời điểm viết) |
+| Let's Talk (nhóm 3) | Sanh | [Issue #71 trên repo Let's Talk](https://github.com/nguyenbaphat59-del/Let-s-Talk-project/issues/71) | 27/11/2026 (thử web ngày 26/11) | Chưa có (đến thời điểm viết) |
+| Nhóm của Đạt (ứng dụng quản lý chi tiêu) | Cả nhóm FocusFlow | Gửi trực tiếp cho Đạt (mục A.1), chưa có issue trên repo của nhóm | - | Nhóm Đạt đã gửi bài đánh giá cho FocusFlow (phần B) |
+
+Khi nhóm nhận góp ý trả lời trong issue hoặc nối pull request sửa vào issue, nhóm sẽ bổ sung đường dẫn vào bảng này.
 
 ### A.1 Đánh giá nhóm của Đạt: ứng dụng quản lý chi tiêu
 
@@ -62,45 +72,63 @@ Mỗi bài đánh giá dùng ba tiêu chí trong đề bài. Mỗi mục chấm 
 
 ### A.2 Đánh giá nhóm PawPass
 
+Bài này là nội dung đã đăng ở [Issue #23 trên repo PawPass](https://github.com/iceruychi-netizen/PawPass-Hosothucung/issues/23). Nó thay cho bản chấm điểm 1 – 5 từng mục viết trước đó, vì bản cũ chưa dựa trên việc mở từng màn hình của PawPass.
+
 | Mục | Nội dung |
 | :--- | :--- |
-| Dự án | PawPass |
-| Người đánh giá | Cả nhóm FocusFlow (tổng hợp ý kiến các thành viên) |
-| Thiết bị đã thử | Laptop (Chrome) |
-| Nhận xét chung | **Giao diện khá đẹp**: màu sắc và hình ảnh hài hòa, bố cục rõ ràng, tạo ấn tượng tốt ngay từ trang đầu |
-
-**Điểm số**
-
-| Tiêu chí | Mục | Điểm (1-5) | Nhận xét |
-| :--- | :--- | :---: | :--- |
-| Dễ dùng | Đơn giản và rõ ràng | 4 | Dễ hiểu ứng dụng làm gì ngay từ trang đầu |
-| Dễ dùng | Thông tin rõ ràng | 4 | Nội dung chia khối rõ ràng |
-| Dễ dùng | Điều hướng giữa các trang | 4 | Menu dễ dùng |
-| Dễ dùng | Phản hồi của hệ thống | 3 | Nên có trạng thái đang tải và thông báo kết quả rõ hơn sau khi thao tác |
-| Dễ dùng | Máy tính, máy tính bảng và điện thoại | 4 | Bố cục co giãn tốt; nên thử kỹ thêm trên màn hình nhỏ |
-| Thẩm mỹ | Màu sắc, phông chữ và kiểu dáng nhất quán | 5 | Màu sắc, phông chữ thống nhất |
-| Thẩm mỹ | Bố cục hợp lý, không rối mắt | 5 | Khoảng trắng hợp lý, dễ nhìn |
-| Thẩm mỹ | Màu sắc và hình ảnh phù hợp nội dung | 5 | Hình ảnh và màu sắc hợp với chủ đề, là điểm mạnh nhất |
-| Thân thiện | Người mới hiểu cách dùng nhanh | 4 | Dễ làm quen |
-| Thân thiện | Hoàn thành việc với ít bước | 4 | Các thao tác chính không nhiều bước |
-| Thân thiện | Có thể điều chỉnh theo người dùng | 3 | Nên có thêm lựa chọn cá nhân hóa (ví dụ chế độ tối) |
+| Dự án | PawPass, hồ sơ thú cưng ([https://pawpass-hosothucung-web.vercel.app/](https://pawpass-hosothucung-web.vercel.app/)) |
+| Người đánh giá | Thảo Anh, đại diện nhóm FocusFlow (24SE1) |
+| Thiết bị đã thử | Laptop, trình duyệt Microsoft Edge |
+| Ngày thử | 27/11/2026 |
+| Trang đã xem | Trang chủ (`#/dashboard`), Thú cưng (`#/pets`), Tìm kiếm (`#/search`), Tài khoản (`#/account`) |
 
 **Điểm mạnh**
 
-1. Giao diện đẹp, màu sắc và hình ảnh hài hòa với chủ đề.
-2. Kiểu dáng nhất quán, bố cục thoáng.
-3. Người mới dễ hiểu và dùng được ngay.
+1. **Thẩm mỹ và thân thiện:** tông màu kem và nâu ấm áp kết hợp hình minh họa thú cưng sinh động ở cả 4 trang, tạo cảm giác gần gũi, dễ chịu.
+2. **Dễ dùng:** thanh điều hướng phía trên chia rõ các khu vực (Trang chủ, Thú cưng, Tìm kiếm, Tài khoản), kèm biểu tượng trực quan, nên người dùng nắm được luồng sử dụng ngay lần đầu.
 
 **Đề xuất cải thiện**
 
-| # | Vấn đề đã thấy | Ở đâu | Đề xuất | Mức ưu tiên |
-| :-: | :--- | :--- | :--- | :---: |
-| 1 | Ít phản hồi khi thao tác | Các form và nút hành động | Thêm trạng thái đang tải và thông báo thành công hoặc lỗi | Trung bình |
-| 2 | Cần kiểm tra thêm trên màn hình nhỏ | Trang có nhiều hình ảnh | Kiểm tra trên điện thoại 360 – 390 px, tránh chữ chồng lên ảnh | Trung bình |
-| 3 | Hình ảnh có thể làm chậm trang | Các trang nhiều ảnh | Dùng ảnh WebP, khai báo kích thước và tải trễ ảnh ở dưới | Thấp |
-| 4 | Chưa tùy chỉnh được giao diện | Cài đặt | Thêm chế độ tối | Thấp |
+| # | Màn hình / trang | Thành phần | Vấn đề đã thấy | Cách sửa đề xuất | Mức ưu tiên |
+| :-: | :--- | :--- | :--- | :--- | :---: |
+| 1 | Trang chủ, Thú cưng, Tìm kiếm, Tài khoản | Dòng tiêu đề phụ (eyebrow text) và lời thoại cạnh linh vật | Font chữ viết tay đang dùng chưa hỗ trợ đủ dấu tiếng Việt (ví dụ "Chào buổi trưa", "tủ hồ sơ", "lục lại sổ", "chủ sổ", "Gõ vài chữ, các bé sẽ đi tìm giúp bạn..."), nên các ký tự có dấu rơi về font hệ thống, nét chữ bị lệch và không đồng bộ | Chuyển sang font viết tay trên Google Fonts có đủ subset `vietnamese` (Patrick Hand, Mali, Itim hoặc Pangolin) trong bản cập nhật sau | Thấp (cập nhật sau) |
 
-**Trao đổi với nhóm được đánh giá:** gửi nhận xét cho nhóm PawPass khi hai nhóm trao đổi góp ý (nhóm PawPass đánh giá FocusFlow ở Phần B).
+Ảnh chụp vị trí lỗi nằm trong issue.
+
+**Trao đổi với nhóm được đánh giá:** issue mời nhóm trả lời và nối pull request sửa vào issue (`Closes #<số>`) để hai bên có dấu vết trao đổi.
+
+### A.3 Đánh giá nhóm Let's Talk (nhóm 3)
+
+Bài này là nội dung đã đăng ở [Issue #71 trên repo Let's Talk](https://github.com/nguyenbaphat59-del/Let-s-Talk-project/issues/71), kèm 11 ảnh chụp có chú thích.
+
+| Mục | Nội dung |
+| :--- | :--- |
+| Dự án | Let's Talk, trò chơi trò chuyện cho nhóm bạn (dùng thử trực tiếp bản đã triển khai) |
+| Người đánh giá | Trần Công Sanh, nhóm FocusFlow |
+| Ngày thử | 26/11/2026 |
+| Tóm tắt của người đánh giá | 1 lỗi nặng, 3 lỗi nhỏ, còn lại là chỗ nên chỉnh cho mượt hơn; web đẹp, chơi trơn tru, lỗi nặng chỉ xuất hiện khi máy chủ phản hồi chậm |
+
+**Điểm mạnh**
+
+1. **Dễ dùng:** luồng chơi gọn (chọn chủ đề, số lượt, bấm Start, không cần tài khoản); có nút Skip intro; 4 hoạt động đều chạy đúng; tải lại giữa ván vẫn giữ đúng câu và tiến độ; mở thẳng trang chơi khi chưa có ván thì tự về trang chủ; đủ 10 lượt thì tự sang trang kết thúc.
+2. **Thẩm mỹ:** tông tím đậm kết hợp hiệu ứng kính mờ nhất quán ở cả 5 trang; mascot mèo đeo tai nghe dễ nhớ; các hộp thoại Exit, End Game, How to Play cùng một kiểu; chủ đề và số lượt đang chọn có viền sáng và dấu tích.
+3. **Thân thiện:** mỗi bước có một dòng chữ nhỏ cho biết đang làm gì; hộp thoại Exit và End Game nói rõ hậu quả trước khi bấm; dùng bàn phím tốt (viền sáng khi Tab, Esc đóng hộp thoại); mở How to Play giữa ván không mất lượt; mất mạng thì báo lỗi bằng câu dễ hiểu.
+
+**Đề xuất cải thiện**
+
+| # | Màn hình / trang | Vấn đề đã thấy | Cách sửa đề xuất | Mức độ (theo bài viết) |
+| :-: | :--- | :--- | :--- | :--- |
+| 1 | Trang chủ và trong ván | Khi máy chủ phản hồi chậm (máy chủ miễn phí vừa "thức dậy"), web đứng im không báo gì: dòng "Checking Friends" đứng mãi, nút Start Playing mờ; sau khi bấm Start Turn thì Start Turn, Exit và End Game đều bị khóa, chờ hơn 15 giây không có chữ nào, chỉ còn cách tải lại trang | Sau khoảng 3 giây hiện "Đang đánh thức máy chủ, đợi xíu nhé…"; đặt giới hạn chờ khoảng 60 giây rồi báo lỗi kèm nút Thử lại; không khóa nút Exit khi đang chờ | Lỗi nặng |
+| 2 | Trong ván, điện thoại xoay ngang | Câu hỏi bị cắt ngang màn hình, phải cuộn mới thấy nút Complete vì 4 thẻ trang trí hai bên chiếm chỗ | Khi màn hình thấp thì ẩn các thẻ trang trí, đưa câu hỏi và nút bấm lên trước | Nên chỉnh |
+| 3 | Trong ván | Ngôi sao lấp lánh ở giữa màn nằm đè lên chữ (ví dụ chữ "moment"); trên điện thoại nhãn "THE HOT SEAT" dính sát dòng đầu của câu hỏi | Đưa ngôi sao ra sau chữ hoặc làm mờ khi hiện câu hỏi; chừa khoảng cách giữa nhãn và câu hỏi | Lỗi nhỏ |
+| 4 | Thanh trên cùng trong ván, điện thoại (màn "Ready to Connect?") | Nút Exit đè lên nhãn chủ đề "Friends", chỉ còn thấy đuôi chữ | Xếp nút Exit và nhãn chủ đề cạnh nhau có khoảng cách; nếu thiếu chỗ thì cho nhãn xuống dòng hoặc rút gọn | Lỗi nhỏ |
+| 5 | Vòng quay chọn hoạt động ("The Universe is choosing…"), điện thoại | Nút Exit đang bị khóa vẫn đè lên nhãn "Friends", hai chữ chồng thành "ExFriends" | Sửa cùng cách với dòng 4 để chữ không chồng nhau ở mọi trạng thái, kể cả khi nút bị khóa | Lỗi nhỏ |
+| 6 | Hộp How to Play | Thanh cuộn vẫn là thanh trắng mặc định của trình duyệt, lệch tông với nền tím tối | Đổi màu thanh cuộn sang tím tối cho hợp nền | Nên chỉnh |
+| 7 | Khi mất mạng | Dòng báo lỗi "The game service could not be reached…" rất nhỏ, nằm sát đáy, cách xa nút Start Turn vừa bấm; trên laptop màn thấp còn nằm dưới mép màn hình | Đưa thông báo lên ngay dưới nút vừa bấm, chữ to hơn và có màu nổi (vàng hoặc hồng) | Nên chỉnh |
+| 8 | Trang kết thúc | Chỉ có lời chúc chung "Great Conversations!", không cho biết ván vừa chơi chủ đề gì, hoàn thành bao nhiêu lượt, bỏ qua bao nhiêu lượt | Thêm một dòng tóm tắt, ví dụ "Friends · 10 lượt hoàn thành · 3 lượt bỏ qua" | Nên chỉnh |
+| 9 | Khung chọn chủ đề và số lượt | Nhãn "STEP 1 OF 2" khó hiểu vì cả hai bước nằm chung một khung, chọn xong bước 1 nhãn vẫn giữ nguyên | Bỏ nhãn, hoặc đánh số 1 và 2 cạnh hai tiêu đề | Nên chỉnh |
+
+**Trao đổi với nhóm được đánh giá:** người đánh giá nhận xét các lỗi này không dễ sửa gọn trong thời gian ngắn, nên nhóm không cần sửa hết mà có thể xem danh sách như hướng cải thiện cho các phiên bản sau.
 
 ---
 
