@@ -142,3 +142,25 @@ Qua 5 sprint, mình học được ba điều chính:
 - **Dùng AI đúng cách:** để hiểu nhanh và kiểm tra lại, còn việc quyết định và viết code là của mình, vì người chịu trách nhiệm cho phần code nộp vẫn là mình.
 
 Mình tự đánh giá mình mạnh ở phần âm thanh và đo hiệu năng. Điều cần cải thiện là chủ động nhận việc , thảo luận và góp ý các tính năng cùng với các thành viên trong nhóm
+
+---
+
+## Sprint 6: Sửa theo bản chấm thử (26/11 – 27/11/2026)
+
+### 1. Việc đã làm
+
+| Việc | Pull request / nơi lưu |
+| :--- | :--- |
+| Đo lại Lighthouse trên Next.js cho các trang chính ([#66](https://github.com/kitalikedev/FocusFlow/issues/66)) | Đang làm, cập nhật khi có pull request |
+| Dự họp rà soát lược đồ cơ sở dữ liệu tối 26/11 trên Discord (đủ 5 người) | Buổi 7 trong `docs/MEETING_NOTES.md` |
+
+_(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_
+
+### 2. Khó khăn và cách giải quyết
+
+_(Viết vấn đề bạn gặp trong sprint này và cách bạn xử lý, bằng lời của bạn.)_
+
+### 3. Tự đánh giá đóng góp
+
+- Mức độ đóng góp (1 – 5): _(điền số)_
+- Nhận xét: _(viết 1 – 2 câu bằng lời của bạn)_

@@ -180,3 +180,47 @@ Nhóm làm việc trong 5 sprint, từ 05/11 đến 26/11/2026. Biên bản họ
 | Điểm Lighthouse lần đo trước thấp do đo trong cửa sổ có sẵn dữ liệu và extension. | Đo lại bằng Lighthouse CLI trong trình duyệt sạch. |
 
 **Việc chưa xong:** không. Cả nhóm đã đánh giá UI/UX cho nhóm của Đạt và nhóm PawPass, nhận góp ý từ hai nhóm này và sửa 4 góp ý (PR #51); video demo đã quay và gắn link trong README; Lighthouse đo lại trên production đạt Performance 95 – 100.
+
+## Sprint 6: Sửa theo bản chấm thử và chuyển sang Next.js
+
+**Thời gian:** 26/11 – 27/11/2026 (Milestone "6 - Next.js and grading fixes"). **Mục tiêu:** sửa các điểm giảng viên chỉ ra trong bản chấm thử 22/11 và chuyển project sang Next.js mà không làm hỏng bản đang chạy. Kế hoạch: [`docs/plans/phase-4-polish.md`](../plans/phase-4-polish.md) mục 10.
+
+| Người | Việc | Pull request / nơi lưu |
+| :--- | :--- | :--- |
+| Nam | Kế hoạch sửa theo bản chấm thử ([#62](https://github.com/kitalikedev/FocusFlow/issues/62)) | [#68](https://github.com/kitalikedev/FocusFlow/pull/68) |
+| Nam | Chuyển build sang Next.js, giữ nguyên giao diện ([#60](https://github.com/kitalikedev/FocusFlow/issues/60)) | [#69](https://github.com/kitalikedev/FocusFlow/pull/69) |
+| Nam | Đọc dữ liệu Analytics và Themes qua Route Handler ([#61](https://github.com/kitalikedev/FocusFlow/issues/61)) | [#71](https://github.com/kitalikedev/FocusFlow/pull/71) |
+| Nam | Chương trình và các điểm cần bàn cho buổi họp rà soát lược đồ; chủ trì buổi họp | [#72](https://github.com/kitalikedev/FocusFlow/pull/72) |
+| Nam (Dũng đồng tác giả) | Migration rà soát lược đồ và job CI chạy trên PostgreSQL thật ([#63](https://github.com/kitalikedev/FocusFlow/issues/63)) | [#77](https://github.com/kitalikedev/FocusFlow/pull/77) |
+| Nam | Bảng kiểm thử thủ công và ảnh ở 3 kích thước ([#75](https://github.com/kitalikedev/FocusFlow/issues/75)); thêm các luồng đã đăng nhập | [#76](https://github.com/kitalikedev/FocusFlow/pull/76), [#81](https://github.com/kitalikedev/FocusFlow/pull/81) |
+| Nam | Sửa tiêu đề tab khi mở thẳng URL ([#78](https://github.com/kitalikedev/FocusFlow/issues/78)) và cập nhật tài liệu theo Next.js ([#79](https://github.com/kitalikedev/FocusFlow/issues/79)) | [#80](https://github.com/kitalikedev/FocusFlow/pull/80) |
+| Nam | README: bản đồ barem và các thay đổi sau chấm thử ([#82](https://github.com/kitalikedev/FocusFlow/issues/82)) | [#83](https://github.com/kitalikedev/FocusFlow/pull/83) |
+| Dũng | Ghi biên bản Buổi 7 (họp rà soát lược đồ, cả 5 người dự) | [#73](https://github.com/kitalikedev/FocusFlow/pull/73) |
+| Dũng | Link file thiết kế gốc và công cụ cho wireframe ([#64](https://github.com/kitalikedev/FocusFlow/issues/64)) | [#74](https://github.com/kitalikedev/FocusFlow/pull/74) |
+| Thảo Anh | Đánh giá UI/UX nhóm PawPass, đăng thành issue trên repo của nhóm đó ([#65](https://github.com/kitalikedev/FocusFlow/issues/65)) | [PawPass #23](https://github.com/iceruychi-netizen/PawPass-Hosothucung/issues/23) |
+| Sanh | Đánh giá UI/UX nhóm Let's Talk, đăng thành issue trên repo của nhóm đó ([#65](https://github.com/kitalikedev/FocusFlow/issues/65)) | [Let's Talk #71](https://github.com/nguyenbaphat59-del/Let-s-Talk-project/issues/71) |
+| Phú | Đo lại Lighthouse trên Next.js cho các trang chính ([#66](https://github.com/kitalikedev/FocusFlow/issues/66)) | Đang làm |
+
+**Thảo luận và ý tưởng**
+
+| Ý tưởng | Đề xuất | Quyết định |
+| :--- | :--- | :--- |
+| Rà soát lược đồ cùng cả nhóm, ghi biên bản | Giảng viên (bản chấm thử) | Họp tối 26/11 trên Discord, biểu quyết 8 điểm: thêm mô tả cho bảng và cột, khóa ngoại ghép cùng chủ cho `focus_sessions.task_id` (có điều kiện về dữ liệu), CI trên PostgreSQL thật; giữ nguyên theme trùng tên, giới hạn đếm rồi chèn, `text[]` và `jsonb`, các chỉ mục. |
+| Chuyển sang Next.js | Giảng viên (bản chấm thử) | Làm Route Handler cho hai trang động; không làm định tuyến App Router cho từng trang ([#67](https://github.com/kitalikedev/FocusFlow/issues/67)) vì timer và nhạc phải chạy liên tục khi đổi trang và sát hạn dễ làm hỏng bản đang chạy. |
+
+**Kết quả**
+
+- Project chạy bằng Next.js 16 trên Vercel; Analytics và Themes đọc dữ liệu qua `/api/focus-sessions` và `/api/saved-themes` (đã có ảnh Network trên production).
+- Migration `20261127000000_schema_review.sql` đã chạy trên production sau khi kiểm tra dữ liệu; CI có thêm job `database (PostgreSQL 15)`.
+- 66 file test, 677 test đạt; bảng kiểm thử thủ công 24 dòng ([`docs/MANUAL_TESTS.md`](../MANUAL_TESTS.md)).
+- Đánh giá UI/UX đã đăng trên repo của nhóm PawPass và nhóm Let's Talk.
+
+**Khó khăn và cách giải quyết**
+
+| Khó khăn | Cách giải quyết |
+| :--- | :--- |
+| Sau khi chuyển sang Next.js, trang trắng vì Content Security Policy chặn các script inline mà Next.js chèn vào. | Thêm `'unsafe-inline'` vào `script-src` (chỉ thêm `'unsafe-eval'` khi chạy `next dev`) và khai báo `"framework": "nextjs"` trong `vercel.json`. |
+| Khi mở thẳng một đường dẫn, tiêu đề tab bị Next.js đặt lại thành "FocusFlow". | Để Next.js gửi sẵn tiêu đề của từng trang bằng `generateMetadata`; kiểm tra lại trên production. |
+| Bài đánh giá PawPass trước đó chung chung. | Viết lại theo từng màn hình thật (trang, thành phần, vấn đề, cách sửa, ảnh) và đăng lên repo của nhóm. |
+
+**Việc chưa xong:** đo Lighthouse trên Next.js cho các trang chính ([#66](https://github.com/kitalikedev/FocusFlow/issues/66)); nhóm PawPass và nhóm Let's Talk chưa trả lời issue.

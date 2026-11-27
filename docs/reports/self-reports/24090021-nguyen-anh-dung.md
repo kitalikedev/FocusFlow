@@ -121,3 +121,27 @@
 
 - Mức độ đóng góp (1 – 5): 5
 - Nhận xét: Tôi đã hoàn thành tốt công việc được giao trong giai đoạn hoàn thiện nhờ sự phối hợp và giúp đỡ nhiệt tình của leader và các thành viên khác.
+
+---
+
+## Sprint 6: Sửa theo bản chấm thử (26/11 – 27/11/2026)
+
+### 1. Việc đã làm
+
+| Việc | Pull request / nơi lưu |
+| :--- | :--- |
+| Ghi biên bản Buổi 7 (họp rà soát lược đồ) | [#73](https://github.com/kitalikedev/FocusFlow/pull/73) |
+| Link file thiết kế gốc và công cụ cho wireframe ([#64](https://github.com/kitalikedev/FocusFlow/issues/64)) | [#74](https://github.com/kitalikedev/FocusFlow/pull/74) |
+| Đồng tác giả migration rà soát lược đồ | [#77](https://github.com/kitalikedev/FocusFlow/pull/77) |
+| Dự họp rà soát lược đồ cơ sở dữ liệu tối 26/11 trên Discord (đủ 5 người) | Buổi 7 trong `docs/MEETING_NOTES.md` |
+
+_(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_
+
+### 2. Khó khăn và cách giải quyết
+
+_(Viết vấn đề bạn gặp trong sprint này và cách bạn xử lý, bằng lời của bạn.)_
+
+### 3. Tự đánh giá đóng góp
+
+- Mức độ đóng góp (1 – 5): _(điền số)_
+- Nhận xét: _(viết 1 – 2 câu bằng lời của bạn)_
