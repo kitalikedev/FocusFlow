@@ -127,7 +127,7 @@ describe('website pages', () => {
       'href',
       'https://github.com/kitalikedev'
     );
-    await waitFor(() => expect(document.title).toBe('About FocusFlow · FocusFlow'));
+    await waitFor(() => expect(document.title).toBe('About FocusFlow'));
   });
 
   it('has the contact details only on the home page, with a footer link to them from every page', async () => {
