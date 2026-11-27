@@ -39,3 +39,52 @@ jobs:
 
       - name: Build Production Artifacts
         run: npm run build
+
+  database:
+    name: database (PostgreSQL 15)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create the Supabase auth and storage stand-ins
+        run: psql -v ON_ERROR_STOP=1 -f supabase/tests/supabase_stub.sql
+
+      - name: Apply the migrations in order
+        run: |
+          for file in supabase/migrations/*.sql; do
+            echo "Applying $file"
+            psql -v ON_ERROR_STOP=1 -f "$file"
+          done
+
+      - name: Load the demo data twice (the second run must not fail)
+        run: |
+          psql -v ON_ERROR_STOP=1 -c "INSERT INTO auth.users (email) VALUES ('demo@example.com')"
+          psql -v ON_ERROR_STOP=1 -f supabase/seed.sql
+          psql -v ON_ERROR_STOP=1 -f supabase/seed.sql
+
+      - name: Run the RLS, limit and last-write-wins tests from docs/ERD.md section 11
+        run: |
+          tests="$RUNNER_TEMP/erd_section_11.sql"
+          awk '/^## 11\./ { in_section = 1 } in_section && /^```sql/ { in_block = 1; next } in_block && /^```/ { exit } in_block' docs/ERD.md > "$tests"
+          test -s "$tests"
+          psql -v ON_ERROR_STOP=1 -f "$tests" 2>&1 | tee "$RUNNER_TEMP/erd_tests.log"
+          grep -q "ALL DATABASE & SECURITY TESTS PASSED" "$RUNNER_TEMP/erd_tests.log"
