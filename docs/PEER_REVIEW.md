@@ -72,30 +72,35 @@ Khi nhóm nhận góp ý trả lời trong issue hoặc nối pull request sửa
 
 ### A.2 Đánh giá nhóm PawPass
 
-Bài này là nội dung đã đăng ở [Issue #23 trên repo PawPass](https://github.com/iceruychi-netizen/PawPass-Hosothucung/issues/23). Nó thay cho bản chấm điểm 1 – 5 từng mục viết trước đó, vì bản cũ chưa dựa trên việc mở từng màn hình của PawPass.
+Bài này là nội dung đã đăng ở [Issue #23 trên repo PawPass](https://github.com/iceruychi-netizen/PawPass-Hosothucung/issues/23), kèm 11 ảnh chụp. Nó thay cho bản chấm điểm 1 – 5 từng mục viết trước đó, vì bản cũ chưa dựa trên việc mở từng màn hình của PawPass. Bản đăng đã được bổ sung trong ngày 27/11/2026 sau khi thử thêm trên điện thoại và bằng bàn phím.
 
 | Mục | Nội dung |
 | :--- | :--- |
 | Dự án | PawPass, hồ sơ thú cưng ([https://pawpass-hosothucung-web.vercel.app/](https://pawpass-hosothucung-web.vercel.app/)) |
 | Người đánh giá | Thảo Anh, đại diện nhóm FocusFlow (24SE1) |
-| Thiết bị đã thử | Laptop, trình duyệt Microsoft Edge |
+| Thiết bị đã thử | Laptop (trình duyệt Microsoft Edge) và giao diện điện thoại 375 px (DevTools) |
 | Ngày thử | 27/11/2026 |
-| Trang đã xem | Trang chủ (`#/dashboard`), Thú cưng (`#/pets`), Tìm kiếm (`#/search`), Tài khoản (`#/account`) |
+| Trang đã xem | Trang chủ (`#/dashboard`), Thú cưng (`#/pets`), Tìm kiếm (`#/search`), Tài khoản (`#/account`), Đăng nhập (`#/login`), cửa sổ Thêm thú cưng |
 
 **Điểm mạnh**
 
-1. **Thẩm mỹ và thân thiện:** tông màu kem và nâu ấm áp kết hợp hình minh họa thú cưng sinh động ở cả 4 trang, tạo cảm giác gần gũi, dễ chịu.
-2. **Dễ dùng:** thanh điều hướng phía trên chia rõ các khu vực (Trang chủ, Thú cưng, Tìm kiếm, Tài khoản), kèm biểu tượng trực quan, nên người dùng nắm được luồng sử dụng ngay lần đầu.
+1. **Thẩm mỹ và thân thiện (máy tính và điện thoại):** tông màu kem và nâu ấm áp kết hợp hình minh họa thú cưng sinh động ở mọi trang, tạo cảm giác gần gũi, dễ chịu.
+2. **Bố cục rõ ràng trên máy tính:** thanh điều hướng ngang chia 4 khu vực (Trang chủ, Thú cưng, Tìm kiếm, Tài khoản) kèm biểu tượng; các khối thông tin ở Trang chủ và Tài khoản được đóng khung cân đối, dễ quan sát.
+3. **Tương thích tốt ở 375 px:** thanh điều hướng tự chia thành 2 hàng (logo và nút đăng xuất ở hàng trên, 4 nút menu chính ở hàng dưới), nút to dễ chạm; cửa sổ Thêm thú cưng co vừa chiều ngang và không tràn viền.
+4. **Hỗ trợ điều hướng bằng bàn phím:** khi nhấn `Tab` qua các nút trên menu và các ô nhập trong form Thêm thú cưng, hệ thống hiện viền cam nổi bật nên dễ biết đang chọn ở đâu.
 
-**Đề xuất cải thiện**
+**Đề xuất cải thiện** (người đánh giá nêu là góp ý nhỏ cho các bản cập nhật sau, không yêu cầu sửa gấp)
 
-| # | Màn hình / trang | Thành phần | Vấn đề đã thấy | Cách sửa đề xuất | Mức ưu tiên |
-| :-: | :--- | :--- | :--- | :--- | :---: |
-| 1 | Trang chủ, Thú cưng, Tìm kiếm, Tài khoản | Dòng tiêu đề phụ (eyebrow text) và lời thoại cạnh linh vật | Font chữ viết tay đang dùng chưa hỗ trợ đủ dấu tiếng Việt (ví dụ "Chào buổi trưa", "tủ hồ sơ", "lục lại sổ", "chủ sổ", "Gõ vài chữ, các bé sẽ đi tìm giúp bạn..."), nên các ký tự có dấu rơi về font hệ thống, nét chữ bị lệch và không đồng bộ | Chuyển sang font viết tay trên Google Fonts có đủ subset `vietnamese` (Patrick Hand, Mali, Itim hoặc Pangolin) trong bản cập nhật sau | Thấp (cập nhật sau) |
+| # | Màn hình / trang | Thiết bị | Thành phần | Vấn đề đã thấy | Cách sửa đề xuất | Mức ưu tiên |
+| :-: | :--- | :--- | :--- | :--- | :--- | :---: |
+| 1 | Đăng nhập (`#/login`) | Điện thoại 375 px | Dòng chào phía trên và mô tả dưới tiêu đề | Font chữ viết tay chưa hỗ trợ đủ dấu tiếng Việt ở câu "xin chào, người nuôi thú cưng!" và "Mở lại sổ của các bé.", nên các ký tự có dấu rơi về font hệ thống và lệch nét | Đổi sang font viết tay trên Google Fonts có đủ bảng mã tiếng Việt (Patrick Hand, Mali, Itim hoặc Pangolin) và khai báo đủ subset `vietnamese` | Thấp |
+| 2 | Trang chủ (`#/dashboard`) | Máy tính và điện thoại | Lời chào phía trên tiêu đề chính | Dòng "Chào buổi trưa, AnhTe!" và "Chào buổi chiều, AnhTe!" bị trộn giữa font viết tay và font dự phòng ở các chữ có dấu | Áp dụng cùng bộ font ở dòng 1 cho thẻ lời chào | Thấp |
+| 3 | Tìm kiếm (`#/search`) | Máy tính và điện thoại | Tiêu đề phụ và lời thoại cạnh linh vật | Cụm "lục lại sổ" và câu "Gõ vài chữ, các bé sẽ đi tìm giúp bạn..." lệch nét ở các chữ có dấu thanh và dấu mũ | Áp dụng cùng bộ font cho tiêu đề phụ và khung thoại | Thấp |
+| 4 | Thú cưng (`#/pets`) và Tài khoản (`#/account`) | Máy tính và điện thoại | Tiêu đề phụ phía trên tiêu đề chính | Cụm "tủ hồ sơ" và "chủ sổ" rơi về font mặc định ở các chữ có dấu, làm giảm tính đồng nhất | Áp dụng cùng bộ font cho toàn bộ tiêu đề phụ | Thấp |
 
-Ảnh chụp vị trí lỗi nằm trong issue.
+Ảnh chụp trong issue: trang Đăng nhập, Trang chủ (kèm viền cam khi điều hướng bằng `Tab`), Tìm kiếm, Thú cưng và Tài khoản, và cửa sổ Thêm thú cưng ở 375 px, mỗi ảnh có chú thích vị trí lỗi hoặc điểm tốt.
 
-**Trao đổi với nhóm được đánh giá:** issue mời nhóm trả lời và nối pull request sửa vào issue (`Closes #<số>`) để hai bên có dấu vết trao đổi.
+**Trao đổi với nhóm được đánh giá:** issue mời nhóm trả lời và nối pull request sửa vào issue (`Closes #<số>`) để hai bên có dấu vết trao đổi. Đến thời điểm viết, issue chưa có bình luận nào.
 
 ### A.3 Đánh giá nhóm Let's Talk (nhóm 3)
 
