@@ -99,3 +99,25 @@ Mình không được giao phần việc mới nên chưa gặp khó khăn kỹ 
 
 - Mức độ đóng góp (1 – 5): 1
 - Nhận xét: Phần việc của mình đã xong ở Sprint 4, sprint này mình theo dõi tiến độ chung. Lần sau mình sẽ chủ động hỏi việc sớm hơn thay vì chờ được giao.
+
+---
+
+## Sprint 6: Sửa theo bản chấm thử (26/11 – 27/11/2026)
+
+### 1. Việc đã làm
+
+| Việc | Pull request / nơi lưu |
+| :--- | :--- |
+| Đánh giá UI/UX nhóm Let's Talk và đăng thành issue trên repo của nhóm đó ([#65](https://github.com/kitalikedev/FocusFlow/issues/65)) | [Let's Talk #71](https://github.com/nguyenbaphat59-del/Let-s-Talk-project/issues/71) |
+| Dự họp rà soát lược đồ cơ sở dữ liệu tối 26/11 trên Discord (đủ 5 người) | Buổi 7 trong `docs/MEETING_NOTES.md` |
+
+_(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_
+
+### 2. Khó khăn và cách giải quyết
+
+_(Viết vấn đề bạn gặp trong sprint này và cách bạn xử lý, bằng lời của bạn.)_
+
+### 3. Tự đánh giá đóng góp
+
+- Mức độ đóng góp (1 – 5): _(điền số)_
+- Nhận xét: _(viết 1 – 2 câu bằng lời của bạn)_

@@ -198,3 +198,31 @@ Ngoài các PR trên:
 
 - Mức độ đóng góp (1 – 5): 5
 - Nhận xét: Mình sửa lỗi lofi và Zen, viết README, tổng hợp góp ý đánh giá chéo, chia việc cuối cùng cho cả nhóm và review mọi PR còn lại.
+
+---
+
+## Sprint 6: Sửa theo bản chấm thử (26/11 – 27/11/2026)
+
+### 1. Việc đã làm
+
+| Việc | Pull request / nơi lưu |
+| :--- | :--- |
+| Kế hoạch sửa theo bản chấm thử ([#62](https://github.com/kitalikedev/FocusFlow/issues/62)) | [#68](https://github.com/kitalikedev/FocusFlow/pull/68) |
+| Chuyển build sang Next.js, giữ nguyên giao diện ([#60](https://github.com/kitalikedev/FocusFlow/issues/60)) | [#69](https://github.com/kitalikedev/FocusFlow/pull/69) |
+| Đọc dữ liệu Analytics và Themes qua Route Handler ([#61](https://github.com/kitalikedev/FocusFlow/issues/61)) | [#71](https://github.com/kitalikedev/FocusFlow/pull/71) |
+| Chủ trì buổi họp rà soát lược đồ; chương trình và các điểm cần bàn | [#72](https://github.com/kitalikedev/FocusFlow/pull/72) |
+| Migration rà soát lược đồ và job CI trên PostgreSQL thật ([#63](https://github.com/kitalikedev/FocusFlow/issues/63)), chạy trên production | [#77](https://github.com/kitalikedev/FocusFlow/pull/77) |
+| Bảng kiểm thử thủ công, ảnh ở 3 kích thước và các luồng đã đăng nhập ([#75](https://github.com/kitalikedev/FocusFlow/issues/75)) | [#76](https://github.com/kitalikedev/FocusFlow/pull/76), [#81](https://github.com/kitalikedev/FocusFlow/pull/81) |
+| Sửa tiêu đề tab ([#78](https://github.com/kitalikedev/FocusFlow/issues/78)) và cập nhật tài liệu theo Next.js ([#79](https://github.com/kitalikedev/FocusFlow/issues/79)) | [#80](https://github.com/kitalikedev/FocusFlow/pull/80) |
+| README: bản đồ barem và thay đổi sau chấm thử ([#82](https://github.com/kitalikedev/FocusFlow/issues/82)) | [#83](https://github.com/kitalikedev/FocusFlow/pull/83) |
+
+_(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_
+
+### 2. Khó khăn và cách giải quyết
+
+_(Viết vấn đề bạn gặp trong sprint này và cách bạn xử lý, bằng lời của bạn.)_
+
+### 3. Tự đánh giá đóng góp
+
+- Mức độ đóng góp (1 – 5): _(điền số)_
+- Nhận xét: _(viết 1 – 2 câu bằng lời của bạn)_

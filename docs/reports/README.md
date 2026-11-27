@@ -13,10 +13,11 @@
 | 3 | 13/11 – 17/11 | Milestone và Issue theo barem, website nhiều trang, trang động |
 | 4 | 18/11 – 20/11 | Google Analytics, Sentry, Lighthouse lần 1, dữ liệu mẫu, nhạc YouTube, giao diện website mới |
 | 5 | 21/11 – 26/11 | Lighthouse lần 2, sửa lỗi, báo cáo README, đánh giá chéo, video |
+| 6 | 26/11 – 27/11 | Sau bản chấm thử: chuyển sang Next.js, rà soát lược đồ, kiểm thử thủ công, đánh giá chéo đăng lên repo các nhóm |
 
 ## Self-report: mỗi người một file
 
-Mỗi thành viên có sẵn **một file**, tên gồm mã số sinh viên, chứa đủ 5 sprint. Mỗi người sửa thẳng trên file của mình:
+Mỗi thành viên có sẵn **một file**, tên gồm mã số sinh viên, chứa đủ 5 sprint. Sprint 6 là sprint ngắn sau bản chấm thử; khung của Sprint 6 nằm ở cuối mỗi file, mỗi người điền thêm bằng lời của mình. Mỗi người sửa thẳng trên file của mình:
 
 | Thành viên | File của bạn |
 | :--- | :--- |
