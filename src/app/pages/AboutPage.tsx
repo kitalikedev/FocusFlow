@@ -13,9 +13,9 @@ const TEAM = [
 ];
 
 const STACK = [
+  'Next.js 16',
   'React 18',
   'TypeScript',
-  'Vite',
   'Tailwind CSS',
   'Zustand',
   'Supabase',
