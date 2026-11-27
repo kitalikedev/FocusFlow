@@ -6,6 +6,7 @@
 - **Source code:** https://github.com/kitalikedev/FocusFlow
 - **Demo video:** [Watch on Google Drive](https://drive.google.com/file/d/1cmKTYNC1bvsAntp_UCvHEP3iSv4Z9ofo/view?usp=sharing)
 - **Course:** Web Design and Development (CSB25022), VNUK. Group 1, class 24SE1.
+- **For graders:** where to find each item of the rubric: [section 11](#11-rubric-map-where-to-find-each-item); what we changed after the trial grading of 22/11/2026: [section 12](#12-changes-since-the-trial-grading).
 
 ![FocusFlow home page](docs/images/site/home.jpg)
 
@@ -21,6 +22,8 @@
 8. [Project planning and teamwork](#8-project-planning-and-teamwork)
 9. [Additional information](#9-additional-information)
 10. [Team](#10-team)
+11. [Rubric map: where to find each item](#11-rubric-map-where-to-find-each-item)
+12. [Changes since the trial grading](#12-changes-since-the-trial-grading)
 
 ## 1. Project overview
 
@@ -268,7 +271,7 @@ The team met to agree on the roles below (meeting notes: [`docs/MEETING_NOTES.md
 | Lê Nguyễn Thảo Anh | UI/UX designer, frontend developer | Pixel theme, wireframes, new website interface |
 | Trần Công Sanh | Backend and frontend developer | Quotes, demo data for the database, YouTube music controller |
 
-**GitHub workflow:** every task is an Issue with an assignee and a milestone (5 milestones); work happens on a branch and goes to `main` only through a pull request that links its issue (`Closes #N`), passes CI (secret check, lint, type check, tests, build) and gets 1 approval, then is squash-merged and deployed by Vercel. `main` is protected by a ruleset. Commit messages are short sentences.
+**GitHub workflow:** every task is an Issue with an assignee and a milestone (6 milestones; the sixth, *Next.js and grading fixes*, holds the work done after the trial grading); work happens on a branch and goes to `main` only through a pull request that links its issue (`Closes #N`), passes CI (secret check, lint, type check, tests, build) and gets 1 approval, then is squash-merged and deployed by Vercel. `main` is protected by a ruleset. Commit messages are short sentences.
 
 **Wireframes** (desktop workspace and the 5 website pages): [`docs/wireframes/`](docs/wireframes/), source files in [Figma](https://www.figma.com/design/SB7nswLyX7S57NwEHATfKH/wireframe_focusflow?node-id=0-1) and a [Claude Design canvas](https://claude.ai/artifact/6GVLXUjZeKgWe6j8hjJXw5). **UI/UX peer review:** we reviewed 2 teams (Đạt's expense manager and PawPass) against the 3 criteria of the brief, and received feedback from the same 2 teams. We fixed 4 of the 6 points (buttons that moved when pressed, listening time for live radio, a mini player on the website pages, covers in the queue) in [PR #51](https://github.com/kitalikedev/FocusFlow/pull/51) and wrote down why the other 2 were not done. Reviews, decisions and before/after screenshots: [`docs/PEER_REVIEW.md`](docs/PEER_REVIEW.md) (in Vietnamese).
 
@@ -291,3 +294,54 @@ Group 1, class 24SE1, VNUK.
 | 3 | 24090006 | Võ Xuân Phú | [vxphuswe](https://github.com/vxphuswe) |
 | 4 | 24090028 | Lê Nguyễn Thảo Anh | [AnhTe0301](https://github.com/AnhTe0301) |
 | 5 | 24090009 | Trần Công Sanh | [sanh2k6-sec](https://github.com/sanh2k6-sec) |
+
+## 11. Rubric map: where to find each item
+
+**What the brief asks the README to contain**
+
+| The brief asks for | Where it is |
+| :--- | :--- |
+| How to run the application | [Section 2](#2-how-to-run-the-application) |
+| Project overview | [Section 1](#1-project-overview), live site and demo video at the top |
+| Features with screenshots | [Section 4](#4-website-pages) and [section 5](#5-features-and-screenshots); full list in [`docs/FEATURES.md`](docs/FEATURES.md) |
+| Database design (ERD) | [Section 6](#6-database-design-erd); data dictionary in [`docs/ERD.md`](docs/ERD.md) |
+| Additional information | [Section 9](#9-additional-information) and the team in [section 10](#10-team) |
+
+**Evidence for each rubric item**
+
+| Item | What the rubric checks | Evidence in the repository |
+| :--- | :--- | :--- |
+| 1(a) | Team meeting, roles and responsibilities | [`docs/MEETING_NOTES.md`](docs/MEETING_NOTES.md) (7 meetings, session 1 sets the roles), [section 8](#8-project-planning-and-teamwork) |
+| 1(b) | Wireframes | [`docs/wireframes/`](docs/wireframes/); tool, source files and dates in [`docs/PROJECT_MANAGEMENT.md`](docs/PROJECT_MANAGEMENT.md#3-wireframes); reviewed in meeting sessions 2 and 4 |
+| 1(c) | Plan with milestones and deadlines | Gantt chart and milestone table in [`docs/PROJECT_MANAGEMENT.md`](docs/PROJECT_MANAGEMENT.md#2-plan-and-milestones), [GitHub milestones](https://github.com/kitalikedev/FocusFlow/milestones?state=all), phase plans in [`docs/plans/`](docs/plans/), [sprint reports](docs/reports/sprints.md) |
+| 1(d) | GitHub repository, tracking changes and tickets | [Issues](https://github.com/kitalikedev/FocusFlow/issues?q=is%3Aissue) with labels, milestones and assignees; [pull requests](https://github.com/kitalikedev/FocusFlow/pulls?q=is%3Apr) from topic branches |
+| 1(e) | GitHub workflow and commit messages | [`docs/PROJECT_MANAGEMENT.md`](docs/PROJECT_MANAGEMENT.md#4-github-workflow); every pull request runs [CI](.github/workflows/ci.yml); since the trial grading every pull request links its issue (`Closes #n`), see [section 12](#12-changes-since-the-trial-grading) |
+| 2(a) | At least 3 pages that follow the wireframes | [Section 4](#4-website-pages): Home, Themes, Analytics, Tracking, About and the workspace `/app` |
+| 2(b) | Tailwind CSS | [`tailwind.config.ts`](tailwind.config.ts) (colors, fonts and animations mapped to the theme tokens), utility classes in every component |
+| 2(c) | Interaction with JavaScript | [Section 5](#5-features-and-screenshots): timer, carousel, sign-in dialog, menus, tasks, themes, sounds; covered by the automated tests |
+| 2(d) | Responsive on several screen sizes | Screenshots of every page at 375, 768 and 1440 px in [`docs/MANUAL_TESTS.md`](docs/MANUAL_TESTS.md) (section 2); phone screenshots in [section 4](#4-website-pages) |
+| 3(a) | Suitable database schema | [Section 6](#6-database-design-erd), [`docs/ERD.md`](docs/ERD.md), [`supabase/migrations/`](supabase/migrations/); team schema review in meeting session 7 and [#63](https://github.com/kitalikedev/FocusFlow/issues/63) |
+| 3(b) | PostgreSQL integration to save and read data | [`supabase/migrations/`](supabase/migrations/), [`SupabaseRepository`](src/core/data/SupabaseRepository.ts), CRUD per table in [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md#2-database-rules-and-crud-operations); database tests on a real PostgreSQL in [CI](.github/workflows/ci.yml) |
+| 3(c) | At least 2 dynamic pages with data from the database | `/analytics` (table `focus_sessions`) and `/themes` (table `saved_themes`), read through the Next.js Route Handlers [`app/api/focus-sessions`](app/api/focus-sessions/route.ts) and [`app/api/saved-themes`](app/api/saved-themes/route.ts); screenshots on production in [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md) section 1.5; signed-in tests in [`docs/MANUAL_TESTS.md`](docs/MANUAL_TESTS.md) section 3 |
+| 4(a) | Google Lighthouse optimization | [Section 7](#7-optimization-lighthouse-analytics-and-sentry), [first audit](docs/lighthouse-report.md), [second audit](docs/Lighthouse_v2_report.md), [`docs/MONITORING.md`](docs/MONITORING.md) |
+| 4(b) | Tracking and logging tools | Google Analytics 4 and Sentry: [section 7](#7-optimization-lighthouse-analytics-and-sentry) and [`docs/MONITORING.md`](docs/MONITORING.md) |
+| 5(a) | Detailed, constructive reviews for at least 2 other teams | [`docs/PEER_REVIEW.md`](docs/PEER_REVIEW.md) part A |
+| 5(b) | Changes made from the feedback received | [`docs/PEER_REVIEW.md`](docs/PEER_REVIEW.md) part B and [PR #51](https://github.com/kitalikedev/FocusFlow/pull/51) |
+| Tests | Automated and manual tests | 677 automated tests on every pull request ([section 9](#9-additional-information)); manual test table with expected and actual results in [`docs/MANUAL_TESTS.md`](docs/MANUAL_TESTS.md) |
+
+## 12. Changes since the trial grading
+
+The trial grading on 22/11/2026 (commit `02dbb44`, 8/10) listed what was missing. Everything below was planned in [`docs/plans/phase-4-polish.md`](docs/plans/phase-4-polish.md) section 10 ([#62](https://github.com/kitalikedev/FocusFlow/issues/62)) and done through issues in the milestone *Next.js and grading fixes*, one pull request per change.
+
+| Item | What was missing | What we did | Evidence |
+| :--- | :--- | :--- | :--- |
+| 1(b) | No design tool or source file for the wireframes | Added the tool, the links to the Figma file and the design canvas, and the date of each wireframe | [`docs/PROJECT_MANAGEMENT.md`](docs/PROJECT_MANAGEMENT.md#3-wireframes), [#64](https://github.com/kitalikedev/FocusFlow/issues/64), [PR #74](https://github.com/kitalikedev/FocusFlow/pull/74) |
+| 1(d), 1(e) | Issues used late, very large commits, few pull requests linked to an issue | From 26/11 every task has its own issue, every pull request links it (`Closes #n` or `Refs #n`), and each commit holds one change | Issues [#60](https://github.com/kitalikedev/FocusFlow/issues/60) to [#67](https://github.com/kitalikedev/FocusFlow/issues/67), [#75](https://github.com/kitalikedev/FocusFlow/issues/75), [#78](https://github.com/kitalikedev/FocusFlow/issues/78), [#79](https://github.com/kitalikedev/FocusFlow/issues/79); [PR #68](https://github.com/kitalikedev/FocusFlow/pull/68) to [PR #81](https://github.com/kitalikedev/FocusFlow/pull/81) (all except the Dependabot one, #70) |
+| 3(a) | No record of the team reviewing the schema | The whole team met on 26/11 (session 7 of [`docs/MEETING_NOTES.md`](docs/MEETING_NOTES.md)) and voted on 8 points. The follow-up migration makes `focus_sessions.task_id` a composite foreign key (a session can only point to a task of the same user) and describes every table and column; it was applied on production after a data check. The points kept as they are have their reasons in [`docs/ERD.md`](docs/ERD.md) section 12. A new CI job runs the migrations and the database tests on a real PostgreSQL 15 | [#63](https://github.com/kitalikedev/FocusFlow/issues/63), [PR #72](https://github.com/kitalikedev/FocusFlow/pull/72), [PR #73](https://github.com/kitalikedev/FocusFlow/pull/73), [PR #77](https://github.com/kitalikedev/FocusFlow/pull/77), [`supabase/migrations/20261127000000_schema_review.sql`](supabase/migrations/20261127000000_schema_review.sql) |
+| 3(c) | Not built with Next.js; the pages read Supabase straight from the browser | Moved the project to Next.js 16 (App Router). The Analytics and Themes pages now read their data through two Route Handlers that run on the server and query Supabase as the signed-in user, so Row Level Security still applies | [Section 3](#3-tools-and-technologies) "How we use Next.js", [#60](https://github.com/kitalikedev/FocusFlow/issues/60), [#61](https://github.com/kitalikedev/FocusFlow/issues/61), [PR #69](https://github.com/kitalikedev/FocusFlow/pull/69), [PR #71](https://github.com/kitalikedev/FocusFlow/pull/71), screenshots in [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md) section 1.5 |
+| Tests and responsive (general advice) | A manual test table and screenshots at 3 screen sizes | Manual test table with expected and actual results (24 rows, guest and signed-in, on the production build and the live site) and 18 screenshots at 375, 768 and 1440 px. The tests found one bug (wrong tab title when a page is opened directly), fixed in [PR #80](https://github.com/kitalikedev/FocusFlow/pull/80) | [`docs/MANUAL_TESTS.md`](docs/MANUAL_TESTS.md), [#75](https://github.com/kitalikedev/FocusFlow/issues/75), [#78](https://github.com/kitalikedev/FocusFlow/issues/78), [PR #76](https://github.com/kitalikedev/FocusFlow/pull/76), [PR #81](https://github.com/kitalikedev/FocusFlow/pull/81) |
+| Documentation | Docs still described the Vite setup | README, `AGENTS.md` and the design documents updated for Next.js and the Route Handlers | [#79](https://github.com/kitalikedev/FocusFlow/issues/79), [PR #80](https://github.com/kitalikedev/FocusFlow/pull/80) |
+| 5(a) | The PawPass review was too general; no record of sending the reviews | In progress | [#65](https://github.com/kitalikedev/FocusFlow/issues/65) |
+| Lighthouse (general advice) | Audit every main page | In progress: audit on Next.js for Home, Themes, Analytics, Tracking, About and the workspace | [#66](https://github.com/kitalikedev/FocusFlow/issues/66) |
+
+Not done on purpose: routing every page through the App Router ([#67](https://github.com/kitalikedev/FocusFlow/issues/67)). The pages share one client-side tree so the timer and the music keep playing while you move between pages; the data work that the grading asked for is done by the Route Handlers above.
