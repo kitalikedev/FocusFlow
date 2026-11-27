@@ -1,6 +1,6 @@
 # Kiểm thử thủ công và ảnh ở ba kích thước màn hình
 
-Ngoài 666 test tự động (Vitest, chạy trong mỗi pull request), nhóm kiểm thử thủ công các luồng chính trên **bản build thật** (`npm run build` rồi `npm start`, tức là Next.js 16 chạy như trên Vercel) để thấy được những gì test tự động không thấy: bố cục thật, thao tác thật, phản hồi của API.
+Ngoài 677 test tự động (Vitest, chạy trong mỗi pull request), nhóm kiểm thử thủ công các luồng chính trên **bản build thật** (`npm run build` rồi `npm start`, tức là Next.js 16 chạy như trên Vercel) để thấy được những gì test tự động không thấy: bố cục thật, thao tác thật, phản hồi của API.
 
 | Mục | Nội dung |
 | :-- | :-- |
@@ -30,9 +30,9 @@ Bảng này chỉ gồm các luồng ở chế độ khách.
 | 12 | Bấm nút sáng/tối ở trang web | Giao diện đổi và nhãn nút đổi theo | Nhãn đổi giữa "Switch to light mode" và "Switch to dark mode", màu chữ tiêu đề đổi từ gần trắng sang gần đen | Đạt |
 | 13 | Mở đường dẫn không tồn tại `/khong-ton-tai` | Về trang chủ | Về trang chủ `/` | Đạt |
 | 14 | Gọi `/api/focus-sessions` và `/api/saved-themes` khi không có token, và với token giả | Trả 401, không lộ dữ liệu, không lưu cache | Cả hai trả 401; token giả trả `{"error":"UNAUTHORIZED"}`; `/api/focus-sessions` trả kèm `Cache-Control: no-store` | Đạt |
-| 15 | Mở thẳng `/themes` (hoặc F5) và xem tiêu đề tab | "Themes · FocusFlow" | Tab chỉ hiện "FocusFlow". Khi bấm chuyển trang từ bên trong ứng dụng thì tiêu đề đúng (ví dụ "About FocusFlow · FocusFlow") | **Không đạt** |
+| 15 | Mở thẳng `/themes` (hoặc F5) và xem tiêu đề tab; rồi bấm chuyển trang trong ứng dụng | "Themes · FocusFlow", và đổi theo từng trang khi chuyển | Mở thẳng cả 6 đường dẫn đều ra đúng tiêu đề (Home "FocusFlow", Themes, Focus Analytics, Tracking, About FocusFlow, Workspace · FocusFlow); chuyển trang trong ứng dụng cũng đổi đúng | Đạt (lần 2) |
 
-Lỗi ở dòng 15 do `metadata.title` của Next.js ghi đè tiêu đề mà ứng dụng đặt sau khi trang tải, chỉ xảy ra khi mở thẳng đường dẫn hoặc tải lại. Không ảnh hưởng chức năng. Tên trang About lặp chữ "FocusFlow" là từ trước khi chuyển sang Next.js.
+Dòng 15 ở lần kiểm thử đầu (26/11/2026) là **Không đạt**: mở thẳng đường dẫn hoặc tải lại chỉ hiện "FocusFlow", do `metadata.title` của Next.js ghi đè tiêu đề mà ứng dụng đặt sau khi trang tải. Đã sửa bằng cách để Next.js gửi đúng tiêu đề của từng trang (`generateMetadata`, 6 trang được build sẵn); kiểm tra lại trên bản build ngày 27/11/2026 thì đạt. Tên trang About trước đó bị lặp chữ "FocusFlow" ("About FocusFlow · FocusFlow"), nay chỉ còn một lần.
 
 ## 2. Ảnh chụp ở ba kích thước
 
