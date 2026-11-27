@@ -7,6 +7,8 @@ import { isOnAppPage } from '@/core/ui/routes';
 import { QuickControls, ToolDock } from '@/core/hud/Dock';
 import { SiteLayout } from './site/SiteLayout';
 import { HomePage } from './pages/HomePage';
+import { TrackingPage } from './pages/TrackingPage';
+import { AboutPage } from './pages/AboutPage';
 import {
   WallpaperLayerSlot,
   EffectsLayerSlot,
@@ -24,13 +26,11 @@ import {
   QuoteSlot,
 } from './slots';
 
-// Auth dialogs and the inner website pages are loaded on demand so they never weigh on the initial bundle.
-// The home page is the landing page, so it ships in the main bundle: lazy loading it showed "Loading…" first
-// and then shifted the layout when the page arrived (Lighthouse, issue #30).
+// Auth dialogs are loaded on demand so they never weigh on the initial bundle.
+// The website pages ship in the main bundle: each is only about 1 KB gzipped, and loading one on demand added a
+// request after the app had started, so a page opened directly appeared later (Lighthouse, issues #30 and #86).
 const AuthModal = lazy(() => import('@/core/auth/AuthModal'));
 const GuestMergeDialog = lazy(() => import('@/core/auth/GuestMergeDialog'));
-const TrackingPage = lazy(() => import('./pages/TrackingPage'));
-const AboutPage = lazy(() => import('./pages/AboutPage'));
 
 const AuthOverlays: React.FC = () => {
   const isAuthModalOpen = useAuthStore((state) => state.isAuthModalOpen);
