@@ -151,7 +151,7 @@ Mình tự đánh giá mình mạnh ở phần âm thanh và đo hiệu năng. �
 
 | Việc | Pull request / nơi lưu |
 | :--- | :--- |
-| Đo lại Lighthouse trên Next.js cho các trang chính ([#66](https://github.com/kitalikedev/FocusFlow/issues/66)) | Đang làm, cập nhật khi có pull request |
+| Đo lại Lighthouse trên Next.js: 4 trang, mobile và desktop, kèm 8 ảnh chụp ([#66](https://github.com/kitalikedev/FocusFlow/issues/66)) | [#90](https://github.com/kitalikedev/FocusFlow/pull/90), [`docs/Lighthouse_v3_report.md`](../../Lighthouse_v3_report.md) |
 | Dự họp rà soát lược đồ cơ sở dữ liệu tối 26/11 trên Discord (đủ 5 người) | Buổi 7 trong `docs/MEETING_NOTES.md` |
 
 _(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_

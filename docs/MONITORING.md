@@ -4,7 +4,7 @@ Lighthouse changes, Google Analytics 4 and Sentry in detail. The summary is in t
 
 ## 1. Lighthouse
 
-We ran Lighthouse on the 3 most used pages, on mobile and desktop, then fixed the problems it found and ran it again.
+We ran Lighthouse on the 3 most used pages, on mobile and desktop, then fixed the problems it found and ran it again. The third audit, after the move to Next.js, is in [`Lighthouse_v3_report.md`](Lighthouse_v3_report.md).
 
 | Page | Device | First audit, 19/11 (P / A / BP / SEO) | Re-audit on production, 22/11 (P / A / BP / SEO) |
 | :--- | :--- | :---: | :---: |

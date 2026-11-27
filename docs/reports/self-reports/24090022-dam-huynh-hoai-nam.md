@@ -215,6 +215,8 @@ Ngoài các PR trên:
 | Bảng kiểm thử thủ công, ảnh ở 3 kích thước và các luồng đã đăng nhập ([#75](https://github.com/kitalikedev/FocusFlow/issues/75)) | [#76](https://github.com/kitalikedev/FocusFlow/pull/76), [#81](https://github.com/kitalikedev/FocusFlow/pull/81) |
 | Sửa tiêu đề tab ([#78](https://github.com/kitalikedev/FocusFlow/issues/78)) và cập nhật tài liệu theo Next.js ([#79](https://github.com/kitalikedev/FocusFlow/issues/79)) | [#80](https://github.com/kitalikedev/FocusFlow/pull/80) |
 | README: bản đồ barem và thay đổi sau chấm thử ([#82](https://github.com/kitalikedev/FocusFlow/issues/82)) | [#83](https://github.com/kitalikedev/FocusFlow/pull/83) |
+| Sửa dịch chuyển bố cục của chân trang làm giảm điểm Lighthouse ([#86](https://github.com/kitalikedev/FocusFlow/issues/86)) | [#87](https://github.com/kitalikedev/FocusFlow/pull/87) |
+| Tải trước ảnh xem trước, gộp 3 trang nhỏ và bỏ hiệu ứng xuất hiện ở phần dựng lớn nhất ([#88](https://github.com/kitalikedev/FocusFlow/issues/88)) | [#89](https://github.com/kitalikedev/FocusFlow/pull/89) |
 
 _(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_
 
