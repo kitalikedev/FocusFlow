@@ -117,13 +117,16 @@
 | Đánh giá UI/UX nhóm PawPass và đăng thành issue trên repo của nhóm đó ([#65](https://github.com/kitalikedev/FocusFlow/issues/65)) | [PawPass #23](https://github.com/iceruychi-netizen/PawPass-Hosothucung/issues/23) |
 | Dự họp rà soát lược đồ cơ sở dữ liệu tối 26/11 trên Discord (đủ 5 người) | Buổi 7 trong `docs/MEETING_NOTES.md` |
 
-_(Bổ sung việc không có pull request: review, thử nghiệm, hỗ trợ bạn khác, trao đổi với các nhóm khác... Xóa dòng này khi viết xong.)_
+- Trực tiếp trải nghiệm và kiểm thử giao diện website **PawPass** trên cả máy tính (Edge) và màn hình điện thoại `375px` (DevTools) theo 3 tiêu chí: dễ dùng, thẩm mỹ và thân thiện với người dùng (bao gồm kiểm tra bố cục responsive, thao tác form và điều hướng bằng phím `Tab`).
+- Tổng hợp kết quả đánh giá, cắt và khoanh vùng chi tiết các vị trí lỗi hiển thị dấu tiếng Việt của font chữ viết tay trên 5 màn hình (`#/login`, `#/dashboard`, `#/search`, `#/pets`, `#/account`), đồng thời đề xuất phương án cải thiện cho các bản cập nhật sau tại [PawPass #23](https://github.com/iceruychi-netizen/PawPass-Hosothucung/issues/23) và theo dõi đối soát PR với nhóm bạn.
+- Tham gia họp nhóm buổi 7 trên Discord để rà soát và thống nhất lược đồ cơ sở dữ liệu cùng các thành viên.
 
 ### 2. Khó khăn và cách giải quyết
 
-_(Viết vấn đề bạn gặp trong sprint này và cách bạn xử lý, bằng lời của bạn.)_
+- **Khó khăn:** Ở bản nháp đầu tiên của issue góp ý, nội dung mới chỉ kiểm thử trên máy tính và tập trung vào một màn hình nên chưa đủ chiều sâu theo nhận xét của bản chấm thử.
+- **Cách giải quyết:** Bổ sung kiểm thử trên giao diện điện thoại `375px`, kiểm tra thêm điều hướng bàn phím (`Tab`), tách riêng và khoanh đỏ vị trí lỗi trên từng ảnh chụp màn hình (che thông tin cá nhân) để cập nhật lại issue chi tiết và rõ ràng hơn.
 
 ### 3. Tự đánh giá đóng góp
 
-- Mức độ đóng góp (1 – 5): _(điền số)_
-- Nhận xét: _(viết 1 – 2 câu bằng lời của bạn)_
+- Mức độ đóng góp (1 – 5): 5
+- Nhận xét: Hoàn thành đầy đủ việc kiểm thử UI/UX chéo trên cả PC và Mobile theo nhận xét bản chấm thử, đồng thời tham gia rà soát cơ sở dữ liệu đúng tiến độ cùng nhóm.
