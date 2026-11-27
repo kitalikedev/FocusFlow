@@ -149,6 +149,17 @@ sequenceDiagram
     App-->>User: workspace shows the account's data
 ```
 
+### 1.5 Evidence: Analytics reads through the Route Handlers on production
+
+Screenshots of the browser's Network tab on the production site (`/analytics`, signed in, 26/11/2026). They show that the page no longer queries Supabase directly: it calls the two Route Handlers of the Next.js server, and both answer `200`. The `Authorization` header is not shown on purpose.
+
+| What it shows | Screenshot |
+| :--- | :-: |
+| Both requests go to the site's own `/api` and return `200`; the numbers on the page (this week, today, streak, minutes per day) come from them | <img src="images/nextjs/analytics-network-list.jpg" alt="Network tab: saved-themes and focus-sessions return 200" width="420"> |
+| The request: `GET https://focus-flow-two-wheat.vercel.app/api/focus-sessions`, status `200 OK` | <img src="images/nextjs/focus-sessions-request.jpg" alt="Request headers of /api/focus-sessions" width="420"> |
+| The response: the list of this user's focus sessions as JSON | <img src="images/nextjs/focus-sessions-response.jpg" alt="Response preview of /api/focus-sessions" width="300"> |
+
+A request without a valid token is refused (`401`); this is checked by the tests in `src/core/data/__tests__/` and by the manual test table in [`MANUAL_TESTS.md`](MANUAL_TESTS.md) (row 14).
 
 ## 2. Database rules and CRUD operations
 
