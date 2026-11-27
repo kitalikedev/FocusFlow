@@ -47,25 +47,28 @@ Open http://localhost:5180. Without any further setup the app runs in **guest mo
 
 **Connect the database (optional, needed for sign-in and the dynamic pages):**
 
-1. Create a free project at [supabase.com](https://supabase.com) and run `supabase/migrations/20261105000000_init_schema.sql` in the **SQL Editor**. It creates the 6 tables, triggers, Row Level Security policies and the `user-wallpapers` storage bucket.
+1. Create a free project at [supabase.com](https://supabase.com) and run the files in `supabase/migrations/` in the **SQL Editor**, in the order of their names. The first creates the 6 tables, triggers, Row Level Security policies and the `user-wallpapers` storage bucket; the second applies the changes from the team schema review (see section 6).
 2. Copy `.env.example` to `.env.local` and fill in the values below, then restart `npm run dev` and sign up in the app.
 
    | Variable | Required | Value |
    | :--- | :---: | :--- |
-   | `VITE_SUPABASE_URL` | For sign-in | Project URL (Project Settings > API) |
-   | `VITE_SUPABASE_PUBLISHABLE_KEY` | For sign-in | Publishable key `sb_publishable_...` (never the service role key) |
-   | `VITE_GA_MEASUREMENT_ID` | No | Google Analytics 4 ID. Empty turns tracking off |
-   | `VITE_SENTRY_DSN` | No | Sentry DSN. Empty turns error logging off |
+   | `NEXT_PUBLIC_SUPABASE_URL` | For sign-in | Project URL (Project Settings > API) |
+   | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | For sign-in | Publishable key `sb_publishable_...` (never the service role key) |
+   | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No | Google Analytics 4 ID. Empty turns tracking off |
+   | `NEXT_PUBLIC_SENTRY_DSN` | No | Sentry DSN. Empty turns error logging off |
+
+   The names used before the move to Next.js (`VITE_SUPABASE_URL` and so on) still work: `next.config.ts` reads them when the `NEXT_PUBLIC_*` ones are missing, so the settings on Vercel did not have to change.
 
 3. **Demo data (optional):** `supabase/seed.sql` adds 10 tasks, a note, 23 focus sessions over 14 days and 3 saved themes to one account. Sign up first, put that account's email in `demo_email` inside the file, paste it into the SQL Editor and run it. It is safe to run again.
 
-**Other commands:** `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`, `npm run check:secrets`.
+**Other commands:** `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build` (Next.js production build), `npm start` (serve that build on the production settings), `npm run check:secrets`.
 
 ## 3. Tools and technologies
 
 | Area | Technology |
 | :--- | :--- |
-| UI | React 18, TypeScript (strict), Vite 5, React Router 6 |
+| Framework | Next.js 16 (App Router, Route Handlers), React 18, TypeScript (strict) |
+| Page routing | React Router 6, inside one Next.js route (see below) |
 | Styling | Tailwind CSS 3 |
 | State | Zustand |
 | Backend | Supabase: Auth, PostgreSQL 15, Storage, REST API |
@@ -75,6 +78,13 @@ Open http://localhost:5180. Without any further setup the app runs in **guest mo
 | Project management | GitHub Issues, Milestones, Pull Requests |
 
 **Why Supabase instead of our own Node.js server?** Supabase gives a real PostgreSQL database with a REST API generated from the schema. The rules a backend would normally check (who can read which rows, input limits, how many items a user may have) are written in the database itself, as Row Level Security policies, `CHECK` constraints and triggers. The frontend talks to it through one class, `SupabaseRepository`, which plays the role of the backend service layer. Details: [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md).
+
+**How we use Next.js.** The project is built, served and deployed as a Next.js 16 app (App Router). It was moved from Vite after the trial grading, in the pull requests of [Issue #60](https://github.com/kitalikedev/FocusFlow/issues/60) and [Issue #61](https://github.com/kitalikedev/FocusFlow/issues/61):
+
+- **Build, server and security headers:** `next build` and `next start`; the Content Security Policy and the other security headers are set in `next.config.ts`; Vercel is told to build it as Next.js in `vercel.json`.
+- **Route Handlers:** the Analytics and Themes pages no longer query Supabase straight from the browser. They call `/api/focus-sessions` and `/api/saved-themes`, which run on the server, check the user's access token and query Supabase as that user, so Row Level Security still decides which rows come back (no service role key anywhere). A request without a valid token gets `401`.
+- **Page titles:** every page is built ahead of time with its own `<title>` (`generateMetadata`).
+- **One route for the interface:** the app keeps its pages, timer and music in one client-side tree, and the Next.js route `app/[[...slug]]` renders it for every path. This is on purpose: the timer and the music keep playing while you move between pages, which separate server-rendered routes would interrupt. Page navigation inside it is done by React Router.
 
 ## 4. Website pages
 
@@ -266,8 +276,8 @@ The team met to agree on the roles below (meeting notes: [`docs/MEETING_NOTES.md
 
 - **Database:** the brief asks for MySQL or PostgreSQL; we use **PostgreSQL** through Supabase (see [section 3](#3-tools-and-technologies) for why there is no separate Node.js server).
 - **Dynamic pages:** `/analytics` and `/themes` show data from the database for a signed-in user. Load the demo data from [section 2](#2-how-to-run-the-application) to see them filled. Without signing in they read the data saved in the browser.
-- **Security:** no `.env` files in git (a pre-commit hook and a CI step check it), Row Level Security on every table, a Content Security Policy on Vercel. Details: [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md#3-security-testing-and-cicd).
-- **Testing:** 65 test files, 666 tests (Vitest, React Testing Library), run on every pull request. A second CI job applies the migrations and the demo data on a real PostgreSQL 15 and runs the database tests of [`docs/ERD.md`](docs/ERD.md) section 11 (Row Level Security, per-user limits, last write wins, same-owner foreign key). Manual test table and screenshots of every page at 375, 768 and 1440 px: [`docs/MANUAL_TESTS.md`](docs/MANUAL_TESTS.md) (in Vietnamese).
+- **Security:** no `.env` files in git (a pre-commit hook and a CI step check it), Row Level Security on every table, a Content Security Policy set in `next.config.ts`. Details: [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md#3-security-testing-and-cicd).
+- **Testing:** 66 test files, 677 tests (Vitest, React Testing Library), run on every pull request. A second CI job applies the migrations and the demo data on a real PostgreSQL 15 and runs the database tests of [`docs/ERD.md`](docs/ERD.md) section 11 (Row Level Security, per-user limits, last write wins, same-owner foreign key). Manual test table and screenshots of every page at 375, 768 and 1440 px: [`docs/MANUAL_TESTS.md`](docs/MANUAL_TESTS.md) (in Vietnamese).
 - **Documentation:** [`PRD`](docs/PRD.md), [`ARCHITECTURE`](docs/ARCHITECTURE.md), [`ERD`](docs/ERD.md), [`API_DOCS`](docs/API_DOCS.md), [`plans/`](docs/plans/), [`PROGRESS`](docs/PROGRESS.md), [`FEATURES`](docs/FEATURES.md), [`SYSTEM_DESIGN`](docs/SYSTEM_DESIGN.md), [`PROJECT_MANAGEMENT`](docs/PROJECT_MANAGEMENT.md), [`MONITORING`](docs/MONITORING.md), [`reports/`](docs/reports/).
 
 ## 10. Team

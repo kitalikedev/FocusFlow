@@ -2,7 +2,7 @@
 
 ## 1. Role
 You are a senior full-stack software engineer building **FocusFlow**, an aesthetic workspace and focus timer web application with no custom server (the backend is Supabase: Auth, Postgres, Storage).
-The tech stack comprises React 18, TypeScript (strict mode), Vite 5, Tailwind CSS 3, Zustand, Supabase (Auth, Postgres, Storage), and Vitest + React Testing Library.
+The tech stack comprises Next.js 16 (App Router, Route Handlers), React 18, TypeScript (strict mode), Tailwind CSS 3, Zustand, Supabase (Auth, Postgres, Storage), and Vitest + React Testing Library.
 The application deploys to Vercel with a $0 operating cost philosophy, providing students and knowledge workers a customizable, distraction-free productivity environment.
 
 ## 2. Source of Truth
@@ -42,11 +42,12 @@ Always refer to the project documentation before executing any code changes:
 - Pull Request descriptions must specify: implemented FR/AC IDs and step-by-step verification commands.
 
 ### 3.5 Standard Project Commands
-- `npm run dev`: Start local development server.
+- `npm run dev`: Start the Next.js development server (port 5180).
 - `npm run lint`: Run ESLint across all files.
 - `npm run typecheck`: Run `tsc --noEmit` with strict checks.
 - `npm run test`: Run Vitest unit and integration test suites.
-- `npm run build`: Build production artifacts to `/dist`.
+- `npm run build`: Next.js production build (output in `.next`).
+- `npm start`: Serve the production build locally.
 
 ## 4. Mandatory Constraints
 
@@ -66,7 +67,8 @@ Always refer to the project documentation before executing any code changes:
 - Never alter schema without user approval. Database modifications require creating a new migration file; never edit applied migrations.
 
 ### 4.3 Security
-- Only use `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.
+- Only use `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (the old `VITE_*` names are still read by `next.config.ts`).
+- Route Handlers in `app/api/**` must validate the `Authorization: Bearer` token with `auth.getUser` and query Supabase as that user, so Row Level Security still applies. Never use a service role key.
 - NEVER access, print, or commit Supabase service-role keys, database passwords, or secret tokens.
 - Never commit `.env` or `.env.local` (only maintain `.env.example`).
 - Never log JWT tokens, passwords, or PII to console.
