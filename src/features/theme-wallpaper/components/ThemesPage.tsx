@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { PageShell } from '@/core/ui/PageShell';
@@ -89,6 +89,9 @@ export const ThemesPage: React.FC = () => {
   const [savedId, setSavedId] = useState<string | null>(null);
 
   const sitePreset = THEME_PRESETS.find((preset) => preset.id === presetId) ?? THEME_PRESETS[0];
+  // The picture is the largest paint of this page, so it is shown at once when the page opens and only slides in
+  // when the visitor picks another theme (a picture that fades in counts for Lighthouse only once it is visible).
+  const openingPresetId = useRef(sitePreset.id).current;
   const saved = savedThemes.find((theme) => theme.id === savedId);
   const selectedName = saved?.name ?? sitePreset.name;
   const selectedAccent = (saved?.config ?? sitePreset.config).tokens.colorAccent;
@@ -105,7 +108,7 @@ export const ThemesPage: React.FC = () => {
       testId="themes-page"
       description="12 built-in themes. Each one sets the colors, the clock font and the wallpaper. Pick one and this whole site wears it, then apply it in the workspace."
     >
-      <Reveal className="mb-6">
+      <Reveal immediate className="mb-6">
         {saved ? (
           <div
             className="flex aspect-[16/10] items-center justify-center rounded-2xl border border-site-line text-[18vw] font-bold sm:text-[140px]"
@@ -129,7 +132,7 @@ export const ThemesPage: React.FC = () => {
               width={1440}
               height={900}
               decoding="async"
-              className="site-slide-in absolute inset-0 h-full w-full object-cover"
+              className={`${sitePreset.id === openingPresetId ? '' : 'site-slide-in'} absolute inset-0 h-full w-full object-cover`}
             />
           </div>
         )}

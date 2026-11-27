@@ -6,6 +6,8 @@ interface RevealProps {
   /** Position in a group: each next item starts a little later. */
   index?: number;
   as?: 'div' | 'li' | 'figure' | 'section';
+  /** Show the content at once, without the slide-in. For what is already on screen when the page opens. */
+  immediate?: boolean;
 }
 
 /**
@@ -17,9 +19,10 @@ export const Reveal: React.FC<RevealProps> = ({
   className = '',
   index = 0,
   as: Tag = 'div',
+  immediate = false,
 }) => {
   const ref = useRef<HTMLElement>(null);
-  const [isVisible, setVisible] = useState(() => typeof IntersectionObserver === 'undefined');
+  const [isVisible, setVisible] = useState(() => immediate || typeof IntersectionObserver === 'undefined');
 
   useEffect(() => {
     const element = ref.current;

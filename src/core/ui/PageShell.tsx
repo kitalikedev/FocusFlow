@@ -28,12 +28,9 @@ export const PageShell: React.FC<PageShellProps> = ({ title, description, testId
           {title}
         </h1>
         {description && (
-          <p
-            className="site-rise max-w-xl text-[17px] leading-relaxed text-site-muted"
-            style={{ '--i': 2 } as React.CSSProperties}
-          >
-            {description}
-          </p>
+          // No entrance animation here: on a phone this paragraph is the largest paint of the page, and the browser
+          // only counts it once it is no longer transparent, so the animation delayed the Lighthouse LCP.
+          <p className="max-w-xl text-[17px] leading-relaxed text-site-muted">{description}</p>
         )}
       </header>
       {children}
