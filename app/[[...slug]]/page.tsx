@@ -17,6 +17,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return { title: titleForPath(slug) };
 }
 
-export default function Page() {
-  return <ClientApp />;
+// The biggest element of the Themes page is the picture of the workspace in the default theme (nebula). The browser
+// only learns about it once the app has started, which delays the largest paint (Lighthouse LCP), so ask for it up
+// front. The values are the ones the page uses for its `<img>` (ThemesPage.tsx).
+const THEMES_PREVIEW = {
+  small: '/images/home/theme-nebula-720.webp',
+  srcSet: '/images/home/theme-nebula-720.webp 720w, /images/home/theme-nebula.webp 1440w',
+  sizes: '(min-width: 1200px) 1160px, calc(100vw - 32px)',
+};
+
+export default async function Page({ params }: PageProps) {
+  const { slug } = await params;
+  return (
+    <>
+      {slug?.[0] === 'themes' && (
+        <link
+          rel="preload"
+          as="image"
+          href={THEMES_PREVIEW.small}
+          imageSrcSet={THEMES_PREVIEW.srcSet}
+          imageSizes={THEMES_PREVIEW.sizes}
+          fetchPriority="high"
+        />
+      )}
+      <ClientApp />
+    </>
+  );
 }
